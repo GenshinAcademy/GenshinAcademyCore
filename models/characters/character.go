@@ -72,7 +72,14 @@ type CharaterLevel uint8
 
 type Character struct {
 	common.Entity
-	Name CharacterName `json:"name"`
+	Name                   CharacterName  `json:"name"`
+	Element                common.Element `json:"element"`
+	AutoAttack             *Skill         `json:"autoAttack"`
+	Skill                  *Skill         `json:"elementalSkill"`
+	Burst                  *Skill         `json:"burst"`
+	AscensionPassiveFirst  *Skill
+	AscensionPassiveSecond *Skill
+	Passive                *Skill
 
-	stats map[uint8]CharacterStats
+	stats *map[uint8]CharacterStats
 }

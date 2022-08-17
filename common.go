@@ -11,6 +11,7 @@ const (
 	ArtifactMainStatType      EntityType = iota
 	ArtifactSecondaryStatType EntityType = iota
 	ModifierType              EntityType = iota
+	ElementType               EntityType = iota
 )
 
 type EntityId uint64
