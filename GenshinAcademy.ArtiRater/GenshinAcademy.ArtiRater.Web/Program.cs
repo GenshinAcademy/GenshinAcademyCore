@@ -6,15 +6,16 @@ namespace GenshinAcademy.ArtiRater.Web
 {
     public class Program
     {
-        public static async Task Main(string[] args)
+        public static void Main(string[] args)
         {
             IWebHost host = BuildWebHost(args);
-            await host.RunAsync();
+            host.Run();
         }
 
         public static IWebHost BuildWebHost(string[] args) =>
             WebHost.CreateDefaultBuilder(args)
             .UseStartup<Startup>()
+            .UseWebRoot("static")
             .Build();
     }
 }
