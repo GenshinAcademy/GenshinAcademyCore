@@ -20,12 +20,20 @@ namespace GenshinAcademy.ArtiRater.Web.Data
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             modelBuilder.Entity<Character>()
-                .HasMany(x => x.StatsProfit)
-                .WithOne(y => y.OwnerCharacter)
-                .HasForeignKey(y => y.OwnerCharacterId);
+                .HasMany(character => character.StatsProfit)
+                .WithOne(profit => profit.OwnerCharacter)
+                .HasForeignKey(profit => profit.OwnerCharacterId);
+            modelBuilder.Entity<Character>().Property(character => character.IconUrl)
+                .HasConversion<string>();
+            modelBuilder.Entity<Character>()
+                .Property(character => character.CharacterNameId)
+                .IsRequired();
+            modelBuilder.Entity<Character>()
+                .HasIndex(character => character.CharacterNameId)
+                .IsUnique();
 
             modelBuilder.Entity<ArtifactStatsProfit>()
-                .Property(y => y.Type)
+                .Property(profit => profit.Type)
                 .HasConversion<int>();
         }
     }
