@@ -1,4 +1,5 @@
 ﻿using GenshinAcademy.ArtiRater.Web.Data;
+using GenshinAcademy.ArtiRater.Web.Models;
 using GenshinAcademy.ArtiRater.Web.WebModels;
 using Microsoft.AspNetCore.Mvc;
 
@@ -8,33 +9,43 @@ namespace GenshinAcademy.ArtiRater.Web.Controllers
     public class CharactersController : Controller
     {
         private ArtiRaterContext _context;
-        private ArtiRaterRepository _repository;
+        private ArtifactRaterRepository _repository;
 
         public CharactersController(ArtiRaterContext context)
         {
             _context = context;
-            _repository = new ArtiRaterRepository(_context);
+            _repository = new ArtifactRaterRepository(_context);
         }
 
         [HttpGet("list")]
-        public async Task<IActionResult> GetCharactersList()
+        public async Task<IActionResult> GetCharactersList([FromQuery] string element)
         {
-            var chars = await _repository.GetCharacters();
+            if (!string.IsNullOrEmpty(element))
+            {
+                IEnumerable<Character> foundCharacters = await _repository.GetCharactersByElementAsync(element, false);
+                return Ok(foundCharacters.Select(x => new CharacterModel(x)).ToArray());
+            }
+
+            IEnumerable<Character> chars = await _repository.GetAllCharactersListAsync();
             return Ok(chars.Select(x => new CharacterModel(x)).ToArray());
         }
 
         [HttpGet("artifacts")]
-        public async Task<IActionResult> GetCharactersProfits()
+        public async Task<IActionResult> GetCharactersProfits([FromQuery]string character, [FromQuery] string element)
         {
-            var chars = await _repository.GetCharactersWithProfits();
-            return Ok(chars.Select(x => new CharacterWithProfitsModel(x, x.StatsProfit)).ToArray());
-        }
+            if (!string.IsNullOrEmpty(character))
+            {
+                Character foundCharacter = await _repository.GetCharacterByIdAsync(character);
+                return Ok(new CharacterWithProfitsModel(foundCharacter, foundCharacter.StatsProfit));
+            }
+            if (!string.IsNullOrEmpty(element))
+            {
+                IEnumerable<Character> foundCharacters = await _repository.GetCharactersByElementAsync(element, true);
+                return Ok(foundCharacters.Select(x => new CharacterWithProfitsModel(x, x.StatsProfit)).ToArray());
+            }
 
-        [HttpGet("artifacts/{character}")]
-        public async Task<IActionResult> GetCharactersList([FromRoute]string character)
-        {
-            await Task.CompletedTask;
-            return Ok();
+            IEnumerable<Character> chars = await _repository.GetAllCharactersWithProfitsAsync();
+            return Ok(chars.Select(x => new CharacterWithProfitsModel(x, x.StatsProfit)).ToArray());
         }
     }
 }
