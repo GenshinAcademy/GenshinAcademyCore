@@ -9,14 +9,14 @@ namespace GenshinAcademy.ArtiRater.Web.WebModels
     {
 
         [JsonPropertyName("stats_profit")]
-        public IReadOnlyDictionary<string, ArtifactProfitModel> StatsProft { get; set; }
+        public IReadOnlyDictionary<string, object> StatsProft { get; set; }
 
         public CharacterWithProfitsModel(Character dataModel, IEnumerable<ArtifactStatsProfit> profits) : base(dataModel)
         {
             Name = dataModel.Name;
             Element = dataModel.Element;
             IconUrl = dataModel.IconUrl;
-            var dictionary = new Dictionary<string, ArtifactProfitModel>(6);
+            var dictionary = new Dictionary<string, object>(6);
             foreach (ArtifactStatsProfit profit in profits)
             {
                 ArtifactProfitModel model = profit.Type switch
