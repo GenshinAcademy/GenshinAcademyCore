@@ -6,6 +6,8 @@
 
         public string Name { get; set; }
 
+        public string CharacterNameId { get; set; }
+
         public string Element { get; set; }
         
         public Uri IconUrl { get; set; }
