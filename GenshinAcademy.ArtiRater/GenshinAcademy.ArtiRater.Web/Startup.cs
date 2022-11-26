@@ -23,7 +23,6 @@ namespace GenshinAcademy.ArtiRater.Web
             {
                 x.UseNpgsql(Configuration["ConnectionStrings:Postgres"]);
             });
-            services.AddAuthorization();
             services.AddCors();
         }
 
