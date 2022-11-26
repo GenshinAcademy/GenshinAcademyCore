@@ -7,6 +7,7 @@ namespace GenshinAcademy.ArtiRater.Web.Models
         public int Id { get; set; }
 
         public Character? OwnerCharacter { get; set; }
+
         public int OwnerCharacterId { get; set; }
 
         public int Attack { get; set; }
