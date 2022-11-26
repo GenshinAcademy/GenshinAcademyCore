@@ -9,6 +9,9 @@ namespace GenshinAcademy.ArtiRater.Web.WebModels
         [JsonPropertyName("name")]
         public string Name { get; set; }
 
+        [JsonPropertyName("character_id")]
+        public string CharacterId { get; set; }
+
         [JsonPropertyName("element")]
         public string Element { get; set; }
 
@@ -18,6 +21,7 @@ namespace GenshinAcademy.ArtiRater.Web.WebModels
         public CharacterModel(Character dataModel)
         {
             Name = dataModel.Name;
+            CharacterId = dataModel.CharacterNameId;
             Element = dataModel.Element;
             IconUrl = dataModel.IconUrl;
         }
