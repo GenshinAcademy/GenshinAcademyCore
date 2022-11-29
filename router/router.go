@@ -22,6 +22,7 @@ func NewRouter(controller RouterController) *gin.Engine {
 	{
 		character.GET("characters/", controller.Ferret.GetCharacters)
 		character.GET("characters/:id", controller.Ferret.GetCharacters)
+		character.GET("characters/stats", controller.Ferret.GetCharactersStats)
 	}
 
 	r.NoRoute(func(c *gin.Context) {

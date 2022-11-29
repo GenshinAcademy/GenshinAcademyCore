@@ -6,6 +6,7 @@ import (
 )
 
 type FerretServiceInterface interface {
+	GetAllCharactersStats() (*[]models.CharacterArtifactStatsProfit, error)
 	GetAllCharacters() (*[]models.Character, error)
 	GetCharacter(id string) (*[]models.Character, error)
 }
@@ -18,6 +19,10 @@ func NewFerretService(repoFerret repository.FerretRepositoryInterface) FerretSer
 	return &FerretService{
 		FerretRepository: repoFerret,
 	}
+}
+
+func (f *FerretService) GetAllCharactersStats() (*[]models.CharacterArtifactStatsProfit, error) {
+	return f.FerretRepository.GetAllCharactersStats("Types")
 }
 
 func (f *FerretService) GetAllCharacters() (*[]models.Character, error) {

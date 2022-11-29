@@ -9,6 +9,7 @@ import (
 )
 
 type FerretRepositoryInterface interface {
+	GetAllCharactersStats(preloads ...string) (*[]models.CharacterArtifactStatsProfit, error)
 	GetAllCharacters(preloads ...string) (*[]models.Character, error)
 	GetCharacter(id string, preloads ...string) (*[]models.Character, error)
 	CreateTx() *gorm.DB
@@ -24,6 +25,15 @@ func NewFerretRepository(dbConfig config.Database) FerretRepositoryInterface {
 	return &FerretRepository{
 		DB: dbConfig.ORM,
 	}
+}
+
+func (p *FerretRepository) GetAllCharactersStats(preloads ...string) (*[]models.CharacterArtifactStatsProfit, error) {
+	character := &[]models.CharacterArtifactStatsProfit{}
+	if err := p.DBWithPreloads(preloads).Find(character).Error; err != nil {
+		logger.Log.Error("Error GetAllCharacters")
+		return nil, err
+	}
+	return character, nil
 }
 
 func (p *FerretRepository) GetAllCharacters(preloads ...string) (*[]models.Character, error) {
