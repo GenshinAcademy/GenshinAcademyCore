@@ -7,7 +7,7 @@ type ArtifactStats struct {
 	Health            int `json:"health"`
 	HealthPercentage  int `json:"healthPercentage"`
 	Defense           int `json:"defense"`
-	DefensePercentage int `json:"defensePercentage`
+	DefensePercentage int `json:"defensePercentage"`
 	ElementalMastery  int `json:"elementalMastery"`
 	EnergyRecharge    int `json:"energyRecharge"`
 	ElementalDamage   int `json:"elementalDamage"`
