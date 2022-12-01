@@ -22,13 +22,13 @@ func NewFerretService(repoFerret repository.FerretRepositoryInterface) FerretSer
 }
 
 func (f *FerretService) GetAllCharactersStats() (*[]models.CharacterArtifactStatsProfit, error) {
-	return f.FerretRepository.GetAllCharactersStats("Types")
+	return f.FerretRepository.GetAllCharactersStats()
 }
 
 func (f *FerretService) GetAllCharacters() (*[]models.Character, error) {
-	return f.FerretRepository.GetAllCharacters("Types")
+	return f.FerretRepository.GetAllCharacters()
 }
 
 func (f *FerretService) GetCharacter(id string) (*[]models.Character, error) {
-	return f.FerretRepository.GetCharacter(id, "Types")
+	return f.FerretRepository.GetCharacter(id)
 }

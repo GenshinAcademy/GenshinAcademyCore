@@ -3,7 +3,7 @@ package repository
 import (
 	"genshinacademycore/config"
 	"genshinacademycore/logger"
-	"genshinacademycore/models"
+	models "genshinacademycore/models/db"
 
 	"gorm.io/gorm"
 )

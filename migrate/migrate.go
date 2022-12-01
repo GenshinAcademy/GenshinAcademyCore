@@ -5,7 +5,7 @@ import (
 	"log"
 
 	"genshinacademycore/config"
-	"genshinacademycore/models"
+	models "genshinacademycore/models/db"
 )
 
 var DB config.Database
@@ -20,6 +20,6 @@ func init() {
 }
 
 func main() {
-	DB.ORM.AutoMigrate(&models.CharacterArtifactStatsProfit{}, &models.Flower{}, &models.Circlet{}, &models.Feather{}, &models.Goblet{}, &models.Sands{}, &models.Substats{})
+	DB.ORM.AutoMigrate(&models.Character{}, models.Name{}, models.StatsProfit{})
 	fmt.Println("Migration complete")
 }
