@@ -8,8 +8,17 @@ import (
 	"gorm.io/gorm"
 )
 
+const (
+	PreloadCharacterName   string = "Name"
+	PerloadCharacterProfit string = "StatsProfit"
+)
+
+var (
+	CharacterAllPreloads []string = []string{PreloadCharacterName, PerloadCharacterProfit}
+)
+
 type FerretRepositoryInterface interface {
-	GetAllCharactersStats(preloads ...string) (*[]models_db.Character, error)
+	GetAllCharactersStats() (*[]models_db.Character, error)
 	// GetAllCharacters(preloads ...string) (*[]models.Character, error)
 	// GetCharacter(id string, preloads ...string) (*[]models.Character, error)
 	CreateTx() *gorm.DB
@@ -17,23 +26,23 @@ type FerretRepositoryInterface interface {
 	CommitTx() error
 }
 
-type FerretRepository struct {
+type ferretRepository struct {
 	DB *gorm.DB
 }
 
 func NewFerretRepository(dbConfig config.Database) FerretRepositoryInterface {
-	return &FerretRepository{
+	return &ferretRepository{
 		DB: dbConfig.ORM,
 	}
 }
 
-func (p *FerretRepository) GetAllCharactersStats(preloads ...string) (*[]models_db.Character, error) {
-	character := &[]models_db.Character{}
-	if err := p.DBWithPreloads(preloads).Find(character).Error; err != nil {
+func (repo *ferretRepository) GetAllCharactersStats() (*[]models_db.Character, error) {
+	characters := &[]models_db.Character{}
+	if err := repo.DBWithPreloads(CharacterAllPreloads).Find(characters).Error; err != nil {
 		logger.Log.Error("Error GetAllCharacters")
 		return nil, err
 	}
-	return character, nil
+	return characters, nil
 }
 
 // func (p *FerretRepository) GetAllCharacters(preloads ...string) (*[]models.Character, error) {
@@ -55,7 +64,7 @@ func (p *FerretRepository) GetAllCharactersStats(preloads ...string) (*[]models_
 // }
 
 // DBWithPreloads - preload data.
-func (p *FerretRepository) DBWithPreloads(preloads []string) *gorm.DB {
+func (p *ferretRepository) DBWithPreloads(preloads []string) *gorm.DB {
 	dbConn := p.DB
 
 	for _, preload := range preloads {
@@ -66,16 +75,16 @@ func (p *FerretRepository) DBWithPreloads(preloads []string) *gorm.DB {
 }
 
 // CreateTx - create database transaction
-func (p *FerretRepository) CreateTx() *gorm.DB {
+func (p *ferretRepository) CreateTx() *gorm.DB {
 	return p.DB.Begin()
 }
 
 // RollbackTx - rollback transaction
-func (p *FerretRepository) RollbackTx() *gorm.DB {
+func (p *ferretRepository) RollbackTx() *gorm.DB {
 	return p.DB.Rollback()
 }
 
 // CommitTx - commit transaction
-func (p *FerretRepository) CommitTx() error {
+func (p *ferretRepository) CommitTx() error {
 	return p.DB.Commit().Error
 }
