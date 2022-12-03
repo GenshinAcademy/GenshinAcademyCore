@@ -3,15 +3,15 @@ package repository
 import (
 	"genshinacademycore/config"
 	"genshinacademycore/logger"
-	models "genshinacademycore/models/db"
+	models_db "genshinacademycore/models/db"
 
 	"gorm.io/gorm"
 )
 
 type FerretRepositoryInterface interface {
-	GetAllCharactersStats(preloads ...string) (*[]models.CharacterArtifactStatsProfit, error)
-	GetAllCharacters(preloads ...string) (*[]models.Character, error)
-	GetCharacter(id string, preloads ...string) (*[]models.Character, error)
+	GetAllCharactersStats(preloads ...string) (*[]models_db.Character, error)
+	// GetAllCharacters(preloads ...string) (*[]models.Character, error)
+	// GetCharacter(id string, preloads ...string) (*[]models.Character, error)
 	CreateTx() *gorm.DB
 	RollbackTx() *gorm.DB
 	CommitTx() error
@@ -27,8 +27,8 @@ func NewFerretRepository(dbConfig config.Database) FerretRepositoryInterface {
 	}
 }
 
-func (p *FerretRepository) GetAllCharactersStats(preloads ...string) (*[]models.CharacterArtifactStatsProfit, error) {
-	character := &[]models.CharacterArtifactStatsProfit{}
+func (p *FerretRepository) GetAllCharactersStats(preloads ...string) (*[]models_db.Character, error) {
+	character := &[]models_db.Character{}
 	if err := p.DBWithPreloads(preloads).Find(character).Error; err != nil {
 		logger.Log.Error("Error GetAllCharacters")
 		return nil, err
@@ -36,23 +36,23 @@ func (p *FerretRepository) GetAllCharactersStats(preloads ...string) (*[]models.
 	return character, nil
 }
 
-func (p *FerretRepository) GetAllCharacters(preloads ...string) (*[]models.Character, error) {
-	character := &[]models.Character{}
-	if err := p.DBWithPreloads(preloads).Find(character).Error; err != nil {
-		logger.Log.Error("Error GetAllCharacters")
-		return nil, err
-	}
-	return character, nil
-}
+// func (p *FerretRepository) GetAllCharacters(preloads ...string) (*[]models.Character, error) {
+// 	character := &[]models.Character{}
+// 	if err := p.DBWithPreloads(preloads).Find(character).Error; err != nil {
+// 		logger.Log.Error("Error GetAllCharacters")
+// 		return nil, err
+// 	}
+// 	return character, nil
+// }
 
-func (p *FerretRepository) GetCharacter(id string, preloads ...string) (*[]models.Character, error) {
-	character := &[]models.Character{}
-	if err := p.DBWithPreloads(preloads).Where("id = ?", id).Find(character).Error; err != nil {
-		logger.Log.Error("Error GetCharacter")
-		return nil, err
-	}
-	return character, nil
-}
+// func (p *FerretRepository) GetCharacter(id string, preloads ...string) (*[]models.Character, error) {
+// 	character := &[]models.Character{}
+// 	if err := p.DBWithPreloads(preloads).Where("id = ?", id).Find(character).Error; err != nil {
+// 		logger.Log.Error("Error GetCharacter")
+// 		return nil, err
+// 	}
+// 	return character, nil
+// }
 
 // DBWithPreloads - preload data.
 func (p *FerretRepository) DBWithPreloads(preloads []string) *gorm.DB {

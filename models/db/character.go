@@ -1,7 +1,7 @@
 package db
 
 type Character struct {
-	ID          int
+	ID          int `json:"-"`
 	CharacterId string
 	Element     string
 	Name        Name        `gorm:"foreignKey:ID"`
@@ -9,13 +9,13 @@ type Character struct {
 }
 
 type Name struct {
-	ID      int
+	ID      int `json:"-"`
 	English string
 	Russian string
 }
 
 type StatsProfit struct {
-	ID                int
+	ID                int `json:"-"`
 	Type              string
 	Attack            int
 	AttackPercentage  int

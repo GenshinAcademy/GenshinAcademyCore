@@ -1,14 +1,14 @@
 package service
 
 import (
-	"genshinacademycore/models"
+	models_db "genshinacademycore/models/db"
 	"genshinacademycore/repository"
 )
 
 type FerretServiceInterface interface {
-	GetAllCharactersStats() (*[]models.CharacterArtifactStatsProfit, error)
-	GetAllCharacters() (*[]models.Character, error)
-	GetCharacter(id string) (*[]models.Character, error)
+	GetAllCharactersStats() (*[]models_db.Character, error)
+	// GetAllCharacters() (*[]models.Character, error)
+	// GetCharacter(id string) (*[]models.Character, error)
 }
 
 type FerretService struct {
@@ -21,14 +21,14 @@ func NewFerretService(repoFerret repository.FerretRepositoryInterface) FerretSer
 	}
 }
 
-func (f *FerretService) GetAllCharactersStats() (*[]models.CharacterArtifactStatsProfit, error) {
+func (f *FerretService) GetAllCharactersStats() (*[]models_db.Character, error) {
 	return f.FerretRepository.GetAllCharactersStats()
 }
 
-func (f *FerretService) GetAllCharacters() (*[]models.Character, error) {
-	return f.FerretRepository.GetAllCharacters()
-}
+// func (f *FerretService) GetAllCharacters() (*[]models.Character, error) {
+// 	return f.FerretRepository.GetAllCharacters()
+// }
 
-func (f *FerretService) GetCharacter(id string) (*[]models.Character, error) {
-	return f.FerretRepository.GetCharacter(id)
-}
+// func (f *FerretService) GetCharacter(id string) (*[]models.Character, error) {
+// 	return f.FerretRepository.GetCharacter(id)
+// }

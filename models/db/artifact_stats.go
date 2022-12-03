@@ -1,7 +1,7 @@
 package db
 
 type ArtifactStats struct {
-	ID                int
+	ID                int `json:"-"`
 	Type              string
 	Attack            int
 	AttackPercentage  int
