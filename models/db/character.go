@@ -3,9 +3,9 @@ package db
 type Character struct {
 	ID          int `json:"-"`
 	CharacterId string
-	Element     string
-	Name        Name        `gorm:"foreignKey:ID"`
-	StatsProfit StatsProfit `gorm:"foreignKey:ID"`
+	Name        Name          `gorm:"foreignKey:ID"`
+	Element     Element       `gorm:"many2many:character_elements"`
+	StatsProfit []StatsProfit `gorm:"foreignKey:OwnerID"`
 }
 
 type Name struct {
@@ -14,30 +14,7 @@ type Name struct {
 	Russian string
 }
 
-type StatsProfit struct {
-	ID                int `json:"-"`
-	Type              string
-	Attack            int
-	AttackPercentage  int
-	Health            int
-	HealthPercentage  int
-	Defense           int
-	DefensePercentage int
-	ElementalMastery  int
-	EnergyRecharge    int
-	ElementalDamage   int
-	CritRate          int
-	CritDamage        int
-	PhysicalDamage    int
-	Heal              int
+type Element struct {
+	ID   int `json:"-"`
+	Name string
 }
-
-// type StatsProfit struct {
-// 	ID       int
-// 	Flower   FlowerProfit   `gorm:"foreignKey:ID"`
-// 	Feather  FeatherProfit  `gorm:"foreignKey:ID"`
-// 	Sands    SandsProfit    `gorm:"foreignKey:ID"`
-// 	Goblet   GobletProfit   `gorm:"foreignKey:ID"`
-// 	Circlet  CircletProfit  `gorm:"foreignKey:ID"`
-// 	Substats SubstatsProfit `gorm:"foreignKey:ID"`
-// }

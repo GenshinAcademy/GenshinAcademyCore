@@ -1,8 +1,9 @@
 package db
 
-type ArtifactStats struct {
-	ID                int `json:"-"`
-	Type              string
+type StatsProfit struct {
+	ID                int  `json:"-"`
+	OwnerID           int  `json:"-"`
+	Slot              Slot `gorm:"many2many:artifact_slots"`
 	Attack            int
 	AttackPercentage  int
 	Health            int
