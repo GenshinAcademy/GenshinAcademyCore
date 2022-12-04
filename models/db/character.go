@@ -3,8 +3,10 @@ package db
 type Character struct {
 	ID          int `json:"-"`
 	CharacterId string
-	Name        Name          `gorm:"foreignKey:ID"`
-	Element     Element       `gorm:"many2many:character_elements"`
+	NameID      int
+	Name        Name
+	ElementID   int
+	Element     Element
 	StatsProfit []StatsProfit `gorm:"foreignKey:OwnerID"`
 }
 

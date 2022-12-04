@@ -1,9 +1,10 @@
 package db
 
 type StatsProfit struct {
-	ID                int  `json:"-"`
-	OwnerID           int  `json:"-"`
-	Slot              Slot `gorm:"many2many:artifact_slots"`
+	ID                int `json:"-"`
+	OwnerID           int `json:"-"`
+	SlotID            int `json:"-"`
+	Slot              Slot
 	Attack            int
 	AttackPercentage  int
 	Health            int
