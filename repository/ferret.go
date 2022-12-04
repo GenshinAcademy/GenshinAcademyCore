@@ -9,14 +9,15 @@ import (
 )
 
 const (
-	PreloadCharacterName string = "Name"
-	PreloadStatsProfit   string = "StatsProfit"
-	PreloadElement       string = "Element"
-	PreloadSlot          string = "Slot"
+	PreloadCharacterName   string = "Name"
+	PreloadStatsProfit     string = "StatsProfit"
+	PreloadElement         string = "Element"
+	PreloadSlot            string = "Slot"
+	PreloadStatsProfitSlot string = PreloadStatsProfit + "." + PreloadSlot
 )
 
 var (
-	CharacterAllPreloads []string = []string{PreloadCharacterName, PreloadStatsProfit}
+	CharacterAllPreloads []string = []string{PreloadCharacterName, PreloadStatsProfit, PreloadElement, PreloadStatsProfitSlot}
 )
 
 type FerretRepositoryInterface interface {
