@@ -24,13 +24,22 @@ func InitDB(env *Config) Database {
 		"LstdFlags": oldLog.LstdFlags,
 	})
 
+	var logLevel gormLogger.LogLevel
+
+	switch env.ENV {
+	case "release":
+		logLevel = gormLogger.Silent
+	default:
+		logLevel = gormLogger.Info
+	}
+
 	newLogger := gormLogger.New(
 		log, // io writer
 		gormLogger.Config{
-			SlowThreshold:             time.Second,     // Slow SQL threshold
-			LogLevel:                  gormLogger.Info, // Log level
-			IgnoreRecordNotFoundError: true,            // Ignore ErrRecordNotFound error for logger
-			Colorful:                  true,            // Disable color
+			SlowThreshold:             time.Second, // Slow SQL threshold
+			LogLevel:                  logLevel,    // Log level
+			IgnoreRecordNotFoundError: true,        // Ignore ErrRecordNotFound error for logger
+			Colorful:                  true,        // Disable color
 		},
 	)
 

@@ -1,7 +1,6 @@
 package service
 
 import (
-	"fmt"
 	models_db "genshinacademycore/models/db"
 	models_web "genshinacademycore/models/web"
 	"genshinacademycore/repository"
@@ -66,7 +65,6 @@ func CharacterFromDBModel(character *models_db.Character) models_web.Character {
 }
 
 func StatsFromDBModel(stats *models_db.StatsProfit) interface{} {
-	fmt.Println(stats.Slot.ID)
 	switch stats.Slot.Name {
 	case "Flower":
 		return models_web.Flower{
