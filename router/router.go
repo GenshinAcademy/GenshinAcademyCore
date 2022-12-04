@@ -15,14 +15,14 @@ type RouterController struct {
 func NewRouter(controller RouterController) *gin.Engine {
 	r := gin.New()
 
-	mode, _ := os.LookupEnv("GIN_MODE")
+	mode, _ := os.LookupEnv("ENV")
 	gin.SetMode(mode)
 
-	character := r.Group("/api/v1/")
+	character := r.Group("/characters")
 	{
 		// character.GET("characters/", controller.Ferret.GetCharacters)
 		// character.GET("characters/:id", controller.Ferret.GetCharacters)
-		character.GET("characters/stats", controller.Ferret.GetCharactersStats)
+		character.GET("stats", controller.Ferret.GetCharactersStats)
 	}
 
 	r.NoRoute(func(c *gin.Context) {
