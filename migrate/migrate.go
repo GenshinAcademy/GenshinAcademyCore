@@ -20,6 +20,6 @@ func init() {
 }
 
 func main() {
-	DB.ORM.AutoMigrate(&models.Character{}, models.Name{}, models.StatsProfit{})
+	DB.ORM.AutoMigrate(&models.Character{}, models.Name{}, models.StatsProfit{}, models.Element{}, models.Slot{})
 	fmt.Println("Migration complete")
 }
