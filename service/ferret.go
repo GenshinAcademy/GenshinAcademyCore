@@ -1,6 +1,7 @@
 package service
 
 import (
+	"fmt"
 	models_db "genshinacademycore/models/db"
 	models_web "genshinacademycore/models/web"
 	"genshinacademycore/repository"
@@ -29,97 +30,91 @@ func (f *FerretService) GetAllCharactersStats() (*[]models_web.CharacterArtifact
 	}
 
 	result := []models_web.CharacterArtifactStatsProfit{}
-	for _, element := range *dbCharacters {
-		var stats *models_db.ArtifactStats = (*models_db.ArtifactStats)(&element.StatsProfit)
+	for _, character := range *dbCharacters {
+		var web_stats models_web.StatsProfit
+		for _, stats := range character.StatsProfit {
+			switch stats.Slot.Name {
+			case "Flower":
+				web_stats.Flower = StatsFromDBModel(&stats).(models_web.Flower)
+			case "Feather":
+				web_stats.Feather = StatsFromDBModel(&stats).(models_web.Feather)
+			case "Sands":
+				web_stats.Sands = StatsFromDBModel(&stats).(models_web.Sands)
+			case "Goblet":
+				web_stats.Goblet = StatsFromDBModel(&stats).(models_web.Goblet)
+			case "Circlet":
+				web_stats.Circlet = StatsFromDBModel(&stats).(models_web.Circlet)
+			default:
+				web_stats.Substats = StatsFromDBModel(&stats).(models_web.Substats)
+			}
+		}
+
 		result = append(result, models_web.CharacterArtifactStatsProfit{
-			Character: CharacterFromDBModel(&element),
-			StatsProfit: models_web.StatsProfit{
-				Flower:   FlowerFromDBModel(stats),
-				Feather:  FeatherFromDBModel(stats),
-				Sands:    SandsFromDBModel(stats),
-				Goblet:   GobletFromDBModel(stats),
-				Circlet:  CircletFromDBModel(stats),
-				Substats: SubstatsFromDBModel(stats),
-			},
+			Character:   CharacterFromDBModel(&character),
+			StatsProfit: web_stats,
 		})
 	}
-
 	return &result, nil
-	//return f.FerretRepository.GetAllCharactersStats()
 }
 
 func CharacterFromDBModel(character *models_db.Character) models_web.Character {
 	return models_web.Character{
 		ID:      character.ID,
 		Name:    character.Name.English,
-		Element: character.Element,
+		Element: character.Element.Name,
 	}
 }
 
-func FlowerFromDBModel(stats *models_db.ArtifactStats) models_web.Flower {
-	return models_web.Flower{
-		Health: stats.Health,
+func StatsFromDBModel(stats *models_db.StatsProfit) interface{} {
+	fmt.Println(stats.Slot.ID)
+	switch stats.Slot.Name {
+	case "Flower":
+		return models_web.Flower{
+			Health: stats.Health,
+		}
+	case "Feather":
+		return models_web.Feather{
+			Attack: stats.Attack,
+		}
+	case "Sands":
+		return models_web.Sands{
+			AttackPercentage:  stats.AttackPercentage,
+			HealthPercentage:  stats.HealthPercentage,
+			DefensePercentage: stats.DefensePercentage,
+			ElementalMastery:  stats.ElementalMastery,
+			EnergyRecharge:    stats.EnergyRecharge,
+		}
+	case "Goblet":
+		return models_web.Goblet{
+			AttackPercentage:  stats.AttackPercentage,
+			HealthPercentage:  stats.HealthPercentage,
+			DefensePercentage: stats.DefensePercentage,
+			ElementalMastery:  stats.ElementalMastery,
+			PhysicalDamage:    stats.PhysicalDamage,
+			ElementalDamage:   stats.ElementalDamage,
+		}
+	case "Circlet":
+		return models_web.Circlet{
+			AttackPercentage:  stats.AttackPercentage,
+			HealthPercentage:  stats.HealthPercentage,
+			DefensePercentage: stats.DefensePercentage,
+			ElementalMastery:  stats.ElementalMastery,
+			CritRate:          stats.CritRate,
+			CritDamage:        stats.CritDamage,
+			Heal:              stats.Heal,
+		}
+	default:
+		return models_web.Substats{
+			Attack:            stats.Attack,
+			AttackPercentage:  stats.AttackPercentage,
+			Health:            stats.Health,
+			HealthPercentage:  stats.HealthPercentage,
+			Defense:           stats.Defense,
+			DefensePercentage: stats.DefensePercentage,
+			ElementalMastery:  stats.ElementalMastery,
+			EnergyRecharge:    stats.EnergyRecharge,
+			CritDamage:        stats.CritDamage,
+			CritRate:          stats.CritRate,
+		}
 	}
 }
-
-func FeatherFromDBModel(stats *models_db.ArtifactStats) models_web.Feather {
-	return models_web.Feather{
-		Attack: stats.Attack,
-	}
-}
-
-func SandsFromDBModel(stats *models_db.ArtifactStats) models_web.Sands {
-	return models_web.Sands{
-		AttackPercentage:  stats.AttackPercentage,
-		HealthPercentage:  stats.HealthPercentage,
-		DefensePercentage: stats.DefensePercentage,
-		ElementalMastery:  stats.ElementalMastery,
-		EnergyRecharge:    stats.EnergyRecharge,
-	}
-}
-
-func GobletFromDBModel(stats *models_db.ArtifactStats) models_web.Goblet {
-	return models_web.Goblet{
-		AttackPercentage:  stats.AttackPercentage,
-		HealthPercentage:  stats.HealthPercentage,
-		DefensePercentage: stats.DefensePercentage,
-		ElementalMastery:  stats.ElementalMastery,
-		PhysicalDamage:    stats.PhysicalDamage,
-		ElementalDamage:   stats.ElementalDamage,
-	}
-}
-
-func CircletFromDBModel(stats *models_db.ArtifactStats) models_web.Circlet {
-	return models_web.Circlet{
-		AttackPercentage:  stats.AttackPercentage,
-		HealthPercentage:  stats.HealthPercentage,
-		DefensePercentage: stats.DefensePercentage,
-		ElementalMastery:  stats.ElementalMastery,
-		CritRate:          stats.CritRate,
-		CritDamage:        stats.CritDamage,
-		Heal:              stats.Heal,
-	}
-}
-
-func SubstatsFromDBModel(stats *models_db.ArtifactStats) models_web.Substats {
-	return models_web.Substats{
-		Attack:            stats.Attack,
-		AttackPercentage:  stats.AttackPercentage,
-		Health:            stats.Health,
-		HealthPercentage:  stats.HealthPercentage,
-		Defense:           stats.Defense,
-		DefensePercentage: stats.DefensePercentage,
-		ElementalMastery:  stats.ElementalMastery,
-		EnergyRecharge:    stats.EnergyRecharge,
-		CritDamage:        stats.CritDamage,
-		CritRate:          stats.CritRate,
-	}
-}
-
-// func (f *FerretService) GetAllCharacters() (*[]models.Character, error) {
-// 	return f.FerretRepository.GetAllCharacters()
-// }
-
-// func (f *FerretService) GetCharacter(id string) (*[]models.Character, error) {
-// 	return f.FerretRepository.GetCharacter(id)
-// }
