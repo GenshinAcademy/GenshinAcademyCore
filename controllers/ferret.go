@@ -19,15 +19,14 @@ func NewFerretController(serviceFerret service.FerretServiceInterface) FerretCon
 }
 
 func (с FerretController) GetCharactersStats(c *gin.Context) {
-	character, err := с.FerretService.GetAllCharactersStats()
+	characters, err := с.FerretService.GetAllCharactersStats()
 
 	if err != nil {
 		c.AbortWithStatus(http.StatusNotFound)
 	}
 
 	c.JSON(http.StatusOK, gin.H{
-		"code": http.StatusOK,
-		"data": character,
+		"data": characters,
 	})
 }
 
