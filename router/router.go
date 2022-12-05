@@ -27,7 +27,6 @@ func NewRouter(controller RouterController) *gin.Engine {
 
 	r.NoRoute(func(c *gin.Context) {
 		c.JSON(http.StatusNotFound, gin.H{
-			"code":    http.StatusNotFound,
 			"message": "Page not found!",
 		})
 	})
