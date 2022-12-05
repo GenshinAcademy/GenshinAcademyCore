@@ -5,6 +5,7 @@ import (
 	"net/http"
 	"os"
 
+	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
 )
 
@@ -17,6 +18,11 @@ func NewRouter(controller RouterController) *gin.Engine {
 
 	mode, _ := os.LookupEnv("ENV")
 	gin.SetMode(mode)
+
+	config := cors.DefaultConfig()
+	// config.AllowOrigins = []string{"genshinacademtsitewillbehere"}
+	config.AllowAllOrigins = true
+	r.Use(cors.New(config))
 
 	character := r.Group("/characters")
 	{
