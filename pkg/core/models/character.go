@@ -14,6 +14,7 @@ type Character struct {
 	Element     Element
 	Rarity      Rarity
 	Weapon      WeaponType
+	Icons       []CharacterIcon
 	//Body          BodyType
 	//Constellation localized_string.LocalizedString
 	//BirthdayMMDD  string
