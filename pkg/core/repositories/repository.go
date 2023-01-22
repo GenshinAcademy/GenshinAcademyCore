@@ -13,8 +13,14 @@ type ICharacterRepository interface {
 	AddCharacter(character models.Character) (models.ModelId, error)
 }
 
+type ICharacterIconRepository interface {
+	IRepository
+	FindIconsByCharacterId(characterId models.ModelId) []models.CharacterIcon
+}
+
 type IRepositoryProvider interface {
 	GetLanguage() string
 	SetLanguage(language string)
 	NewCharacterRepo() ICharacterRepository
+	//NewCharacterIconRepo() ICharacterIconRepository
 }
