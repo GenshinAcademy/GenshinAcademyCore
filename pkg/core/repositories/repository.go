@@ -8,13 +8,13 @@ type IRepository interface {
 
 type ICharacterRepository interface {
 	IRepository
+	GetCharacterNames(parameters CharacterFindParameters) []string
 	FindCharacterById(characterId models.ModelId) models.Character
 	FindCharacters(parameters CharacterFindParameters) []models.Character
 	AddCharacter(character models.Character) (models.ModelId, error)
 }
 
 type ICharacterIconRepository interface {
-	IRepository
 	FindIconsByCharacterId(characterId models.ModelId) []models.CharacterIcon
 }
 
