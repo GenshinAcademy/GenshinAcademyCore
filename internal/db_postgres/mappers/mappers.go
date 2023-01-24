@@ -5,6 +5,6 @@ import (
 	models "ga/pkg/core/models"
 )
 
-func CharacterfromDbModel(model db_models.Db_Character) models.Character {
+func CharacterfromDbModel(model *db_models.Db_Character) models.Character {
 	panic("Not implemented")
 }
