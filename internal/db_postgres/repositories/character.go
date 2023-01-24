@@ -59,7 +59,8 @@ func (repo PostgresCharacterRepository) FindCharacters(parameters repositories.C
 	for _, character := range selectedChacters {
 		result = append(result, db_mappers.CharacterfromDbModel(&character))
 	}
-	panic("TODO")
+
+	return result
 }
 
 func (repo PostgresCharacterRepository) AddCharacter(character models.Character) (models.ModelId, error) {
