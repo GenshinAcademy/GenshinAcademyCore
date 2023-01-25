@@ -3,7 +3,12 @@ package repositories
 import "ga/pkg/core/models"
 
 type IRepository interface {
-	GetLanguage() string
+	GetLanguage() models.Language
+}
+
+type ILanguageRepository interface {
+	AddLanguage(language *models.Language)
+	FindLanguage(lang string) models.Language
 }
 
 type ICharacterRepository interface {
@@ -23,4 +28,5 @@ type IRepositoryProvider interface {
 	SetLanguage(language string)
 	NewCharacterRepo() ICharacterRepository
 	//NewCharacterIconRepo() ICharacterIconRepository
+	NewLanguageRepo() ILanguageRepository
 }
