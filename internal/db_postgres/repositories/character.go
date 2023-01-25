@@ -11,16 +11,20 @@ import (
 
 // *** Character repository ***//
 type PostgresCharacterRepository struct {
-	language       string
+	language       models.Language
 	gormConnection *gorm.DB
 }
 
 func addCharacterPreloads(db *gorm.DB) *gorm.DB {
 	return db.
+		Joins("Name").
+		Joins("FullName").
+		Joins("Descriptiond").
+		Joins("Title").
 		Joins("Icons")
 }
 
-func (repo PostgresCharacterRepository) GetLanguage() string {
+func (repo PostgresCharacterRepository) GetLanguage() models.Language {
 	return repo.language
 }
 
@@ -64,7 +68,10 @@ func (repo PostgresCharacterRepository) FindCharacters(parameters repositories.C
 }
 
 func (repo PostgresCharacterRepository) AddCharacter(character models.Character) (models.ModelId, error) {
-	panic("TODO")
+	var newCharacter = db_mappers.DbCharacterFromModel(&character)
+	repo.gormConnection.Create(&newCharacter)
+
+	return models.ModelId(newCharacter.Id), nil
 }
 
 func (repo PostgresCharacterRepository) GetCharacterNames(parameters repositories.CharacterFindParameters) []string {
