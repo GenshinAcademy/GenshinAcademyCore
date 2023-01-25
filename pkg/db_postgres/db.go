@@ -2,7 +2,9 @@ package db
 
 import (
 	"fmt"
-	//ga/pkg/core/repositories"
+	"ga/internal/db_postgres"
+	db_repositories "ga/internal/db_postgres/repositories"
+
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
 	gormLogger "gorm.io/gorm/logger"
@@ -44,6 +46,12 @@ func (dbConfig PostgresDatabaseConfiguration) GetConnectionString() string {
 		dbConfig.Port)
 }
 
+func CreatePostgresProvider() db_repositories.PostgresRepositoryProvider {
+	return db_repositories.PostgresRepositoryProvider{
+		GormConnection: database.Connections[0].ORMConnection,
+	}
+}
+
 func newConnection() postgresDatabaseConnection {
 	orm, err := gorm.Open(postgres.Open(database.Configuration.GetConnectionString()), &gorm.Config{})
 	if err != nil {
@@ -66,6 +74,7 @@ func InitializePostgresDatabase(config PostgresDatabaseConfiguration) {
 		Connections:   make([]postgresDatabaseConnection, 0),
 	}
 	newConnection()
+	db_postgres.MigrateDatabase(database.Connections[0].ORMConnection)
 }
 
 // Closes all active connections. Should be called with defer in main thread, either should be executed on application close
