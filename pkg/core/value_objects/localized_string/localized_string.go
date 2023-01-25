@@ -9,19 +9,19 @@ type LocalizedString struct {
 	value      string
 }
 
-func (str *LocalizedString) IsEmpty() bool {
+func (str LocalizedString) IsEmpty() bool {
 	return str.value != ""
 }
 
-func (str *LocalizedString) GetId() StringId {
+func (str LocalizedString) GetId() StringId {
 	return str.id
 }
 
-func (str *LocalizedString) GetLanguageId() LanguageId {
+func (str LocalizedString) GetLanguageId() LanguageId {
 	return str.languageId
 }
 
-func (str *LocalizedString) GetValue() string {
+func (str LocalizedString) GetValue() string {
 	return str.value
 }
 
@@ -32,14 +32,25 @@ func Empty(id StringId) LocalizedString {
 	}
 }
 
-func Create(id StringId, languageId LanguageId, value *string) LocalizedString {
-	if value == nil || *value == "" {
+func New(languageId LanguageId, value string) LocalizedString {
+	if value == "" {
+		panic("Cannot create empty string")
+	}
+	return LocalizedString{
+		id:         0,
+		languageId: languageId,
+		value:      value,
+	}
+}
+
+func Create(id StringId, languageId LanguageId, value string) LocalizedString {
+	if value == "" {
 		panic("Cannot create empty string")
 	}
 	return LocalizedString{
 		id:         id,
 		languageId: languageId,
-		value:      *value,
+		value:      value,
 	}
 }
 
