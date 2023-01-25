@@ -25,3 +25,9 @@ func CreateGenshinCore(config GenshinCoreConfiguration) *GenshinCore {
 	core.providerFunc = defaultGetProvider
 	return core
 }
+
+func (core *GenshinCore) GetProvider(language string) repositories.IRepositoryProvider {
+	var provider = core.providerFunc()
+	provider.SetLanguage(language)
+	return provider
+}
