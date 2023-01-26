@@ -15,13 +15,14 @@ type PostgresCharacterRepository struct {
 	gormConnection *gorm.DB
 }
 
+// Automatically adds all preloads
 func addCharacterPreloads(db *gorm.DB) *gorm.DB {
 	return db.
-		Joins("Name").
-		Joins("FullName").
-		Joins("Descriptiond").
-		Joins("Title").
-		Joins("Icons")
+		Preload("Name.StringValues").
+		Preload("FullName.StringValues").
+		Preload("Description.StringValues").
+		Preload("Title.StringValues").
+		Preload("Icons")
 }
 
 func (repo PostgresCharacterRepository) GetLanguage() models.Language {
@@ -67,8 +68,8 @@ func (repo PostgresCharacterRepository) FindCharacters(parameters repositories.C
 	return result
 }
 
-func (repo PostgresCharacterRepository) AddCharacter(character models.Character) (models.ModelId, error) {
-	var newCharacter = db_mappers.DbCharacterFromModel(&character)
+func (repo PostgresCharacterRepository) AddCharacter(character *models.Character) (models.ModelId, error) {
+	var newCharacter = db_mappers.DbCharacterFromModel(character)
 	repo.gormConnection.Create(&newCharacter)
 
 	return models.ModelId(newCharacter.Id), nil
@@ -76,7 +77,7 @@ func (repo PostgresCharacterRepository) AddCharacter(character models.Character)
 
 func (repo PostgresCharacterRepository) GetCharacterNames(parameters repositories.CharacterFindParameters) []string {
 	var characterNames []db_models.Db_Character
-	repo.gormConnection.Select([]string{"characterid"}, &characterNames)
+	repo.gormConnection.Select([]string{"character_id"}, &characterNames)
 	var result []string = make([]string, 0)
 	for _, character := range characterNames {
 		result = append(result, character.CharacterId)
