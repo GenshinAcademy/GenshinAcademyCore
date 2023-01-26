@@ -4,6 +4,9 @@ import (
 	"fmt"
 	"ga/internal/db_postgres"
 	db_repositories "ga/internal/db_postgres/repositories"
+	"ga/pkg/core"
+	"ga/pkg/core/models"
+	"ga/pkg/core/repositories"
 
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
@@ -46,12 +49,25 @@ func (dbConfig PostgresDatabaseConfiguration) GetConnectionString() string {
 		dbConfig.Port)
 }
 
-func CreatePostgresProvider() db_repositories.PostgresRepositoryProvider {
+func CreatePostgresProvider(language models.Language) repositories.IRepositoryProvider {
 	return db_repositories.PostgresRepositoryProvider{
 		GormConnection: database.Connections[0].ORMConnection,
+		Language:       language,
 	}
 }
 
+// Creates new postgres repository for working with languages
+func CreatePostgresLanguageRepository() repositories.ILanguageRepository {
+	return db_repositories.CreatePostresLanguageRepository(database.Connections[0].ORMConnection)
+}
+
+// Applies postgres repositories to GenshinCore
+func ConfigurePostgresDB(config *core.GenshinCoreConfiguration) {
+	config.ProviderFunc = core.GetProviderFunc(CreatePostgresProvider)
+	config.LanguageRepoFunc = core.GetLanguageRepoFunc(CreatePostgresLanguageRepository)
+}
+
+// Creates new gorm connection and adds to connections pool
 func newConnection() postgresDatabaseConnection {
 	orm, err := gorm.Open(postgres.Open(database.Configuration.GetConnectionString()), &gorm.Config{})
 	if err != nil {
