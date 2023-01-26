@@ -1,3 +1,4 @@
+// Contains sets of converters from DB models to Core models and from Core models to DB models
 package db_mappers
 
 import (
@@ -6,6 +7,7 @@ import (
 	"ga/pkg/core/value_objects/localized_string"
 )
 
+// Converts DB character model to Core character model
 func DbCharacterFromModel(model *models.Character) db_models.Db_Character {
 
 	var result db_models.Db_Character = db_models.Db_Character{
@@ -23,6 +25,7 @@ func DbCharacterFromModel(model *models.Character) db_models.Db_Character {
 	return result
 }
 
+// Converts Core character model to DB character model
 func CharacterfromDbModel(model *db_models.Db_Character) models.Character {
 	return models.Character{
 		BaseModel: models.BaseModel{
@@ -39,6 +42,7 @@ func CharacterfromDbModel(model *db_models.Db_Character) models.Character {
 	}
 }
 
+// Converts DB language model to Core language model
 func LanguageFromDbModel(model *db_models.Db_Language) models.Language {
 	return models.Language{
 		BaseModel: models.BaseModel{
@@ -48,6 +52,7 @@ func LanguageFromDbModel(model *db_models.Db_Language) models.Language {
 	}
 }
 
+// Converts Core language model to DB language model
 func DbLanguageFromModel(model *models.Language) db_models.Db_Language {
 	return db_models.Db_Language{
 		Id:   db_models.DBKey(model.Id),
@@ -55,17 +60,28 @@ func DbLanguageFromModel(model *models.Language) db_models.Db_Language {
 	}
 }
 
+// Converts DB string model to LocalizedString
 func LocalizedStringFromDbModel(model *db_models.Db_String) localized_string.LocalizedString {
+	if model.GetValue() == "" {
+		return localized_string.Empty(localized_string.StringId(0))
+	}
 	return localized_string.Create(
 		localized_string.StringId(model.Id),
-		localized_string.LanguageId(model.LanguageId),
-		model.Value)
+		localized_string.LanguageId(model.GetLanguageId()),
+		model.GetValue(),
+	)
 }
 
+// Converts LocalizedString to DB string model
 func DbStringFromLocalizedString(model *localized_string.LocalizedString) db_models.Db_String {
 	return db_models.Db_String{
-		Id:         db_models.DBKey(model.GetId()),
-		LanguageId: db_models.DBKey(model.GetLanguageId()),
-		Value:      model.GetValue(),
+		Id: db_models.DBKey(model.GetId()),
+		StringValues: []db_models.Db_StringValue{
+			{
+				Id:         db_models.DBKey(model.GetId()),
+				LanguageId: db_models.DBKey(model.GetLanguageId()),
+				Value:      model.GetValue(),
+			},
+		},
 	}
 }
