@@ -2,8 +2,7 @@ package db_repositories
 
 import (
 	//"ga/pkg/core/models"
-	db_mappers "ga/internal/db_postgres/mappers"
-	db_models "ga/internal/db_postgres/models"
+
 	"ga/pkg/core/models"
 	"ga/pkg/core/repositories"
 
@@ -12,38 +11,29 @@ import (
 
 // *** Repository provider ***//
 type PostgresRepositoryProvider struct {
-	language       string
+	Language       models.Language
 	GormConnection *gorm.DB
 }
 
-func (provider PostgresRepositoryProvider) GetLanguage() string {
-	return provider.language
+// Gets reository language
+func (provider PostgresRepositoryProvider) GetLanguage() models.Language {
+	return provider.Language
 }
 
-func (provider PostgresRepositoryProvider) SetLanguage(language string) {
-	provider.language = language
-}
-
+// Creates new postgres character repository with language specified by provider
 func (provider PostgresRepositoryProvider) NewCharacterRepo() repositories.ICharacterRepository {
+	var langRepo = provider.NewLanguageRepo()
+	var langModel = langRepo.FindLanguage(provider.Language.LanguageName)
 
-	var lang db_models.Db_Language
-	provider.GormConnection.Where("name = ?", provider.GetLanguage()).First(lang)
-
-	var langModel models.Language = db_mappers.LanguageFromDbModel(&lang)
 	return PostgresCharacterRepository{
 		language:       langModel,
 		gormConnection: provider.GormConnection,
 	}
 }
 
+// Creates new postgres language repository
 func (provider PostgresRepositoryProvider) NewLanguageRepo() repositories.ILanguageRepository {
 	return PostgresLanguageRepository{
 		gormConnection: provider.GormConnection,
-	}
-}
-
-func NewRepositoryProvider(language string) repositories.IRepositoryProvider {
-	return PostgresRepositoryProvider{
-		language: language,
 	}
 }
