@@ -1,5 +1,6 @@
 package db_models
 
+//Character DB model
 type Db_Character struct {
 	Id            DBKey `gorm:"primaryKey"`
 	NameId        DBKey `gorm:"column:name"`
