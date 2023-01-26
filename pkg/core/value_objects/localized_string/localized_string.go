@@ -21,10 +21,12 @@ func (str LocalizedString) GetLanguageId() LanguageId {
 	return str.languageId
 }
 
+// Gets string value
 func (str LocalizedString) GetValue() string {
 	return str.value
 }
 
+// Creates emopty string with passed id
 func Empty(id StringId) LocalizedString {
 	return LocalizedString{
 		id:    id,
@@ -32,6 +34,7 @@ func Empty(id StringId) LocalizedString {
 	}
 }
 
+// Creates brand new localized string (Should be used when adding new strings)
 func New(languageId LanguageId, value string) LocalizedString {
 	if value == "" {
 		panic("Cannot create empty string")
@@ -43,6 +46,7 @@ func New(languageId LanguageId, value string) LocalizedString {
 	}
 }
 
+// Instantiates LocalizedString assuming existing values are passed
 func Create(id StringId, languageId LanguageId, value string) LocalizedString {
 	if value == "" {
 		panic("Cannot create empty string")
@@ -54,6 +58,7 @@ func Create(id StringId, languageId LanguageId, value string) LocalizedString {
 	}
 }
 
+// Compares string by Id. (Strings of different languages but with same Ids are treated as same strings)
 func Equals(str1 *LocalizedString, str2 *LocalizedString) bool {
 	if str1 == nil && str2 == nil {
 		return true
@@ -65,6 +70,7 @@ func Equals(str1 *LocalizedString, str2 *LocalizedString) bool {
 	return str1.id == str2.id
 }
 
+// Compares two strings by Id and language
 func EqualsCulture(str1 *LocalizedString, str2 *LocalizedString) bool {
 	if str1 == nil && str2 == nil {
 		return true
@@ -77,4 +83,9 @@ func EqualsCulture(str1 *LocalizedString, str2 *LocalizedString) bool {
 	}
 
 	return str1.id == str2.id && str1.languageId == str2.languageId
+}
+
+// Works like ToString
+func (str LocalizedString) String() string {
+	return str.value
 }
