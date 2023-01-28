@@ -4,7 +4,7 @@ import (
 	db_mappers "ga/internal/db_postgres/mappers"
 	db_models "ga/internal/db_postgres/models"
 	"ga/pkg/core/models"
-	"ga/pkg/core/repositories"
+	"ga/pkg/core/repositories/find_parameters"
 
 	"gorm.io/gorm"
 )
@@ -15,14 +15,36 @@ type PostgresCharacterRepository struct {
 	gormConnection *gorm.DB
 }
 
+func (repo PostgresCharacterRepository) preloadStrings(preloads []string) *gorm.DB {
+	var connection = repo.gormConnection
+	for _, preload := range preloads {
+		connection = connection.Preload(preload, "language_id = ?", repo.language.Id)
+	}
+
+	return connection
+}
+
+var (
+	characterPreloads []string = []string{
+		"Name.StringValues",
+		"FullName.StringValues",
+		"Description.StringValues",
+		"Title.StringValues",
+	}
+)
+
 // Automatically adds all preloads
-func addCharacterPreloads(db *gorm.DB) *gorm.DB {
-	return db.
-		Preload("Name.StringValues").
-		Preload("FullName.StringValues").
-		Preload("Description.StringValues").
-		Preload("Title.StringValues").
+func (repo PostgresCharacterRepository) addCharacterPreloads() *gorm.DB {
+
+	return repo.preloadStrings(characterPreloads).
 		Preload("Icons")
+	/*return repo.gormConnection.
+
+	Preload("Name.StringValues").
+	Preload("FullName.StringValues").
+	Preload("Description.StringValues").
+	Preload("Title.StringValues").
+	Preload("Icons")*/
 }
 
 func (repo PostgresCharacterRepository) GetLanguage() models.Language {
@@ -31,23 +53,22 @@ func (repo PostgresCharacterRepository) GetLanguage() models.Language {
 
 func (repo PostgresCharacterRepository) FindCharacterById(characterId models.ModelId) models.Character {
 	var selectedCharacter db_models.Db_Character
-	addCharacterPreloads(repo.gormConnection).
-		First(&selectedCharacter, db_models.DBKey(characterId))
+	repo.addCharacterPreloads().First(&selectedCharacter, db_models.DBKey(characterId))
 
 	return db_mappers.CharacterfromDbModel(&selectedCharacter)
 }
 
-func (repo PostgresCharacterRepository) FindCharacters(parameters repositories.CharacterFindParameters) []models.Character {
+func (repo PostgresCharacterRepository) FindCharacters(parameters find_parameters.CharacterFindParameters) []models.Character {
 
 	var selectedChacters []db_models.Db_Character = make([]db_models.Db_Character, 0)
 	var result []models.Character = make([]models.Character, 0)
-	gormConnection := addCharacterPreloads(repo.gormConnection)
+	gormConnection := repo.addCharacterPreloads()
 
 	if len(parameters.Ids) > 0 {
 		gormConnection.Find(&selectedChacters, parameters.Ids)
 	} else {
-		if len(parameters.Names) > 0 {
-			gormConnection = gormConnection.Where("character_id IN ?", parameters.Names)
+		if len(parameters.CharactedIds) > 0 {
+			gormConnection = gormConnection.Where("character_id IN ?", parameters.CharactedIds)
 		}
 
 		if len(parameters.Elements) > 0 {
@@ -75,7 +96,16 @@ func (repo PostgresCharacterRepository) AddCharacter(character *models.Character
 	return models.ModelId(newCharacter.Id), nil
 }
 
-func (repo PostgresCharacterRepository) GetCharacterNames(parameters repositories.CharacterFindParameters) []string {
+func (repo PostgresCharacterRepository) UpdateCharacter(character *models.Character) {
+	if character.Id == models.UNDEFINED_ID {
+		panic("Cannot update not existing character!")
+	}
+
+	var characterToUpdate db_models.Db_Character = db_mappers.DbCharacterFromModel(character)
+	repo.gormConnection.Save(&characterToUpdate)
+}
+
+func (repo PostgresCharacterRepository) GetCharacterIds(parameters find_parameters.CharacterFindParameters) []string {
 	var characterNames []db_models.Db_Character
 	repo.gormConnection.Select([]string{"character_id"}, &characterNames)
 	var result []string = make([]string, 0)

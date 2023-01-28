@@ -1,6 +1,9 @@
 package repositories
 
-import "ga/pkg/core/models"
+import (
+	"ga/pkg/core/models"
+	"ga/pkg/core/repositories/find_parameters"
+)
 
 type IRepository interface {
 	GetLanguage() models.Language
@@ -13,10 +16,11 @@ type ILanguageRepository interface {
 
 type ICharacterRepository interface {
 	IRepository
-	GetCharacterNames(parameters CharacterFindParameters) []string
+	GetCharacterIds(parameters find_parameters.CharacterFindParameters) []string
 	FindCharacterById(characterId models.ModelId) models.Character
-	FindCharacters(parameters CharacterFindParameters) []models.Character
+	FindCharacters(parameters find_parameters.CharacterFindParameters) []models.Character
 	AddCharacter(character *models.Character) (models.ModelId, error)
+	UpdateCharacter(character *models.Character)
 }
 
 type ICharacterIconRepository interface {

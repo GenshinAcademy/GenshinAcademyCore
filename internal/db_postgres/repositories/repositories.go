@@ -22,18 +22,8 @@ func (provider PostgresRepositoryProvider) GetLanguage() models.Language {
 
 // Creates new postgres character repository with language specified by provider
 func (provider PostgresRepositoryProvider) NewCharacterRepo() repositories.ICharacterRepository {
-	var langRepo = provider.NewLanguageRepo()
-	var langModel = langRepo.FindLanguage(provider.Language.LanguageName)
-
 	return PostgresCharacterRepository{
-		language:       langModel,
-		gormConnection: provider.GormConnection,
-	}
-}
-
-// Creates new postgres language repository
-func (provider PostgresRepositoryProvider) NewLanguageRepo() repositories.ILanguageRepository {
-	return PostgresLanguageRepository{
+		language:       provider.Language,
 		gormConnection: provider.GormConnection,
 	}
 }
