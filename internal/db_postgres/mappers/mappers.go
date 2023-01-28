@@ -63,7 +63,7 @@ func DbLanguageFromModel(model *models.Language) db_models.Db_Language {
 // Converts DB string model to LocalizedString
 func LocalizedStringFromDbModel(model *db_models.Db_String) localized_string.LocalizedString {
 	if model.GetValue() == "" {
-		return localized_string.Empty(localized_string.StringId(0))
+		return localized_string.Empty(localized_string.StringId(model.Id))
 	}
 	return localized_string.Create(
 		localized_string.StringId(model.Id),
