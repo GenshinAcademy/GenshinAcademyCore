@@ -1,4 +1,4 @@
-package db
+package core_postgres
 
 import (
 	"fmt"
@@ -15,7 +15,7 @@ import (
 
 var (
 	ConnectionFormat string = "host=%s user=%s password=%s dbname=%s port=%s sslmode=disable TimeZone=Asia/Shanghai"
-	database         postgresDatabaseProvider
+	database         postgresDatabase
 )
 
 type postgresDatabaseConnection struct {
@@ -23,7 +23,7 @@ type postgresDatabaseConnection struct {
 	ORMConnection *gorm.DB
 }
 
-type postgresDatabaseProvider struct {
+type postgresDatabase struct {
 	Configuration PostgresDatabaseConfiguration
 	Connections   []postgresDatabaseConnection
 	Logger        gormLogger.Interface
@@ -49,7 +49,7 @@ func (dbConfig PostgresDatabaseConfiguration) GetConnectionString() string {
 		dbConfig.Port)
 }
 
-func CreatePostgresProvider(language models.Language) repositories.IRepositoryProvider {
+func createPostgresProvider(language models.Language) repositories.IRepositoryProvider {
 	return db_repositories.PostgresRepositoryProvider{
 		GormConnection: database.Connections[0].ORMConnection,
 		Language:       language,
@@ -57,14 +57,14 @@ func CreatePostgresProvider(language models.Language) repositories.IRepositoryPr
 }
 
 // Creates new postgres repository for working with languages
-func CreatePostgresLanguageRepository() repositories.ILanguageRepository {
+func createPostgresLanguageRepository() repositories.ILanguageRepository {
 	return db_repositories.CreatePostresLanguageRepository(database.Connections[0].ORMConnection)
 }
 
 // Applies postgres repositories to GenshinCore
 func ConfigurePostgresDB(config *core.GenshinCoreConfiguration) {
-	config.ProviderFunc = core.GetProviderFunc(CreatePostgresProvider)
-	config.LanguageRepoFunc = core.GetLanguageRepoFunc(CreatePostgresLanguageRepository)
+	config.ProviderFunc = core.GetProviderFunc(createPostgresProvider)
+	config.LanguageRepoFunc = core.GetLanguageRepoFunc(createPostgresLanguageRepository)
 }
 
 // Creates new gorm connection and adds to connections pool
@@ -85,7 +85,7 @@ func newConnection() postgresDatabaseConnection {
 
 // Initializes database
 func InitializePostgresDatabase(config PostgresDatabaseConfiguration) {
-	database = postgresDatabaseProvider{
+	database = postgresDatabase{
 		Configuration: config,
 		Connections:   make([]postgresDatabaseConnection, 0),
 	}
