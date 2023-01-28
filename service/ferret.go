@@ -61,6 +61,7 @@ func CharacterFromDBModel(character *models_db.Character) models_web.Character {
 		ID:      character.ID,
 		Name:    character.Name.English,
 		Element: character.Element.Name,
+		IconURL: character.IconURL,
 	}
 }
 
