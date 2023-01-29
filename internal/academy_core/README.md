@@ -1,0 +1,1 @@
+*** This package is core package of GenshinAcademy ***

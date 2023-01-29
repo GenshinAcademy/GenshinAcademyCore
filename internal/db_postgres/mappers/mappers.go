@@ -3,8 +3,8 @@ package db_mappers
 
 import (
 	db_models "ga/internal/db_postgres/models"
-	models "ga/pkg/core/models"
-	"ga/pkg/core/value_objects/localized_string"
+	models "ga/pkg/genshin_core/models"
+	"ga/pkg/genshin_core/value_objects/localized_string"
 )
 
 // Converts DB character model to Core character model

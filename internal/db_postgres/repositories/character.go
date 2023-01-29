@@ -3,8 +3,8 @@ package db_repositories
 import (
 	db_mappers "ga/internal/db_postgres/mappers"
 	db_models "ga/internal/db_postgres/models"
-	"ga/pkg/core/models"
-	"ga/pkg/core/repositories/find_parameters"
+	"ga/pkg/genshin_core/models"
+	"ga/pkg/genshin_core/repositories/find_parameters"
 
 	"gorm.io/gorm"
 )

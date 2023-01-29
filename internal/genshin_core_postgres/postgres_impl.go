@@ -4,9 +4,9 @@ import (
 	"fmt"
 	"ga/internal/db_postgres"
 	db_repositories "ga/internal/db_postgres/repositories"
-	"ga/pkg/core"
-	"ga/pkg/core/models"
-	"ga/pkg/core/repositories"
+	core "ga/pkg/genshin_core"
+	"ga/pkg/genshin_core/models"
+	"ga/pkg/genshin_core/repositories"
 
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"

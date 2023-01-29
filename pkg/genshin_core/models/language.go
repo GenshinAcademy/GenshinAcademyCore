@@ -1,6 +1,6 @@
 package models
 
-import "ga/pkg/core/value_objects/localized_string"
+import "ga/pkg/genshin_core/value_objects/localized_string"
 
 // Language
 type Language struct {

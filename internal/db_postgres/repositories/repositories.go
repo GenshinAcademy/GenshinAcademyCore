@@ -1,10 +1,10 @@
 package db_repositories
 
 import (
-	//"ga/pkg/core/models"
+	//"ga/pkg/genshin_core/models"
 
-	"ga/pkg/core/models"
-	"ga/pkg/core/repositories"
+	"ga/pkg/genshin_core/models"
+	"ga/pkg/genshin_core/repositories"
 
 	"gorm.io/gorm"
 )

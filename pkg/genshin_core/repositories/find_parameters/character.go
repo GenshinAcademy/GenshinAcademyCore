@@ -1,6 +1,6 @@
 package find_parameters
 
-import "ga/pkg/core/models"
+import "ga/pkg/genshin_core/models"
 
 type CharacterFindParameters struct {
 	FindParameters

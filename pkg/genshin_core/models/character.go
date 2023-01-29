@@ -1,7 +1,7 @@
 package models
 
 import (
-	"ga/pkg/core/value_objects/localized_string"
+	"ga/pkg/genshin_core/value_objects/localized_string"
 )
 
 type Character struct {

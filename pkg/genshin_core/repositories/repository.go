@@ -1,8 +1,8 @@
 package repositories
 
 import (
-	"ga/pkg/core/models"
-	"ga/pkg/core/repositories/find_parameters"
+	"ga/pkg/genshin_core/models"
+	"ga/pkg/genshin_core/repositories/find_parameters"
 )
 
 type IRepository interface {

@@ -1,8 +1,8 @@
-package core
+package genshin_core
 
 import (
-	"ga/pkg/core/models"
-	"ga/pkg/core/repositories"
+	"ga/pkg/genshin_core/models"
+	"ga/pkg/genshin_core/repositories"
 )
 
 type GetProviderFunc func(models.Language) repositories.IRepositoryProvider

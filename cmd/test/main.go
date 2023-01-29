@@ -2,11 +2,11 @@ package main
 
 import (
 	"fmt"
-	core "ga/pkg/core"
-	"ga/pkg/core/models"
-	"ga/pkg/core/repositories"
-	"ga/pkg/core/repositories/find_parameters"
-	"ga/pkg/core_postgres"
+	core_postgres "ga/internal/genshin_core_postgres"
+	core "ga/pkg/genshin_core"
+	"ga/pkg/genshin_core/models"
+	"ga/pkg/genshin_core/repositories"
+	"ga/pkg/genshin_core/repositories/find_parameters"
 )
 
 // Sample method for creating characters
