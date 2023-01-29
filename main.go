@@ -34,7 +34,7 @@ func main() {
 
 	r := router.NewRouter(controller)
 
-	err = r.Run()
+	err = r.Run(":" + env.ServerPort)
 	if err != nil {
 		logger.Log.Error(err)
 	}
