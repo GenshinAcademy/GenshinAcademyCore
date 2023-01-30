@@ -1,4 +1,4 @@
-package core_postgres
+package genshin_core_postgres
 
 import (
 	"fmt"

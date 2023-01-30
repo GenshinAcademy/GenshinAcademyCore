@@ -2,7 +2,7 @@ package main
 
 import (
 	"fmt"
-	core_postgres "ga/internal/genshin_core_postgres"
+	"ga/internal/genshin_core_postgres"
 	core "ga/pkg/genshin_core"
 	"ga/pkg/genshin_core/models"
 	"ga/pkg/genshin_core/repositories"
@@ -37,7 +37,7 @@ func updateCharacter(language models.Language, character *models.Character, repo
 }
 
 func main() {
-	var dbConfig core_postgres.PostgresDatabaseConfiguration = core_postgres.PostgresDatabaseConfiguration{
+	var dbConfig genshin_core_postgres.PostgresDatabaseConfiguration = genshin_core_postgres.PostgresDatabaseConfiguration{
 		Host:         "localhost",
 		UserName:     "postgres",
 		UserPassword: "12345678",
@@ -45,15 +45,15 @@ func main() {
 		Port:         "5432",
 		ServerPort:   "",
 	}
-	core_postgres.InitializePostgresDatabase(dbConfig)
-	defer core_postgres.CleanupConnections()
+	genshin_core_postgres.InitializePostgresDatabase(dbConfig)
+	defer genshin_core_postgres.CleanupConnections()
 
 	var defaultLanguage = "Russian"
 	//Initializing gacore config and configure it for postgres db
 	var config core.GenshinCoreConfiguration = core.GenshinCoreConfiguration{
 		DefaultLanguage: defaultLanguage,
 	}
-	core_postgres.ConfigurePostgresDB(&config)
+	genshin_core_postgres.ConfigurePostgresDB(&config)
 
 	//Create ga core
 	var gacore *core.GenshinCore = core.CreateGenshinCore(config)
