@@ -42,8 +42,8 @@ func main() {
 		UserName:     "postgres",
 		UserPassword: "12345678",
 		Name:         "gacore_db",
-		Port:         "5432",
-		ServerPort:   "",
+		Port:         5432,
+		ServerPort:   0,
 	}
 	genshin_core_postgres.InitializePostgresDatabase(dbConfig)
 	defer genshin_core_postgres.CleanupConnections()

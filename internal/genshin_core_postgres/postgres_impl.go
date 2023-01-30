@@ -14,7 +14,7 @@ import (
 )
 
 var (
-	ConnectionFormat string = "host=%s user=%s password=%s dbname=%s port=%s sslmode=disable TimeZone=Asia/Shanghai"
+	ConnectionFormat string = "host=%s user=%s password=%s dbname=%s port=%d sslmode=disable TimeZone=Asia/Shanghai"
 	database         postgresDatabase
 )
 
@@ -35,8 +35,8 @@ type PostgresDatabaseConfiguration struct {
 	UserName     string
 	UserPassword string
 	Name         string
-	Port         string
-	ServerPort   string
+	Port         uint16
+	ServerPort   uint16
 }
 
 // Gets connectionstring from configuration
