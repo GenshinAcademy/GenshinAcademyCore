@@ -59,7 +59,7 @@ func (f *FerretService) GetAllCharactersStats() (*[]models_web.CharacterArtifact
 func CharacterFromDBModel(character *models_db.Character) models_web.Character {
 	return models_web.Character{
 		ID:      character.ID,
-		Name:    character.Name.English,
+		Name:    character.Name.Russian,
 		Element: character.Element.Name,
 		IconURL: character.IconURL,
 	}
