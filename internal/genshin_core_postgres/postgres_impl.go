@@ -5,7 +5,7 @@ import (
 	"ga/internal/db_postgres"
 	db_repositories "ga/internal/db_postgres/repositories"
 	core "ga/pkg/genshin_core"
-	"ga/pkg/genshin_core/models"
+	"ga/pkg/genshin_core/languages"
 	"ga/pkg/genshin_core/repositories"
 
 	"gorm.io/driver/postgres"
@@ -14,7 +14,7 @@ import (
 )
 
 var (
-	ConnectionFormat string = "host=%s user=%s password=%s dbname=%s port=%d sslmode=disable TimeZone=Asia/Shanghai"
+	ConnectionFormat string = "host=%s user=%s password=%s dbname=%s port=%d sslmode=disable"
 	database         postgresDatabase
 )
 
@@ -49,7 +49,7 @@ func (dbConfig PostgresDatabaseConfiguration) GetConnectionString() string {
 		dbConfig.Port)
 }
 
-func createPostgresProvider(language models.Language) repositories.IRepositoryProvider {
+func createPostgresProvider(language languages.Language) repositories.RepositoryProvider {
 	return db_repositories.PostgresRepositoryProvider{
 		GormConnection: database.Connections[0].ORMConnection,
 		Language:       language,

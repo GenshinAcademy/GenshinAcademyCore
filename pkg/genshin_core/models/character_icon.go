@@ -1,7 +1,15 @@
 package models
 
+type CharacterIconType byte
+
+const (
+	Front CharacterIconType = iota
+	Side
+	Gacha
+)
+
 type CharacterIcon struct {
-	BaseModel
-	Type CharacterIconType
-	Url  string
+	CharacterId ModelId
+	Type        CharacterIconType
+	Url         string
 }

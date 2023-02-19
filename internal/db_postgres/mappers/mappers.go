@@ -1,67 +1,111 @@
-// Contains sets of converters from DB models to Core models and from Core models to DB models
+// Contains sets of converters from DB academy_models to Core academy_models and from Core academy_models to DB academy_models
 package db_mappers
 
 import (
+	academy_models "ga/internal/academy_core/models"
+	"ga/internal/academy_core/value_objects/localized_string"
+	"ga/internal/db_postgres/cache"
 	db_models "ga/internal/db_postgres/models"
-	models "ga/pkg/genshin_core/models"
-	"ga/pkg/genshin_core/value_objects/localized_string"
+	genshin_models "ga/pkg/genshin_core/models"
 )
 
-// Converts DB character model to Core character model
-func DbCharacterFromModel(model *models.Character) db_models.Db_Character {
+type Mapper struct {
+	cache        *cache.Cache
+	languge      academy_models.Language
+	languageName string
+}
 
-	var result db_models.Db_Character = db_models.Db_Character{
+func CreateMapper(languageName string, language academy_models.Language, cache *cache.Cache) Mapper {
+	return Mapper{
+		languageName: languageName,
+		languge:      language,
+		cache:        cache,
+	}
+}
+
+// MapDbCharacterFromModel Converts DB character model to Core character model
+func (mapper Mapper) MapDbCharacterFromModel(model *academy_models.Character) db_models.DbCharacter {
+	var strings = mapper.cache.GetCharacterStrings(db_models.DBKey(model.Id))
+	var result = db_models.DbCharacter{
 		Id:          db_models.DBKey(model.Id),
-		CharacterId: model.CharacterId,
-		Name:        DbStringFromLocalizedString(&model.Name),
-		FullName:    DbStringFromLocalizedString(&model.FullName),
-		Description: DbStringFromLocalizedString(&model.Description),
-		Title:       DbStringFromLocalizedString(&model.Title),
-		Element:     byte(model.Element),
-		Rarity:      byte(model.Rarity),
-		Weapon:      byte(model.Weapon),
+		CharacterId: db_models.GenshinKey(model.CharacterId),
+		Name:        mapper.MapDbStringFromString(strings.Name, model.Name),
+		FullName:    mapper.MapDbStringFromString(strings.FullName, model.FullName),
+		Description: mapper.MapDbStringFromString(strings.Description, model.Description),
+		Title:       mapper.MapDbStringFromString(strings.Title, model.Title),
+		Element:     uint8(model.Element),
+		Rarity:      uint8(model.Rarity),
+		Weapon:      uint8(model.Weapon),
 	}
 
 	return result
 }
 
-// Converts Core character model to DB character model
-func CharacterfromDbModel(model *db_models.Db_Character) models.Character {
-	return models.Character{
-		BaseModel: models.BaseModel{
-			Id: models.ModelId(model.Id),
+// MapAcademyCharacterFromDbModel Converts Db character model to Academy character model
+func (mapper Mapper) MapAcademyCharacterFromDbModel(model *db_models.DbCharacter) academy_models.Character {
+	return academy_models.Character{
+		AcademyModel: academy_models.AcademyModel{
+			Id: academy_models.AcademyId(model.Id),
 		},
-		CharacterId: model.CharacterId,
-		Name:        LocalizedStringFromDbModel(&model.Name),
-		FullName:    LocalizedStringFromDbModel(&model.FullName),
-		Description: LocalizedStringFromDbModel(&model.Description),
-		Title:       LocalizedStringFromDbModel(&model.Title),
-		Element:     models.Element(model.Element),
-		Rarity:      models.Rarity(model.Rarity),
-		Weapon:      models.WeaponType(model.Weapon),
+		Character: mapper.MapGenshinCharacterFromDbModel(model),
 	}
 }
 
-// Converts DB language model to Core language model
-func LanguageFromDbModel(model *db_models.Db_Language) models.Language {
-	return models.Language{
-		BaseModel: models.BaseModel{
-			Id: models.ModelId(model.Id),
+// MapGenshinCharacterFromDbModel Converts Db character model to Core character model
+func (mapper Mapper) MapGenshinCharacterFromDbModel(model *db_models.DbCharacter) genshin_models.Character {
+	return genshin_models.Character{
+		CharacterId: string(model.CharacterId),
+		Name:        mapper.StringFromDbModel(&model.Name),
+		FullName:    mapper.StringFromDbModel(&model.FullName),
+		Description: mapper.StringFromDbModel(&model.Description),
+		Title:       mapper.StringFromDbModel(&model.Title),
+		Element:     genshin_models.Element(model.Element),
+		Rarity:      genshin_models.Rarity(model.Rarity),
+		Weapon:      genshin_models.WeaponType(model.Weapon),
+	}
+}
+
+// LanguageFromDbModel Converts DB language model to language model
+func (mapper Mapper) LanguageFromDbModel(model *db_models.DbLanguage) academy_models.Language {
+	return academy_models.Language{
+		AcademyModel: academy_models.AcademyModel{
+			Id: academy_models.AcademyId(model.Id),
 		},
 		LanguageName: model.Name,
 	}
 }
 
-// Converts Core language model to DB language model
-func DbLanguageFromModel(model *models.Language) db_models.Db_Language {
-	return db_models.Db_Language{
+// DbLanguageFromModel Converts language model to DB language model
+func (mapper Mapper) DbLanguageFromModel(model *academy_models.Language) db_models.DbLanguage {
+	return db_models.DbLanguage{
 		Id:   db_models.DBKey(model.Id),
 		Name: model.LanguageName,
 	}
 }
 
-// Converts DB string model to LocalizedString
-func LocalizedStringFromDbModel(model *db_models.Db_String) localized_string.LocalizedString {
+// StringFromDbModel Gets string value from Db model
+func (mapper Mapper) StringFromDbModel(model *db_models.DbString) string {
+	if model.GetValue() == "" {
+		return ""
+	}
+	return model.GetValue()
+}
+
+func (mapper Mapper) MapDbStringFromString(key db_models.DBKey, value string) db_models.DbString {
+	return db_models.DbString{
+		Id: db_models.DBKey(key),
+		StringValues: []db_models.DbStringvalue{
+			{
+				Id:         db_models.DBKey(key),
+				LanguageId: db_models.DBKey(mapper.languge.Id),
+				Value:      value,
+			},
+		},
+	}
+}
+
+// LocalizedStringFromDbModel Converts DB string model to LocalizedString
+func (mapper Mapper) LocalizedStringFromDbModel(model *db_models.DbString) localized_string.LocalizedString {
 	if model.GetValue() == "" {
 		return localized_string.Empty(localized_string.StringId(model.Id))
 	}
@@ -72,11 +116,11 @@ func LocalizedStringFromDbModel(model *db_models.Db_String) localized_string.Loc
 	)
 }
 
-// Converts LocalizedString to DB string model
-func DbStringFromLocalizedString(model *localized_string.LocalizedString) db_models.Db_String {
-	return db_models.Db_String{
+// MapDbStringFromLocalizedString Converts LocalizedString to DB string model
+func (mapper Mapper) MapDbStringFromLocalizedString(model *localized_string.LocalizedString) db_models.DbString {
+	return db_models.DbString{
 		Id: db_models.DBKey(model.GetId()),
-		StringValues: []db_models.Db_StringValue{
+		StringValues: []db_models.DbStringvalue{
 			{
 				Id:         db_models.DBKey(model.GetId()),
 				LanguageId: db_models.DBKey(model.GetLanguageId()),

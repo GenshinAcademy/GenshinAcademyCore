@@ -1,6 +1,6 @@
 package db_models
 
-type Db_CharacterIcon struct {
+type DbCharacterIcon struct {
 	Id          DBKey `gorm:"primaryKey"`
 	CharacterId DBKey
 	IconType    byte

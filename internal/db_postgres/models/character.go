@@ -1,19 +1,20 @@
 package db_models
 
-//Character DB model
-type Db_Character struct {
-	Id            DBKey `gorm:"primaryKey"`
-	NameId        DBKey `gorm:"column:name"`
-	Name          Db_String
-	CharacterId   string `gorm:"column:character_id;uniqueIndex"`
-	FullNameId    DBKey  `gorm:"column:full_name"`
-	FullName      Db_String
-	DescriptionId DBKey `gorm:"column:description"`
-	Description   Db_String
-	TitleId       DBKey `gorm:"column:title"`
-	Title         Db_String
-	Element       byte               `gorm:"column:element"`
-	Rarity        byte               `gorm:"column:rarity"`
-	Weapon        byte               `gorm:"column:weapon"`
-	Icons         []Db_CharacterIcon `gorm:"foreignKey:CharacterId"`
+// DbCharacter Character DB model
+type DbCharacter struct {
+	Id              DBKey `gorm:"primaryKey"`
+	NameId          DBKey `gorm:"column:name"`
+	Name            DbString
+	CharacterId     GenshinKey `gorm:"column:character_id;uniqueIndex"`
+	FullNameId      DBKey      `gorm:"column:full_name"`
+	FullName        DbString
+	DescriptionId   DBKey `gorm:"column:description"`
+	Description     DbString
+	TitleId         DBKey `gorm:"column:title"`
+	Title           DbString
+	Element         uint8              `gorm:"column:element"`
+	Rarity          uint8              `gorm:"column:rarity"`
+	Weapon          uint8              `gorm:"column:weapon"`
+	Icons           []DbCharacterIcon  `gorm:"foreignKey:CharacterId"`
+	ArtifactProfits []DbArtifactProfit `gorm:"foreignKey:CharacterId"`
 }

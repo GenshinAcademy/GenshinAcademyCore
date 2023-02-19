@@ -1,16 +1,12 @@
 package models
 
-import (
-	"ga/pkg/genshin_core/value_objects/localized_string"
-)
-
 type Character struct {
 	BaseModel
-	Name        localized_string.LocalizedString
+	Name        string
 	CharacterId string
-	FullName    localized_string.LocalizedString
-	Description localized_string.LocalizedString
-	Title       localized_string.LocalizedString
+	FullName    string
+	Description string
+	Title       string
 	Element     Element
 	Rarity      Rarity
 	Weapon      WeaponType

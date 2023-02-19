@@ -5,7 +5,6 @@ type WeaponType byte
 type BodyType byte
 type Element byte
 type Rarity byte
-type CharacterIconType byte
 type Region byte
 
 const (

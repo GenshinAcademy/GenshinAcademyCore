@@ -1,9 +1,9 @@
-package db_repositories
+package academy
 
 import (
+	models "ga/internal/academy_core/models"
 	db_mappers "ga/internal/db_postgres/mappers"
 	db_models "ga/internal/db_postgres/models"
-	"ga/pkg/genshin_core/models"
 
 	"gorm.io/gorm"
 )
@@ -27,20 +27,20 @@ func (repo PostgresLanguageRepository) AddLanguage(language *models.Language) {
 		panic("Language with this name already exists")
 	}
 
-	var langDbModel = db_models.Db_Language{
+	var langDbModel = db_models.DbLanguage{
 		Name: language.LanguageName,
 	}
 
 	repo.gormConnection.Create(&langDbModel)
 	//TODO: Error
-	language.Id = models.ModelId(langDbModel.Id)
+	language.Id = models.AcademyId(langDbModel.Id)
 }
 
 // Finds language by name
 func (repo PostgresLanguageRepository) FindLanguage(lang string) models.Language {
-	var langDbModel = db_models.Db_Language{}
+	var langDbModel = db_models.DbLanguage{}
 
 	repo.gormConnection.Where("name = ?", &lang).First(&langDbModel)
 	//TODO: Error
-	return db_mappers.LanguageFromDbModel(&langDbModel)
+    return db_mappers.Mapper{}.LanguageFromDbModel(&langDbModel)
 }

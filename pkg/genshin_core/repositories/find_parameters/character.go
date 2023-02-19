@@ -4,13 +4,7 @@ import "ga/pkg/genshin_core/models"
 
 type CharacterFindParameters struct {
 	FindParameters
-	CharactedIds []string
-	Elements     []models.Element
-}
-
-func (param CharacterFindParameters) AddCharacterId(name string) CharacterFindParameters {
-	param.CharactedIds = append(param.CharactedIds, name)
-	return param
+	Elements []models.Element
 }
 
 func (param CharacterFindParameters) AddElement(element models.Element) CharacterFindParameters {
@@ -20,6 +14,8 @@ func (param CharacterFindParameters) AddElement(element models.Element) Characte
 
 func FindByCharacterId(characterId string) CharacterFindParameters {
 	return CharacterFindParameters{
-		CharactedIds: []string{characterId},
+		FindParameters: FindParameters{
+			Ids: []models.ModelId{models.ModelId(characterId)},
+		},
 	}
 }

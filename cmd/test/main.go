@@ -10,7 +10,7 @@ import (
 )
 
 // Sample method for creating characters
-func createHuTao(language models.Language, charRepo *repositories.ICharacterRepository) {
+func createHuTao(language models.Language, charRepo *repositories.CharacterRepository) {
 	//var languageId localized_string.LanguageId = localized_string.LanguageId(language.Id)
 	//localized_string.New(languageId, "SomeTitle"), Is valid option to craete strings too!
 	var hutao = models.Character{
@@ -28,7 +28,7 @@ func createHuTao(language models.Language, charRepo *repositories.ICharacterRepo
 	(*charRepo).AddCharacter(&hutao)
 }
 
-func updateCharacter(language models.Language, character *models.Character, repo repositories.ICharacterRepository) {
+func updateCharacter(language models.Language, character *models.Character, repo repositories.CharacterRepository) {
 	character.Name = language.CreateString(character.Name, "Name"+language.LanguageName)
 	character.FullName = language.CreateString(character.FullName, "FullName"+language.LanguageName)
 	character.Description = language.CreateString(character.Description, "Description"+language.LanguageName)

@@ -1,15 +1,17 @@
 package models
 
-import "ga/pkg/genshin_core/value_objects/localized_string"
+import (
+	"ga/internal/academy_core/value_objects/localized_string"
+)
 
 // Language
 type Language struct {
-	BaseModel
+	AcademyModel
 	LanguageName string
 }
 
 func (lang Language) CreateNewString(value string) localized_string.LocalizedString {
-	if lang.Id == 0 {
+	if lang.Id == UNDEFINED_ID {
 		panic("Cannot create new string for not initialized language")
 	}
 
@@ -18,7 +20,7 @@ func (lang Language) CreateNewString(value string) localized_string.LocalizedStr
 
 // Create new string for specified language
 func (lang Language) CreateString(src localized_string.LocalizedString, value string) localized_string.LocalizedString {
-	if lang.Id == 0 {
+	if lang.Id == UNDEFINED_ID {
 		panic("Cannot create new string for not initialized language")
 	}
 

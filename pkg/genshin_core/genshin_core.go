@@ -1,61 +1,44 @@
 package genshin_core
 
 import (
-	"ga/pkg/genshin_core/models"
+	"ga/pkg/genshin_core/languages"
 	"ga/pkg/genshin_core/repositories"
 )
 
-type GetProviderFunc func(models.Language) repositories.IRepositoryProvider
-type GetLanguageRepoFunc func() repositories.ILanguageRepository
+type GetProviderFunc func(languages.Language) repositories.RepositoryProvider
 
 type GenshinCoreConfiguration struct {
-	DefaultLanguage  string
-	ProviderFunc     GetProviderFunc
-	LanguageRepoFunc GetLanguageRepoFunc
+	DefaultLanguage languages.Language
+	ProviderFunc    GetProviderFunc
 }
 
 type GenshinCore struct {
 	providerFunc        GetProviderFunc
-	languageRepoFunc    GetLanguageRepoFunc
-	defaultLanguageName string
+	defaultLanguageName languages.Language
 }
 
-func (core *GenshinCore) GetDefaultLanguageName() string {
+func (core *GenshinCore) GetDefaultLanguageName() languages.Language {
 	return core.defaultLanguageName
 }
 
-func defaultGetProvider(language models.Language) repositories.IRepositoryProvider {
+func defaultGetProvider(languages.Language) repositories.RepositoryProvider {
 	panic("GetProviderFunc not specified!")
 }
-
-func defaultGetLanguageRepo() repositories.ILanguageRepository {
-	panic("GetLanguageRepoFunc not specified!")
-}
-
 func CreateGenshinCore(config GenshinCoreConfiguration) *GenshinCore {
 	var core = new(GenshinCore)
 	core.defaultLanguageName = config.DefaultLanguage
 	core.providerFunc = defaultGetProvider
-	core.languageRepoFunc = defaultGetLanguageRepo
 
-	if config.LanguageRepoFunc != nil {
-		core.languageRepoFunc = config.LanguageRepoFunc
-	}
-	if config.LanguageRepoFunc != nil {
+	if config.ProviderFunc != nil {
 		core.providerFunc = config.ProviderFunc
 	}
 	return core
 }
 
-func (core *GenshinCore) GetLanguageRepository() repositories.ILanguageRepository {
-	return core.languageRepoFunc()
+func (core *GenshinCore) GetDefaultProvider() repositories.RepositoryProvider {
+	return core.GetProvider(core.defaultLanguageName)
 }
 
-func (core *GenshinCore) GetDefaultProvider() repositories.IRepositoryProvider {
-	var defaultLanguage = core.languageRepoFunc().FindLanguage(core.defaultLanguageName)
-	return core.GetProvider(defaultLanguage)
-}
-
-func (core *GenshinCore) GetProvider(language models.Language) repositories.IRepositoryProvider {
+func (core *GenshinCore) GetProvider(language languages.Language) repositories.RepositoryProvider {
 	return core.providerFunc(language)
 }

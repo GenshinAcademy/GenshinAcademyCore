@@ -6,11 +6,12 @@ import (
 	"gorm.io/gorm"
 )
 
-// Creates database structure
+// MigrateDatabase Creates database structure
 func MigrateDatabase(connection *gorm.DB) {
-	connection.AutoMigrate(&db_models.Db_Language{})
-	connection.AutoMigrate(&db_models.Db_String{})
-	connection.AutoMigrate(&db_models.Db_StringValue{})
-	connection.AutoMigrate(&db_models.Db_Character{})
-	connection.AutoMigrate(&db_models.Db_CharacterIcon{})
+	connection.AutoMigrate(&db_models.DbLanguage{})
+	connection.AutoMigrate(&db_models.DbString{})
+	connection.AutoMigrate(&db_models.DbStringvalue{})
+	connection.AutoMigrate(&db_models.DbCharacter{})
+	connection.AutoMigrate(&db_models.DbCharacterIcon{})
+    connection.AutoMigrate(&db_models.DbArtifactProfit{})
 }

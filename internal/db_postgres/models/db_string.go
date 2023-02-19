@@ -1,29 +1,29 @@
 package db_models
 
-//Special table for connectiong string refs and other entities in DB
-type Db_String struct {
-	Id           DBKey            `gorm:"primaryKey;autoIncrement:true"`
-	StringValues []Db_StringValue `gorm:"foreignKey:Id"`
+// DbString Special table for connectiong string refs and other entities in DB
+type DbString struct {
+	Id           DBKey           `gorm:"primaryKey;autoIncrement:true"`
+	StringValues []DbStringvalue `gorm:"foreignKey:Id"`
 }
 
-// Value of string. Separate table in DB
-type Db_StringValue struct {
+// DbStringvalue Value of string. Separate table in DB
+type DbStringvalue struct {
 	Id         DBKey `gorm:"primaryKey"`
 	LanguageId DBKey `gorm:"primaryKey"`
-	Language   Db_Language
+	Language   DbLanguage
 	Value      string
 }
 
-// Gets first string value
-func (str Db_String) GetValue() string {
+// GetValue Gets first string value
+func (str DbString) GetValue() string {
 	if len(str.StringValues) == 0 {
 		return ""
 	}
 	return str.StringValues[0].Value
 }
 
-// Gets first language
-func (str Db_String) GetLanguageId() DBKey {
+// GetLanguageId Gets first language
+func (str DbString) GetLanguageId() DBKey {
 	if len(str.StringValues) == 0 {
 		return DBKey(0)
 	}

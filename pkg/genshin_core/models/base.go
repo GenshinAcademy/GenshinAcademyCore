@@ -1,9 +1,9 @@
 package models
 
-type ModelId uint64
+type ModelId string
 
 const (
-	UNDEFINED_ID ModelId = 0
+	DEFAULT_ID ModelId = ""
 )
 
 type BaseModel struct {
@@ -11,5 +11,5 @@ type BaseModel struct {
 }
 
 func (id ModelId) IsValid() bool {
-	return id != UNDEFINED_ID
+	return id != DEFAULT_ID
 }
