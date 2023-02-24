@@ -14,7 +14,7 @@ type CharacterStrings struct {
 func (cache *Cache) GetCharacterStrings(key db_models.DBKey) *CharacterStrings {
 	var val, ok = cache.characterStrings[key]
 	if !ok {
-		return &CharacterStrings{}
+		return nil
 	}
 	return val
 }
