@@ -1,4 +1,4 @@
-package models
+package enums
 
 type Gender byte
 type WeaponType byte

@@ -1,8 +1,9 @@
 package db_models
 
 type DbCharacterIcon struct {
-	Id          DBKey `gorm:"primaryKey"`
-	CharacterId DBKey
-	IconType    byte
+	CharacterId DBKey `gorm:"primaryKey"`
+	IconType    uint8  `gorm:"primaryKey"`
 	Url         string
 }
+
+// TODO: Make URL type that checks format 

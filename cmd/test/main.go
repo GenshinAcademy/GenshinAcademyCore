@@ -2,42 +2,50 @@ package main
 
 import (
 	"fmt"
-	"ga/internal/genshin_core_postgres"
+	"ga/internal/academy_core"
+	academy_models "ga/internal/academy_core/models"
+	academy_postgres "ga/internal/db_postgres/implementation/academy"
 	core "ga/pkg/genshin_core"
+
 	"ga/pkg/genshin_core/models"
+	"ga/pkg/genshin_core/models/enums"
+	"ga/pkg/genshin_core/models/languages"
 	"ga/pkg/genshin_core/repositories"
 	"ga/pkg/genshin_core/repositories/find_parameters"
 )
 
 // Sample method for creating characters
-func createHuTao(language models.Language, charRepo *repositories.CharacterRepository) {
+func createHuTao(charRepo *repositories.CharacterRepository) {
 	//var languageId localized_string.LanguageId = localized_string.LanguageId(language.Id)
 	//localized_string.New(languageId, "SomeTitle"), Is valid option to craete strings too!
 	var hutao = models.Character{
-		CharacterId: "hu_tao",
-		Element:     models.Pyro,
-		Rarity:      models.Legendary,
-		Weapon:      models.Polearm,
+		BaseModel: models.BaseModel{
+			Id: models.ModelId("hu_tao"),
+		},
+		Name:        "Hu Tao",
+		FullName:    "Hu Tao",
+		Description: "Pyro DPS character",
+		Title:       "Some title",
+		Element:     enums.Pyro,
+		Rarity:      enums.Legendary,
+		Weapon:      enums.Polearm,
 	}
-
-	hutao.Name = language.CreateString(hutao.Name, "Hu Tao")
-	hutao.FullName = language.CreateString(hutao.FullName, "Hu Taoooo")
-	hutao.Description = language.CreateString(hutao.Description, "Pyro character")
-	hutao.Title = language.CreateString(hutao.Title, "Title")
 
 	(*charRepo).AddCharacter(&hutao)
 }
 
-func updateCharacter(language models.Language, character *models.Character, repo repositories.CharacterRepository) {
-	character.Name = language.CreateString(character.Name, "Name"+language.LanguageName)
-	character.FullName = language.CreateString(character.FullName, "FullName"+language.LanguageName)
-	character.Description = language.CreateString(character.Description, "Description"+language.LanguageName)
-	character.Title = language.CreateString(character.Title, "Title"+language.LanguageName)
+func updateCharacter(character *models.Character, repo repositories.CharacterRepository) {
+
+	character.Name = "Ху Тао"
+	character.FullName = "Ху Тао"
+	character.Description = "Персонаж тест"
+	character.Title = "Титул"
+
 	repo.UpdateCharacter(character)
 }
 
 func main() {
-	var dbConfig genshin_core_postgres.PostgresDatabaseConfiguration = genshin_core_postgres.PostgresDatabaseConfiguration{
+	var dbConfig academy_postgres.PostgresDatabaseConfiguration = academy_postgres.PostgresDatabaseConfiguration{
 		Host:         "localhost",
 		UserName:     "postgres",
 		UserPassword: "12345678",
@@ -45,27 +53,30 @@ func main() {
 		Port:         5432,
 		ServerPort:   0,
 	}
-	genshin_core_postgres.InitializePostgresDatabase(dbConfig)
-	defer genshin_core_postgres.CleanupConnections()
 
-	var defaultLanguage = "Russian"
+	academy_postgres.InitializePostgresDatabase(dbConfig)
+	defer academy_postgres.CleanupConnections()
+
+	var defaultLanguage = languages.English
 	//Initializing gacore config and configure it for postgres db
-	var config core.GenshinCoreConfiguration = core.GenshinCoreConfiguration{
-		DefaultLanguage: defaultLanguage,
+	var config academy_core.AcademyCoreConfiguration = academy_core.AcademyCoreConfiguration{
+		GenshinCoreConfiguration: core.GenshinCoreConfiguration{
+			DefaultLanguage: defaultLanguage,
+		},
 	}
-	genshin_core_postgres.ConfigurePostgresDB(&config)
+	academy_postgres.ConfigurePostgresDB(&config)
 
 	//Create ga core
-	var gacore *core.GenshinCore = core.CreateGenshinCore(config)
+	var gacore *academy_core.AcademyCore = academy_core.CreateAcademyCore(config)
 
 	var langRepo = gacore.GetLanguageRepository()
 
 	//Create language if it does not exist
-	var language = langRepo.FindLanguage(gacore.GetDefaultLanguageName())
+	var language = gacore.GetDefaultLanguage()
 	var upd bool = false
 	if language.Id == 0 {
-		language = models.Language{
-			LanguageName: defaultLanguage,
+		language = academy_models.Language{
+			LanguageName: string(defaultLanguage),
 		}
 		langRepo.AddLanguage(&language)
 		fmt.Println("Language created successfully!\n", language)
@@ -75,22 +86,24 @@ func main() {
 	}
 
 	//Get provider (with default language, and then character repo)
-	var provider = gacore.GetDefaultProvider()
-	var characterRepo = provider.NewCharacterRepo()
+	var characterRepo = gacore.AsGenshinCore().GetDefaultProvider().NewCharacterRepo()
 
 	var findParams = find_parameters.FindByCharacterId("hu_tao")
 	var result = characterRepo.FindCharacters(findParams)
-	var hutao models.Character = characterRepo.FindCharacterById(1)
+	var hutao, _ = characterRepo.FindCharacterById("hu_tao")
 	if len(result) == 0 {
-		createHuTao(language, &characterRepo)
+		createHuTao(&characterRepo)
 		var hutaoNew = characterRepo.FindCharacters(findParams)[0]
 		fmt.Println("Hu tao successfully added to DB!\n", hutaoNew)
 		return
 	}
 	if upd {
-		updateCharacter(language, &hutao, characterRepo)
+		updateCharacter(&hutao, characterRepo)
 		fmt.Println("Hu Tao model updated successfully!\n", hutao)
 	}
 
 	fmt.Println("Hu Tao model retrieved successfully!\n", hutao)
+
+	var hutaoacad, _ = gacore.GetDefaultProvider().NewCharacterRepo().FindCharacterByGenshinId("hu_tao")
+	fmt.Println("Hu Tao ACADEMY model retrieved successfully!\n", hutaoacad)
 }

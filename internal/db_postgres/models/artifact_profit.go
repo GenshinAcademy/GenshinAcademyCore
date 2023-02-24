@@ -1,20 +1,19 @@
 package db_models
 
 type DbArtifactProfit struct {
-	CharacterId       DBKey `gorm:"primaryKey"`
-	SlotId            DBKey `gorm:"primaryKey"`
-	SlotName          string
-	Attack            uint16
-	AttackPercentage  uint16
-	Health            uint16
-	HealthPercentage  uint16
-	Defense           uint16
-	DefensePercentage uint16
-	ElementalMastery  uint16
-	EnergyRecharge    uint16
-	ElementalDamage   uint16
-	CritRate          uint16
-	CritDamage        uint16
-	PhysicalDamage    uint16
-	Heal              uint16
+	CharacterId       DBKey  `gorm:"primaryKey"`
+	SlotId            DBKey  `gorm:"primaryKey"`
+	Attack            uint16 `gorm:"not null"`
+	AttackPercentage  uint16 `gorm:"not null"`
+	Health            uint16 `gorm:"not null"`
+	HealthPercentage  uint16 `gorm:"not null"`
+	Defense           uint16 `gorm:"not null"`
+	DefensePercentage uint16 `gorm:"not null"`
+	ElementalMastery  uint16 `gorm:"not null"`
+	EnergyRecharge    uint16 `gorm:"not null"`
+	ElementalDamage   uint16 `gorm:"not null"`
+	CritRate          uint16 `gorm:"not null"`
+	CritDamage        uint16 `gorm:"not null"`
+	PhysicalDamage    uint16 `gorm:"not null"`
+	Heal              uint16 `gorm:"not null"`
 }

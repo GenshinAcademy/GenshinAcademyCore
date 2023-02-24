@@ -1,29 +1,30 @@
 package academy
 
 import (
-	models "ga/internal/academy_core/models"
+    academy_models "ga/internal/academy_core/models"
+    "ga/pkg/genshin_core/models/languages"
 	db_mappers "ga/internal/db_postgres/mappers"
 	db_models "ga/internal/db_postgres/models"
 
-	"gorm.io/gorm"
+    "gorm.io/gorm"
 )
 
-// Postgres language repository
+// PostgresLanguageRepository Postgres language repository
 type PostgresLanguageRepository struct {
 	gormConnection *gorm.DB
 }
 
-// Creates language repository with provided gorm connection
+// CreatePostresLanguageRepository Creates language repository with provided gorm connection
 func CreatePostresLanguageRepository(connection *gorm.DB) PostgresLanguageRepository {
 	return PostgresLanguageRepository{
 		gormConnection: connection,
 	}
 }
 
-// Adds language
-func (repo PostgresLanguageRepository) AddLanguage(language *models.Language) {
-	var langModel = repo.FindLanguage(language.LanguageName)
-	if langModel.Id != 0 {
+// AddLanguage Adds language
+func (repo PostgresLanguageRepository) AddLanguage(language *academy_models.Language) {
+    var langModel = repo.FindLanguage(languages.Language(language.LanguageName))
+	if langModel.Id != academy_models.UNDEFINED_ID {
 		panic("Language with this name already exists")
 	}
 
@@ -33,14 +34,14 @@ func (repo PostgresLanguageRepository) AddLanguage(language *models.Language) {
 
 	repo.gormConnection.Create(&langDbModel)
 	//TODO: Error
-	language.Id = models.AcademyId(langDbModel.Id)
+	language.Id = academy_models.AcademyId(langDbModel.Id)
 }
 
-// Finds language by name
-func (repo PostgresLanguageRepository) FindLanguage(lang string) models.Language {
+// FindLanguage Finds language by name
+func (repo PostgresLanguageRepository) FindLanguage(lang languages.Language) academy_models.Language {
 	var langDbModel = db_models.DbLanguage{}
 
 	repo.gormConnection.Where("name = ?", &lang).First(&langDbModel)
 	//TODO: Error
-    return db_mappers.Mapper{}.LanguageFromDbModel(&langDbModel)
+    return db_mappers.Mapper{}.MapLanguageFromDbModel(&langDbModel)
 }

@@ -5,7 +5,6 @@ import (
 	"ga/pkg/genshin_core/models"
 )
 
-const UNDEFINED_ID = 0
 
 type Character struct {
 	AcademyModel

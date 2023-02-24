@@ -1,4 +1,4 @@
-package models
+package value_objects
 
 type CharacterIconType byte
 
@@ -9,7 +9,6 @@ const (
 )
 
 type CharacterIcon struct {
-	CharacterId ModelId
 	Type        CharacterIconType
 	Url         string
 }

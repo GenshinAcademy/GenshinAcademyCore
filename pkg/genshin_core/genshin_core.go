@@ -1,7 +1,7 @@
 package genshin_core
 
 import (
-	"ga/pkg/genshin_core/languages"
+	"ga/pkg/genshin_core/models/languages"
 	"ga/pkg/genshin_core/repositories"
 )
 

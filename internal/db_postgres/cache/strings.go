@@ -1,6 +1,8 @@
 package cache
 
-import db_models "ga/internal/db_postgres/models"
+import (
+	db_models "ga/internal/db_postgres/models"
+)
 
 type CharacterStrings struct {
 	Name        db_models.DBKey
@@ -8,6 +10,7 @@ type CharacterStrings struct {
 	Description db_models.DBKey
 	Title       db_models.DBKey
 }
+
 func (cache *Cache) GetCharacterStrings(key db_models.DBKey) *CharacterStrings {
 	var val, ok = cache.characterStrings[key]
 	if !ok {
@@ -19,7 +22,7 @@ func (cache *Cache) GetCharacterStrings(key db_models.DBKey) *CharacterStrings {
 func (cache *Cache) UpdateCharacterStrings(model *db_models.DbCharacter) *CharacterStrings {
 	var strings = cache.GetCharacterStrings(model.Id)
 	if strings == nil {
-		strings = &CharacterStrings{}
+		strings = new(CharacterStrings)
 		cache.characterStrings[model.Id] = strings
 	}
 
@@ -28,5 +31,5 @@ func (cache *Cache) UpdateCharacterStrings(model *db_models.DbCharacter) *Charac
 	strings.Description = model.DescriptionId
 	strings.Title = model.TitleId
 
-    return strings
+	return strings
 }

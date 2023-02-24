@@ -21,7 +21,7 @@ func (str LocalizedString) GetLanguageId() LanguageId {
 	return str.languageId
 }
 
-// Gets string value
+// GetValue Gets string value
 func (str LocalizedString) GetValue() string {
 	return str.value
 }
@@ -46,7 +46,7 @@ func New(languageId LanguageId, value string) LocalizedString {
 	}
 }
 
-// Instantiates LocalizedString assuming existing values are passed
+// Create Instantiates LocalizedString assuming existing values are passed
 func Create(id StringId, languageId LanguageId, value string) LocalizedString {
 	if value == "" {
 		panic("Cannot create empty string")
@@ -58,7 +58,7 @@ func Create(id StringId, languageId LanguageId, value string) LocalizedString {
 	}
 }
 
-// Compares string by Id. (Strings of different languages but with same Ids are treated as same strings)
+// Equals Compares string by Id. (Strings of different languages but with same Ids are treated as same strings)
 func Equals(str1 *LocalizedString, str2 *LocalizedString) bool {
 	if str1 == nil && str2 == nil {
 		return true
@@ -70,7 +70,7 @@ func Equals(str1 *LocalizedString, str2 *LocalizedString) bool {
 	return str1.id == str2.id
 }
 
-// Compares two strings by Id and language
+// EqualsCulture Compares two strings by Id and language
 func EqualsCulture(str1 *LocalizedString, str2 *LocalizedString) bool {
 	if str1 == nil && str2 == nil {
 		return true
