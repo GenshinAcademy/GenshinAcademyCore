@@ -6,8 +6,9 @@ import (
 	academy_models "ga/internal/academy_core/models"
 	academy_postgres "ga/internal/db_postgres/implementation/academy"
 	core "ga/pkg/genshin_core"
+    "ga/pkg/genshin_core/value_objects"
 
-	"ga/pkg/genshin_core/models"
+    "ga/pkg/genshin_core/models"
 	"ga/pkg/genshin_core/models/enums"
 	"ga/pkg/genshin_core/models/languages"
 	"ga/pkg/genshin_core/repositories"
@@ -97,6 +98,15 @@ func main() {
 		fmt.Println("Hu tao successfully added to DB!\n", hutaoNew)
 		return
 	}
+
+    upd = true
+    if len(hutao.Icons) == 0 {
+        hutao.Icons = append(hutao.Icons, value_objects.CharacterIcon{
+            Type: value_objects.Front,
+            Url: "http://localhost/hu_tao.png",
+        })
+    }
+
 	if upd {
 		updateCharacter(&hutao, characterRepo)
 		fmt.Println("Hu Tao model updated successfully!\n", hutao)
