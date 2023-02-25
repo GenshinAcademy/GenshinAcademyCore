@@ -39,7 +39,7 @@ func (repo PostgresCharacterRepository) preloadStrings(preloads []string) *gorm.
 
 var (
 	characterStringPreloads []string = []string{
-		"DatabaseName.StringValues",
+		"Name.StringValues",
 		"FullName.StringValues",
 		"Description.StringValues",
 		"Title.StringValues",
