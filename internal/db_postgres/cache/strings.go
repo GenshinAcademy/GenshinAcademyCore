@@ -20,6 +20,7 @@ func (cache *Cache) GetCharacterStrings(key db_models.DBKey) *CharacterStrings {
 }
 
 func (cache *Cache) UpdateCharacterStrings(model *db_models.DbCharacter) *CharacterStrings {
+    cache.Lock()
 	var strings = cache.GetCharacterStrings(model.Id)
 	if strings == nil {
 		strings = new(CharacterStrings)
@@ -30,6 +31,7 @@ func (cache *Cache) UpdateCharacterStrings(model *db_models.DbCharacter) *Charac
 	strings.FullName = model.FullNameId
 	strings.Description = model.DescriptionId
 	strings.Title = model.TitleId
+    cache.Unlock()
 
 	return strings
 }
