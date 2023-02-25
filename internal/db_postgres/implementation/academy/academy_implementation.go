@@ -40,7 +40,7 @@ type PostgresDatabaseConfiguration struct {
     Host         string
     UserName     string
     UserPassword string
-    Name         string
+    DatabaseName string
     Port         uint16
     ServerPort   uint16
 }
@@ -51,7 +51,7 @@ func (dbConfig PostgresDatabaseConfiguration) GetConnectionString() string {
         dbConfig.Host,
         dbConfig.UserName,
         dbConfig.UserPassword,
-        dbConfig.Name,
+        dbConfig.DatabaseName,
         dbConfig.Port)
 }
 

@@ -49,7 +49,7 @@ func main() {
 		Host:         "localhost",
 		UserName:     "postgres",
 		UserPassword: "12345678",
-		Name:         "gacore_db",
+		DatabaseName: "gacore_db",
 		Port:         5432,
 		ServerPort:   0,
 	}
