@@ -33,10 +33,15 @@ const (
 )
 
 const (
-	Common Rarity = iota
-	Uncommon
-	Rare
+    // Common 1 star rarity
+    Common Rarity = iota
+    // Uncommon 2 star rarity
+    Uncommon
+    // Rare 3 star rarity
+    Rare
+    // Epic 4 star rarity
 	Epic
+    // Legendary 5 star rarity
 	Legendary
 )
 
