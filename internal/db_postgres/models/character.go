@@ -1,6 +1,6 @@
 package db_models
 
-// DbCharacter Character DB model
+// DbCharacters represents Genshin character in database.
 type DbCharacter struct {
 	Id              DBKey `gorm:"primaryKey"`
 	NameId          DBKey `gorm:"column:name"`

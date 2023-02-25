@@ -20,19 +20,19 @@ import (
 
 type Mapper struct {
 	cache        *cache.Cache
-	languge      academy_models.Language
+	language     academy_models.Language
 	languageName string
 }
 
 func CreateMapper(languageName string, language academy_models.Language, cache *cache.Cache) Mapper {
 	return Mapper{
 		languageName: languageName,
-		languge:      language,
+		language:     language,
 		cache:        cache,
 	}
 }
 
-// MapDbCharacterFromModel Converts DB character model to Core character model
+// MapDbCharacterFromModel converts Core character model to DB character model.
 func (mapper Mapper) MapDbCharacterFromModel(model *academy_models.Character) db_models.DbCharacter {
 	var strings = mapper.cache.GetCharacterStrings(db_models.DBKey(model.Id))
 
@@ -52,7 +52,7 @@ func (mapper Mapper) MapDbCharacterFromModel(model *academy_models.Character) db
 	return character
 }
 
-// MapAcademyCharacterFromDbModel Converts Db character model to Academy character model
+// MapAcademyCharacterFromDbModel converts DB character model to Academy character model.
 func (mapper Mapper) MapAcademyCharacterFromDbModel(model *db_models.DbCharacter) academy_models.Character {
 	var character = academy_models.Character{
 		AcademyModel: academy_models.AcademyModel{
@@ -90,7 +90,7 @@ func (mapper Mapper) mapGenshinCharacterArrays(model *genshin_models.Character, 
 	}
 }
 
-// MapGenshinCharacterFromDbModel Converts Db character model to Core character model
+// MapGenshinCharacterFromDbModel converts DB character model to Core character model
 func (mapper Mapper) MapGenshinCharacterFromDbModel(model *db_models.DbCharacter) genshin_models.Character {
 	var character = genshin_models.Character{
 		BaseModel: genshin_models.BaseModel{
@@ -110,7 +110,7 @@ func (mapper Mapper) MapGenshinCharacterFromDbModel(model *db_models.DbCharacter
 	return character
 }
 
-// MapLanguageFromDbModel Converts DB language model to language model
+// MapLanguageFromDbModel converts DB language model to language model
 func (mapper Mapper) MapLanguageFromDbModel(model *db_models.DbLanguage) academy_models.Language {
 	return academy_models.Language{
 		AcademyModel: academy_models.AcademyModel{
@@ -120,7 +120,7 @@ func (mapper Mapper) MapLanguageFromDbModel(model *db_models.DbLanguage) academy
 	}
 }
 
-// DbLanguageFromModel Converts language model to DB language model
+// DbLanguageFromModel converts language model to DB language model
 func (mapper Mapper) DbLanguageFromModel(model *academy_models.Language) db_models.DbLanguage {
 	return db_models.DbLanguage{
 		Id:   db_models.DBKey(model.Id),
@@ -128,7 +128,7 @@ func (mapper Mapper) DbLanguageFromModel(model *academy_models.Language) db_mode
 	}
 }
 
-// StringFromDbModel Gets string value from Db model
+// StringFromDbModel returns string value from DB model
 func (mapper Mapper) StringFromDbModel(model *db_models.DbString) string {
 	if model.GetValue() == "" {
 		return ""
@@ -142,7 +142,7 @@ func (mapper Mapper) MapDbStringFromString(key db_models.DBKey, value string) db
 		StringValues: []db_models.DbStringvalue{
 			{
 				Id:         db_models.DBKey(key),
-				LanguageId: db_models.DBKey(mapper.languge.Id),
+				LanguageId: db_models.DBKey(mapper.language.Id),
 				Value:      value,
 			},
 		},
