@@ -1,11 +1,11 @@
 package enums
 
-type Gender byte
-type WeaponType byte
-type BodyType byte
-type Element byte
-type Rarity byte
-type Region byte
+type Gender uint8
+type WeaponType uint8
+type BodyType uint8
+type Element uint8
+type Rarity uint8
+type Region uint8
 
 const (
 	Male Gender = iota
