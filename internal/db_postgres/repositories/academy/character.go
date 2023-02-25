@@ -1,7 +1,6 @@
 package academy
 
 import (
-	"fmt"
 	academy_models "ga/internal/academy_core/models"
 	"ga/internal/academy_core/repositories/find_parameters"
 	"ga/internal/db_postgres"
@@ -119,9 +118,7 @@ func (repo PostgresCharacterRepository) UpdateCharacter(character *academy_model
 	}
 
 	var characterToUpdate = repo.mapper.MapDbCharacterFromModel(character)
-	fmt.Println(characterToUpdate)
 	repo.gormConnection.Save(&characterToUpdate)
-	fmt.Println(characterToUpdate)
 
 	db_postgres.GetCache().UpdateCharacterStrings(&characterToUpdate)
 }
