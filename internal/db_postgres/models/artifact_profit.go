@@ -1,7 +1,7 @@
 package db_models
 
-// DbArtifactProfit represents artifact stats profit for Genshin characters in database.
-type DbArtifactProfit struct {
+// ArtifactProfit represents table for Genshin characters' artifact stats profit in database.
+type ArtifactProfit struct {
 	CharacterId       DBKey  `gorm:"primaryKey"`
 	SlotId            DBKey  `gorm:"primaryKey"`
 	Attack            uint16 `gorm:"not null"`

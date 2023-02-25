@@ -19,8 +19,8 @@ func (cache *Cache) GetCharacterStrings(key db_models.DBKey) *CharacterStrings {
 	return val
 }
 
-func (cache *Cache) UpdateCharacterStrings(model *db_models.DbCharacter) *CharacterStrings {
-    cache.Lock()
+func (cache *Cache) UpdateCharacterStrings(model *db_models.Character) *CharacterStrings {
+	cache.Lock()
 	var strings = cache.GetCharacterStrings(model.Id)
 	if strings == nil {
 		strings = new(CharacterStrings)
@@ -31,7 +31,7 @@ func (cache *Cache) UpdateCharacterStrings(model *db_models.DbCharacter) *Charac
 	strings.FullName = model.FullNameId
 	strings.Description = model.DescriptionId
 	strings.Title = model.TitleId
-    cache.Unlock()
+	cache.Unlock()
 
 	return strings
 }

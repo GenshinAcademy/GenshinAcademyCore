@@ -25,10 +25,10 @@ func GetCache() *cache.Cache {
 
 // MigrateDatabase сreates database structure
 func MigrateDatabase(connection *gorm.DB) {
-	connection.AutoMigrate(&db_models.DbLanguage{})
-	connection.AutoMigrate(&db_models.DbString{})
-	connection.AutoMigrate(&db_models.DbStringvalue{})
-	connection.AutoMigrate(&db_models.DbCharacter{})
-	connection.AutoMigrate(&db_models.DbCharacterIcon{})
-	connection.AutoMigrate(&db_models.DbArtifactProfit{})
+	connection.AutoMigrate(&db_models.Language{})
+	connection.AutoMigrate(&db_models.String{})
+	connection.AutoMigrate(&db_models.StringValue{})
+	connection.AutoMigrate(&db_models.Character{})
+	connection.AutoMigrate(&db_models.CharacterIcon{})
+	connection.AutoMigrate(&db_models.ArtifactProfit{})
 }

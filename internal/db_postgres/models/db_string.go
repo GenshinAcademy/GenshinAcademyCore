@@ -1,21 +1,21 @@
 package db_models
 
-// DbString represents table for string refs and other entities in database.
-type DbString struct {
-	Id           DBKey           `gorm:"primaryKey;autoIncrement:true"`
-	StringValues []DbStringvalue `gorm:"foreignKey:Id"`
+// String represents table for string refs and other entities in database.
+type String struct {
+	Id           DBKey         `gorm:"primaryKey;autoIncrement:true"`
+	StringValues []StringValue `gorm:"foreignKey:Id"`
 }
 
-// DbStringvalue represents string values. Separate table in database.
-type DbStringvalue struct {
+// StringValue represents table for string values. Separate table in database.
+type StringValue struct {
 	Id         DBKey `gorm:"primaryKey"`
 	LanguageId DBKey `gorm:"primaryKey"`
-	Language   DbLanguage
+	Language   Language
 	Value      string
 }
 
 // GetValue gets first string value.
-func (str DbString) GetValue() string {
+func (str String) GetValue() string {
 	if len(str.StringValues) == 0 {
 		return ""
 	}
@@ -23,7 +23,7 @@ func (str DbString) GetValue() string {
 }
 
 // GetLanguageId gets first language.
-func (str DbString) GetLanguageId() DBKey {
+func (str String) GetLanguageId() DBKey {
 	if len(str.StringValues) == 0 {
 		return DBKey(0)
 	}

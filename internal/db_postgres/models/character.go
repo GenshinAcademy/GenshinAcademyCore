@@ -1,20 +1,20 @@
 package db_models
 
-// DbCharacters represents Genshin character in database.
-type DbCharacter struct {
+// Character represents table for Genshin character in database.
+type Character struct {
 	Id              DBKey `gorm:"primaryKey"`
 	NameId          DBKey `gorm:"column:name"`
-	Name            DbString
+	Name            String
 	CharacterId     GenshinKey `gorm:"column:character_id;uniqueIndex"`
 	FullNameId      DBKey      `gorm:"column:full_name"`
-	FullName        DbString
+	FullName        String
 	DescriptionId   DBKey `gorm:"column:description"`
-	Description     DbString
+	Description     String
 	TitleId         DBKey `gorm:"column:title"`
-	Title           DbString
-	Element         uint8              `gorm:"column:element"`
-	Rarity          uint8              `gorm:"column:rarity"`
-	Weapon          uint8              `gorm:"column:weapon"`
-	Icons           []DbCharacterIcon  `gorm:"foreignKey:CharacterId"`
-	ArtifactProfits []DbArtifactProfit `gorm:"foreignKey:CharacterId"`
+	Title           String
+	Element         uint8            `gorm:"column:element"`
+	Rarity          uint8            `gorm:"column:rarity"`
+	Weapon          uint8            `gorm:"column:weapon"`
+	Icons           []CharacterIcon  `gorm:"foreignKey:CharacterId"`
+	ArtifactProfits []ArtifactProfit `gorm:"foreignKey:CharacterId"`
 }

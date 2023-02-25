@@ -58,14 +58,14 @@ func (repo PostgresCharacterRepository) GetLanguage() academy_models.Language {
 }
 
 func (repo PostgresCharacterRepository) FindCharacterById(characterId academy_models.AcademyId) (academy_models.Character, bool) {
-	var selectedCharacter db_models.DbCharacter
+	var selectedCharacter db_models.Character
 	repo.addCharacterPreloads().Where("id = ?", characterId).First(&selectedCharacter)
 
 	return repo.mapper.MapAcademyCharacterFromDbModel(&selectedCharacter), selectedCharacter.Id != db_models.DBKey(academy_models.UNDEFINED_ID)
 }
 
 func (repo PostgresCharacterRepository) FindCharacterByGenshinId(characterId genshin_models.ModelId) (academy_models.Character, bool) {
-	var selectedCharacter db_models.DbCharacter
+	var selectedCharacter db_models.Character
 	repo.addCharacterPreloads().Where("character_id = ?", characterId).First(&selectedCharacter)
 
 	return repo.mapper.MapAcademyCharacterFromDbModel(&selectedCharacter), selectedCharacter.Id != db_models.DBKey(academy_models.UNDEFINED_ID)
@@ -73,7 +73,7 @@ func (repo PostgresCharacterRepository) FindCharacterByGenshinId(characterId gen
 
 func (repo PostgresCharacterRepository) FindCharacters(parameters find_parameters.CharacterFindParameters) []academy_models.Character {
 
-	var selectedChacters = make([]db_models.DbCharacter, 0)
+	var selectedChacters = make([]db_models.Character, 0)
 	var result = make([]academy_models.Character, 0)
 	gormConnection := repo.addCharacterPreloads()
 
@@ -124,7 +124,7 @@ func (repo PostgresCharacterRepository) UpdateCharacter(character *academy_model
 }
 
 func (repo PostgresCharacterRepository) GetCharacterIds(parameters find_parameters.CharacterFindParameters) []genshin_models.ModelId {
-	var characterNames []db_models.DbCharacter
+	var characterNames []db_models.Character
 	repo.gormConnection.Select([]string{"character_id"}, &characterNames)
 	var result = make([]genshin_models.ModelId, 0)
 	for _, character := range characterNames {

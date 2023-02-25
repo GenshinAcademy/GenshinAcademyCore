@@ -1,7 +1,7 @@
 package db_models
 
-// DbCharacterIcons represents icons for Genshin characters in database.
-type DbCharacterIcon struct {
+// CharacterIcon represents table for Genshin characters' icons in database.
+type CharacterIcon struct {
 	CharacterId DBKey `gorm:"primaryKey"`
 	IconType    uint8 `gorm:"primaryKey"`
 	Url         string

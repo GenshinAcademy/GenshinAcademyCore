@@ -33,10 +33,10 @@ func CreateMapper(languageName string, language academy_models.Language, cache *
 }
 
 // MapDbCharacterFromModel converts Core character model to DB character model.
-func (mapper Mapper) MapDbCharacterFromModel(model *academy_models.Character) db_models.DbCharacter {
+func (mapper Mapper) MapDbCharacterFromModel(model *academy_models.Character) db_models.Character {
 	var strings = mapper.cache.GetCharacterStrings(db_models.DBKey(model.Id))
 
-	var character = db_models.DbCharacter{
+	var character = db_models.Character{
 		Id:          db_models.DBKey(model.Id),
 		CharacterId: db_models.GenshinKey(model.Character.Id),
 		Name:        mapper.MapDbStringFromString(strings.Name, model.Name),
@@ -53,7 +53,7 @@ func (mapper Mapper) MapDbCharacterFromModel(model *academy_models.Character) db
 }
 
 // MapAcademyCharacterFromDbModel converts DB character model to Academy character model.
-func (mapper Mapper) MapAcademyCharacterFromDbModel(model *db_models.DbCharacter) academy_models.Character {
+func (mapper Mapper) MapAcademyCharacterFromDbModel(model *db_models.Character) academy_models.Character {
 	var character = academy_models.Character{
 		AcademyModel: academy_models.AcademyModel{
 			Id: academy_models.AcademyId(model.Id),
@@ -66,7 +66,7 @@ func (mapper Mapper) MapAcademyCharacterFromDbModel(model *db_models.DbCharacter
 	return character
 }
 
-func (mapper Mapper) mapDbCharacterArrays(model *db_models.DbCharacter, srcModel *academy_models.Character) {
+func (mapper Mapper) mapDbCharacterArrays(model *db_models.Character, srcModel *academy_models.Character) {
 	// Genshin related
 	for i := 0; i < len(srcModel.Icons); i += 1 {
 		model.Icons = append(model.Icons, mapper.MapDbCharacterIcon(db_models.DBKey(srcModel.Id), &srcModel.Icons[i]))
@@ -78,20 +78,20 @@ func (mapper Mapper) mapDbCharacterArrays(model *db_models.DbCharacter, srcModel
 	}
 }
 
-func (mapper Mapper) mapAcademyCharacterArrays(model *academy_models.Character, srcModel *db_models.DbCharacter) {
+func (mapper Mapper) mapAcademyCharacterArrays(model *academy_models.Character, srcModel *db_models.Character) {
 	for i := 0; i < len(srcModel.ArtifactProfits); i += 1 {
 		model.Profits = append(model.Profits, mapper.MapArtifactStats(&srcModel.ArtifactProfits[i]))
 	}
 }
 
-func (mapper Mapper) mapGenshinCharacterArrays(model *genshin_models.Character, srcModel *db_models.DbCharacter) {
+func (mapper Mapper) mapGenshinCharacterArrays(model *genshin_models.Character, srcModel *db_models.Character) {
 	for i := 0; i < len(srcModel.Icons); i += 1 {
 		model.Icons = append(model.Icons, mapper.MapCharacterIcon(&srcModel.Icons[i]))
 	}
 }
 
 // MapGenshinCharacterFromDbModel converts DB character model to Core character model
-func (mapper Mapper) MapGenshinCharacterFromDbModel(model *db_models.DbCharacter) genshin_models.Character {
+func (mapper Mapper) MapGenshinCharacterFromDbModel(model *db_models.Character) genshin_models.Character {
 	var character = genshin_models.Character{
 		BaseModel: genshin_models.BaseModel{
 			Id: genshin_models.ModelId(model.CharacterId),
@@ -111,7 +111,7 @@ func (mapper Mapper) MapGenshinCharacterFromDbModel(model *db_models.DbCharacter
 }
 
 // MapLanguageFromDbModel converts DB language model to language model
-func (mapper Mapper) MapLanguageFromDbModel(model *db_models.DbLanguage) academy_models.Language {
+func (mapper Mapper) MapLanguageFromDbModel(model *db_models.Language) academy_models.Language {
 	return academy_models.Language{
 		AcademyModel: academy_models.AcademyModel{
 			Id: academy_models.AcademyId(model.Id),
@@ -121,25 +121,25 @@ func (mapper Mapper) MapLanguageFromDbModel(model *db_models.DbLanguage) academy
 }
 
 // DbLanguageFromModel converts language model to DB language model
-func (mapper Mapper) DbLanguageFromModel(model *academy_models.Language) db_models.DbLanguage {
-	return db_models.DbLanguage{
+func (mapper Mapper) DbLanguageFromModel(model *academy_models.Language) db_models.Language {
+	return db_models.Language{
 		Id:   db_models.DBKey(model.Id),
 		Name: model.LanguageName,
 	}
 }
 
 // StringFromDbModel returns string value from DB model
-func (mapper Mapper) StringFromDbModel(model *db_models.DbString) string {
+func (mapper Mapper) StringFromDbModel(model *db_models.String) string {
 	if model.GetValue() == "" {
 		return ""
 	}
 	return model.GetValue()
 }
 
-func (mapper Mapper) MapDbStringFromString(key db_models.DBKey, value string) db_models.DbString {
-	return db_models.DbString{
+func (mapper Mapper) MapDbStringFromString(key db_models.DBKey, value string) db_models.String {
+	return db_models.String{
 		Id: db_models.DBKey(key),
-		StringValues: []db_models.DbStringvalue{
+		StringValues: []db_models.StringValue{
 			{
 				Id:         db_models.DBKey(key),
 				LanguageId: db_models.DBKey(mapper.language.Id),
@@ -150,7 +150,7 @@ func (mapper Mapper) MapDbStringFromString(key db_models.DBKey, value string) db
 }
 
 // LocalizedStringFromDbModel Converts DB string model to LocalizedString
-func (mapper Mapper) LocalizedStringFromDbModel(model *db_models.DbString) localized_string.LocalizedString {
+func (mapper Mapper) LocalizedStringFromDbModel(model *db_models.String) localized_string.LocalizedString {
 	if model.GetValue() == "" {
 		return localized_string.Empty(localized_string.StringId(model.Id))
 	}
@@ -162,10 +162,10 @@ func (mapper Mapper) LocalizedStringFromDbModel(model *db_models.DbString) local
 }
 
 // MapDbStringFromLocalizedString Converts LocalizedString to DB string model
-func (mapper Mapper) MapDbStringFromLocalizedString(model *localized_string.LocalizedString) db_models.DbString {
-	return db_models.DbString{
+func (mapper Mapper) MapDbStringFromLocalizedString(model *localized_string.LocalizedString) db_models.String {
+	return db_models.String{
 		Id: db_models.DBKey(model.GetId()),
-		StringValues: []db_models.DbStringvalue{
+		StringValues: []db_models.StringValue{
 			{
 				Id:         db_models.DBKey(model.GetId()),
 				LanguageId: db_models.DBKey(model.GetLanguageId()),
@@ -175,7 +175,7 @@ func (mapper Mapper) MapDbStringFromLocalizedString(model *localized_string.Loca
 	}
 }
 
-func (mapper Mapper) MapArtifactStats(model *db_models.DbArtifactProfit) artifact_profit.ArtifactProfit {
+func (mapper Mapper) MapArtifactStats(model *db_models.ArtifactProfit) artifact_profit.ArtifactProfit {
 	return artifact_profit.ArtifactProfit{
 		Slot:              artifact_profit.ProfitSlotFromNumber(artifact_profit.ProfitSlotNumber(model.SlotId)),
 		Attack:            artifact_profit.StatProfit(model.Attack),
@@ -194,11 +194,11 @@ func (mapper Mapper) MapArtifactStats(model *db_models.DbArtifactProfit) artifac
 	}
 }
 
-func (mapper Mapper) MapDbArtifactStats(parentId db_models.DBKey, model *artifact_profit.ArtifactProfit) db_models.DbArtifactProfit {
+func (mapper Mapper) MapDbArtifactStats(parentId db_models.DBKey, model *artifact_profit.ArtifactProfit) db_models.ArtifactProfit {
 	if parentId == db_models.DBKey(academy_models.UNDEFINED_ID) {
 		panic("Cannot create artifactstat with undefined character")
 	}
-	return db_models.DbArtifactProfit{
+	return db_models.ArtifactProfit{
 		CharacterId:       parentId,
 		SlotId:            db_models.DBKey(artifact_profit.ProfitSlotNumberFromName(model.Slot)),
 		Attack:            uint16(model.Attack),
@@ -217,15 +217,15 @@ func (mapper Mapper) MapDbArtifactStats(parentId db_models.DBKey, model *artifac
 	}
 }
 
-func (mapper Mapper) MapCharacterIcon(model *db_models.DbCharacterIcon) genshin_objects.CharacterIcon {
+func (mapper Mapper) MapCharacterIcon(model *db_models.CharacterIcon) genshin_objects.CharacterIcon {
 	return genshin_objects.CharacterIcon{
 		Type: genshin_objects.CharacterIconType(model.IconType),
 		Url:  model.Url,
 	}
 }
 
-func (mapper Mapper) MapDbCharacterIcon(parentId db_models.DBKey, model *genshin_objects.CharacterIcon) db_models.DbCharacterIcon {
-	return db_models.DbCharacterIcon{
+func (mapper Mapper) MapDbCharacterIcon(parentId db_models.DBKey, model *genshin_objects.CharacterIcon) db_models.CharacterIcon {
+	return db_models.CharacterIcon{
 		CharacterId: parentId,
 		IconType:    uint8(model.Type),
 		Url:         model.Url,
