@@ -1,8 +1,8 @@
 package models
 
 import (
-    "ga/pkg/genshin_core/models/enums"
-    "ga/pkg/genshin_core/value_objects"
+	"ga/pkg/genshin_core/models/enums"
+	"ga/pkg/genshin_core/value_objects"
 )
 
 type Character struct {
@@ -14,7 +14,7 @@ type Character struct {
 	Element     enums.Element
 	Rarity      enums.Rarity
 	Weapon      enums.WeaponType
-    Icons       []value_objects.CharacterIcon
+	Icons       []value_objects.CharacterIcon
 	//Body          BodyType
 	//Constellation string
 	//BirthdayMMDD  string
