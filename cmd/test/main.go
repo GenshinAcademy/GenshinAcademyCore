@@ -46,9 +46,11 @@ func updateCharacter(character *models.Character, repo repositories.CharacterRep
 }
 
 func main() {
-	configuration.Init()
-
-	logger := configuration.Logger
+	err := configuration.Init()
+	if err != nil {
+		panic(err)
+	}
+	logger := configuration.GetLogger()
 
 	var dbConfig academy_postgres.PostgresDatabaseConfiguration = academy_postgres.PostgresDatabaseConfiguration{
 		Host:         configuration.ENV.DBHost,
