@@ -2,7 +2,6 @@ package configuration
 
 import (
 	"github.com/spf13/viper"
-	"go.uber.org/zap"
 )
 
 type Config struct {
@@ -16,8 +15,7 @@ type Config struct {
 }
 
 var (
-	ENV    Config
-	Logger *zap.Logger
+	ENV Config
 )
 
 func loadENV() error {
@@ -41,8 +39,6 @@ func Init() error {
 	if err != nil {
 		return err
 	}
-
-	setupLogger()
 
 	return nil
 }

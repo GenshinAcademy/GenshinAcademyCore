@@ -17,11 +17,13 @@ import (
 )
 
 func main() {
-	configuration.Init()
+	err := configuration.Init()
+	if err != nil {
+		panic(err)
+	}
+	logger := configuration.GetLogger()
 
-	logger := configuration.Logger
-
-	defer configuration.Logger.Sync()
+	defer logger.Sync()
 
 	apiEn := genshindb_wrapper.Create("https://genshin-db-api.vercel.app/api", gdb_enums.English, logger.Sugar())
 	apiRu := genshindb_wrapper.Create("https://genshin-db-api.vercel.app/api", gdb_enums.Russian, logger.Sugar())

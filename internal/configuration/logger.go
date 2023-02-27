@@ -4,12 +4,12 @@ import (
 	"go.uber.org/zap"
 )
 
-func setupLogger() {
-	Logger, _ := zap.NewProduction()
+func GetLogger() *zap.Logger {
+	logger, _ := zap.NewProduction()
 
 	if ENV.LogLevel == 1 {
-		Logger, _ = zap.NewDevelopment()
+		logger, _ = zap.NewDevelopment()
 	}
 
-	zap.ReplaceGlobals(Logger)
+	return logger
 }
