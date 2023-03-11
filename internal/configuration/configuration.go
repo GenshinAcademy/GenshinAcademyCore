@@ -12,6 +12,7 @@ type Config struct {
 	DBPort         uint16 `mapstructure:"POSTGRES_PORT"`
 	ServerPort     string `mapstructure:"SERVER_PORT"`
 	LogLevel       byte   `mapstructure:"LOG_LEVEL"`
+	GinMode        string `mapstructure:"GIN_MODE"`
 }
 
 var (
