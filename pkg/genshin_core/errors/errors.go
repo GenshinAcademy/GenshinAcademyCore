@@ -28,5 +28,5 @@ func EmptyId() error {
 }
 
 func (err emptyIdError) Error() string {
-	return fmt.Sprintf("Empty Id provided.")
+	return "Empty Id provided."
 }
