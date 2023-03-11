@@ -18,33 +18,57 @@ jobs:
         with:
           go-version: "1.20"
 
-      - name: Build
+      - name: Build Server
         run: |
           go build -o server ./cmd/web/main.go
 
-      - name: Upload artifact for deploy job
+      - name: Build Synchronization
+        run: |
+          go build -o sync ./cmd/sync/main.go
+
+      - name: Upload server artifact for deploy job
         uses: actions/upload-artifact@v3
         with:
           name: server-artifact
           path: server
+
+      - name: Upload synchronization artifact for deploy job
+        uses: actions/upload-artifact@v3
+        with:
+          name: sync-artifact
+          path: sync
 
   deploy:
     runs-on: ubuntu-latest
     needs: build
 
     steps:
-      - name: Download artifact from build job
+      - name: Download server artifact from build job
         uses: actions/download-artifact@v3
         with:
           name: server-artifact
+      
+      - name: Download sync artifact from build job
+        uses: actions/download-artifact@v3
+        with:
+          name: sync-artifact
 
-      - name: Deploy
+      - name: Deploy server
         uses: appleboy/scp-action@master
         with:
           host: ${{ secrets.HOST }}
           username: ${{ secrets.USERNAME }}
           key: ${{ secrets.SSH_KEY }}
           source: server
+          target: ${{ vars.OUTPUT_DIR_DEV }}
+
+      - name: Deploy sync
+        uses: appleboy/scp-action@master
+        with:
+          host: ${{ secrets.HOST }}
+          username: ${{ secrets.USERNAME }}
+          key: ${{ secrets.SSH_KEY }}
+          source: sync
           target: ${{ vars.OUTPUT_DIR_DEV }}
 
       - name: Restart server
