@@ -20,7 +20,7 @@ jobs:
 
       - name: Build
         run: |
-          go build -o server .\cmd\web\main.go
+          go build -o server ./cmd/web/main.go
 
       - name: Upload artifact for deploy job
         uses: actions/upload-artifact@v3
