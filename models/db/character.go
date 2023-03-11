@@ -8,6 +8,7 @@ type Character struct {
 	ElementID   int
 	Element     Element
 	StatsProfit []StatsProfit `gorm:"foreignKey:OwnerID"`
+	IconURL     string
 }
 
 type Name struct {

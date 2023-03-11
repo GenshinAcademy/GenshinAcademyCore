@@ -22,10 +22,10 @@ func main() {
 	repoFerret := repository.NewFerretRepository(db)
 
 	// init service
-	servicePokemon := service.NewFerretService(repoFerret)
+	serviceFerret := service.NewFerretService(repoFerret)
 
 	// init controller
-	controllerFerret := controllers.NewFerretController(servicePokemon)
+	controllerFerret := controllers.NewFerretController(serviceFerret)
 
 	// setup router
 	controller := router.RouterController{
@@ -34,7 +34,7 @@ func main() {
 
 	r := router.NewRouter(controller)
 
-	err = r.Run()
+	err = r.Run(":" + env.ServerPort)
 	if err != nil {
 		logger.Log.Error(err)
 	}

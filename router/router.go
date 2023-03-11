@@ -19,10 +19,7 @@ func NewRouter(controller RouterController) *gin.Engine {
 	mode, _ := os.LookupEnv("ENV")
 	gin.SetMode(mode)
 
-	config := cors.DefaultConfig()
-	// config.AllowOrigins = []string{"genshinacademtsitewillbehere"}
-	config.AllowAllOrigins = true
-	r.Use(cors.New(config))
+	r.Use(cors.Default())
 
 	character := r.Group("/characters")
 	{
