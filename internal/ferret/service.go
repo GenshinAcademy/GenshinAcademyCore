@@ -6,6 +6,7 @@ import (
 	"ga/internal/ferret/web_models"
 	"ga/pkg/genshin_core/models/languages"
 	"net/http"
+	"strings"
 
 	"github.com/gin-gonic/gin"
 )
@@ -24,10 +25,7 @@ func CreateService(core *academy_core.AcademyCore) *FerretService {
 // Requires Accept-Language header in request
 func (service *FerretService) GetAllCharactersWithProfits(c *gin.Context) {
 	// TODO: GetProvider should return error if provider is not found
-	var language = languages.Language(c.GetHeader("Accept-Language"))
-	if language == "" {
-		language = languages.English
-	}
+	var language = languages.GetLanguage(languages.ConvertStringsToLanguages(strings.Split(c.GetHeader("Accept-Language"), ",")))
 
 	var characterRepo = service.core.GetProvider(language).NewCharacterRepo()
 	var result = characterRepo.FindCharacters(find_parameters.CharacterFindParameters{})
