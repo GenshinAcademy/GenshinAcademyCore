@@ -8,6 +8,7 @@ import (
 // mapCharacter converts academy_core model to ferret model
 func (service *FerretService) mapCharacter(input models.Character) web_models.FerretCharacter {
 	var output web_models.FerretCharacter
+	output.CharacterId = string(input.Character.Id)
 	output.Name = input.Name
 	output.Element = uint8(input.Element)
 	output.IconUrl = input.Icons[0].Url
