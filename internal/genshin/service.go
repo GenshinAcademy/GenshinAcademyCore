@@ -10,11 +10,12 @@ import (
 )
 
 type GenshinService struct {
-	core academy_core.AcademyCore
+	core *academy_core.AcademyCore
 }
 
-func CreateService(core academy_core.AcademyCore) *GenshinService {
+func CreateService(core *academy_core.AcademyCore) *GenshinService {
 	var result *GenshinService = new(GenshinService)
+	result.core = core
 	return result
 }
 
@@ -22,7 +23,11 @@ func CreateService(core academy_core.AcademyCore) *GenshinService {
 // Requires Accept-Language header in request
 func (service *GenshinService) GetAllCharacters(c *gin.Context) {
 	// TODO: GetProvider should return error if provider is not found
-	var characterRepo = service.core.AsGenshinCore().GetProvider(languages.Language(c.GetHeader("Accept-Language"))).NewCharacterRepo()
+	var language = languages.Language(c.GetHeader("Accept-Language"))
+	if language == "" {
+		language = languages.English
+	}
+	var characterRepo = service.core.AsGenshinCore().GetProvider(language).NewCharacterRepo()
 	var result = characterRepo.FindCharacters(find_parameters.CharacterFindParameters{})
 
 	c.JSON(http.StatusOK,

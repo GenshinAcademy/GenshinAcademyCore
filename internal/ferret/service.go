@@ -11,11 +11,12 @@ import (
 )
 
 type FerretService struct {
-	core academy_core.AcademyCore
+	core *academy_core.AcademyCore
 }
 
-func CreateService(core academy_core.AcademyCore) *FerretService {
+func CreateService(core *academy_core.AcademyCore) *FerretService {
 	var result *FerretService = new(FerretService)
+	result.core = core
 	return result
 }
 
@@ -23,7 +24,12 @@ func CreateService(core academy_core.AcademyCore) *FerretService {
 // Requires Accept-Language header in request
 func (service *FerretService) GetAllCharactersWithProfits(c *gin.Context) {
 	// TODO: GetProvider should return error if provider is not found
-	var characterRepo = service.core.GetProvider(languages.Language(c.GetHeader("Accept-Language"))).NewCharacterRepo()
+	var language = languages.Language(c.GetHeader("Accept-Language"))
+	if language == "" {
+		language = languages.English
+	}
+
+	var characterRepo = service.core.GetProvider(language).NewCharacterRepo()
 	var result = characterRepo.FindCharacters(find_parameters.CharacterFindParameters{})
 	var characters []web_models.FerretCharacter
 	for _, char := range result {
