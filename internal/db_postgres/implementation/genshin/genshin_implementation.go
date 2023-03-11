@@ -67,10 +67,10 @@ func ConfigurePostgresDB(config *core.GenshinCoreConfiguration) {
 }
 
 // newConnection creates new gorm connection and adds to connections pool,
-func newConnection() postgresDatabaseConnection {
+func newConnection() (postgresDatabaseConnection, error) {
 	orm, err := gorm.Open(postgres.Open(database.Configuration.GetConnectionString()), &gorm.Config{})
 	if err != nil {
-		fmt.Println(err.Error())
+		return postgresDatabaseConnection{}, err
 	}
 
 	var connection = postgresDatabaseConnection{
@@ -79,18 +79,24 @@ func newConnection() postgresDatabaseConnection {
 	}
 	database.Connections = append(database.Connections, connection)
 
-	return connection
+	return connection, nil
 }
 
 // InitializePostgresDatabase initializes database.
-func InitializePostgresDatabase(config PostgresDatabaseConfiguration) {
+func InitializePostgresDatabase(config PostgresDatabaseConfiguration) error {
 	database = postgresDatabase{
 		Configuration: config,
 		Connections:   make([]postgresDatabaseConnection, 0),
 	}
-	newConnection()
+	_, err := newConnection()
+	if err != nil {
+		return err
+	}
+
 	db_postgres.MigrateDatabase(database.Connections[0].ORMConnection)
 	db_postgres.InitializeCache()
+
+	return nil
 }
 
 // CleanupConnections closes all active connections.
