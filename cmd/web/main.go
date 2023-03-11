@@ -39,7 +39,6 @@ func init() {
 	}
 
 	academy_postgres.InitializePostgresDatabase(dbConfig)
-	defer academy_postgres.CleanupConnections()
 
 	//Initializing gacore config and configure it for postgres db
 	var config academy_core.AcademyCoreConfiguration = academy_core.AcademyCoreConfiguration{
@@ -53,12 +52,13 @@ func init() {
 	gacore := academy_core.CreateAcademyCore(config)
 
 	// Create ferret service
-	ferretService = ferret.CreateService(*gacore)
-	genshinService = genshin.CreateService(*gacore)
+	ferretService = ferret.CreateService(gacore)
+	genshinService = genshin.CreateService(gacore)
 }
 
 // Web server here
 func main() {
+	defer academy_postgres.CleanupConnections()
 	r := gin.New()
 
 	gin.SetMode(configuration.ENV.GinMode)
