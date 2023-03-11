@@ -5,6 +5,6 @@ package languages
 type Language string
 
 const (
-	English Language = "English"
-	Russian Language = "Russian"
+	English Language = "en_us"
+	Russian Language = "ru_ru"
 )
