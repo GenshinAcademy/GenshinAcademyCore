@@ -11,7 +11,7 @@ type StringValue struct {
 	Id         DBKey `gorm:"primaryKey"`
 	LanguageId DBKey `gorm:"primaryKey"`
 	Language   Language
-	Value      string
+	Value      string `gorm:"type:varchar"`
 }
 
 // GetValue gets first string value.

@@ -5,7 +5,7 @@ type Character struct {
 	Id              DBKey `gorm:"primaryKey"`
 	NameId          DBKey `gorm:"column:name"`
 	Name            String
-	CharacterId     GenshinKey `gorm:"column:character_id;uniqueIndex"`
+	CharacterId     GenshinKey `gorm:"column:character_id;uniqueIndex;type:varchar"`
 	FullNameId      DBKey      `gorm:"column:full_name"`
 	FullName        String
 	DescriptionId   DBKey `gorm:"column:description"`
