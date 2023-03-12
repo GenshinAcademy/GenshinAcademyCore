@@ -31,6 +31,9 @@ func (service *FerretService) GetAllCharactersWithProfits(c *gin.Context) {
 	var result = characterRepo.FindCharacters(find_parameters.CharacterFindParameters{})
 	var characters []web_models.FerretCharacter
 	for _, char := range result {
+		if len(char.Profits) == 0 {
+			continue
+		}
 		characters = append(characters, service.mapCharacter(char))
 	}
 
