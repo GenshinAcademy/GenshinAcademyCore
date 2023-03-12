@@ -59,14 +59,16 @@ func init() {
 // Web server here
 func main() {
 	defer academy_postgres.CleanupConnections()
-	r := gin.New()
+	r := gin.Default()
 
 	gin.SetMode(configuration.ENV.GinMode)
 
 	// TODO: Move all router related code to internal/router package
 	r.Use(cors.Default())
 
-	characters := r.Group("/characters")
+	mainRoute := r.Group("/api")
+
+	characters := mainRoute.Group("/characters")
 	{
 		characters.GET("/", genshinService.GetAllCharacters)
 		characters.GET("/stats", ferretService.GetAllCharactersWithProfits)
