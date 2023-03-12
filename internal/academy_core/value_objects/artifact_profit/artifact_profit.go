@@ -1,5 +1,7 @@
 package artifact_proft
 
+import "fmt"
+
 type ProfitSlot string
 type ProfitSlotNumber uint8
 type StatProfit uint16
@@ -7,7 +9,8 @@ type StatProfit uint16
 const DefaultProfitValue = 0
 
 const (
-	PlumeNumber ProfitSlotNumber = iota
+	SubStatsNumber ProfitSlotNumber = iota
+	PlumeNumber
 	FlowerNumber
 	GobletNumber
 	CircletNumber
@@ -15,11 +18,12 @@ const (
 )
 
 const (
-	Plume   ProfitSlot = "plume"
-	Flower  ProfitSlot = "flower"
-	Goblet  ProfitSlot = "goblet"
-	Circlet ProfitSlot = "circlet"
-	Sands   ProfitSlot = "sands"
+	SubStats ProfitSlot = "substats"
+	Plume    ProfitSlot = "plume"
+	Flower   ProfitSlot = "flower"
+	Goblet   ProfitSlot = "goblet"
+	Circlet  ProfitSlot = "circlet"
+	Sands    ProfitSlot = "sands"
 )
 
 type ArtifactProfit struct {
@@ -70,8 +74,11 @@ func ProfitSlotFromNumber(num ProfitSlotNumber) ProfitSlot {
 		return Circlet
 	case SandsNumber:
 		return Sands
+	case SubStatsNumber:
+		return SubStats
 	default:
-		panic("Provided unknown ProfitSlotNumber")
+		// TODO Panic to error return
+		panic(fmt.Sprintf("Provided unknown ProfitSlotNumber %d", num))
 	}
 }
 
@@ -87,7 +94,10 @@ func ProfitSlotNumberFromName(num ProfitSlot) ProfitSlotNumber {
 		return CircletNumber
 	case Sands:
 		return SandsNumber
+	case SubStats:
+		return SubStatsNumber
 	default:
-		panic("Provided unknown ProfitSlot")
+		// TODO Panic to error return
+		panic(fmt.Sprintf("Provided unknown ProfitSlot %s", num))
 	}
 }
