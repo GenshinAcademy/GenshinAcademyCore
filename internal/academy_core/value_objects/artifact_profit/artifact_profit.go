@@ -10,20 +10,20 @@ const DefaultProfitValue = 0
 
 const (
 	SubStatsNumber ProfitSlotNumber = iota
-	PlumeNumber
 	FlowerNumber
+	PlumeNumber
+	SandsNumber
 	GobletNumber
 	CircletNumber
-	SandsNumber
 )
 
 const (
 	SubStats ProfitSlot = "substats"
-	Plume    ProfitSlot = "plume"
 	Flower   ProfitSlot = "flower"
+	Plume    ProfitSlot = "plume"
+	Sands    ProfitSlot = "sands"
 	Goblet   ProfitSlot = "goblet"
 	Circlet  ProfitSlot = "circlet"
-	Sands    ProfitSlot = "sands"
 )
 
 type ArtifactProfit struct {
@@ -64,18 +64,18 @@ func CreateNew(slot ProfitSlot) ArtifactProfit {
 
 func ProfitSlotFromNumber(num ProfitSlotNumber) ProfitSlot {
 	switch num {
-	case PlumeNumber:
-		return Plume
+	case SubStatsNumber:
+		return SubStats
 	case FlowerNumber:
 		return Flower
+	case PlumeNumber:
+		return Plume
+	case SandsNumber:
+		return Sands
 	case GobletNumber:
 		return Goblet
 	case CircletNumber:
 		return Circlet
-	case SandsNumber:
-		return Sands
-	case SubStatsNumber:
-		return SubStats
 	default:
 		// TODO Panic to error return
 		panic(fmt.Sprintf("Provided unknown ProfitSlotNumber %d", num))
@@ -84,18 +84,18 @@ func ProfitSlotFromNumber(num ProfitSlotNumber) ProfitSlot {
 
 func ProfitSlotNumberFromName(num ProfitSlot) ProfitSlotNumber {
 	switch num {
-	case Plume:
-		return PlumeNumber
+	case SubStats:
+		return SubStatsNumber
 	case Flower:
 		return FlowerNumber
+	case Plume:
+		return PlumeNumber
+	case Sands:
+		return SandsNumber
 	case Goblet:
 		return GobletNumber
 	case Circlet:
 		return CircletNumber
-	case Sands:
-		return SandsNumber
-	case SubStats:
-		return SubStatsNumber
 	default:
 		// TODO Panic to error return
 		panic(fmt.Sprintf("Provided unknown ProfitSlot %s", num))
