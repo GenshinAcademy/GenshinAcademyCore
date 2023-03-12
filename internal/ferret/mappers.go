@@ -12,7 +12,8 @@ func (service *FerretService) mapCharacter(input models.Character) web_models.Fe
 	output.Name = input.Name
 	output.Element = uint8(input.Element)
 	output.IconUrl = input.Icons[0].Url
-	output.StatsProfit = []web_models.StatsProfit{}
+	output.StatsProfit = make([]web_models.StatsProfit, len(input.Profits))
+
 	for i, stat := range input.Profits {
 		var statProfit = &output.StatsProfit[i]
 		statProfit.Slot = string(stat.Slot)
