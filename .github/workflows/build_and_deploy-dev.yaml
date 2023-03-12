@@ -26,32 +26,23 @@ jobs:
         run: |
           go build -o sync ./cmd/sync/main.go
 
-      - name: Upload server artifact for deploy job
+      - name: Upload artifacts for deploy job
         uses: actions/upload-artifact@v3
         with:
-          name: server-artifact
-          path: server
-
-      - name: Upload synchronization artifact for deploy job
-        uses: actions/upload-artifact@v3
-        with:
-          name: sync-artifact
-          path: sync
+          name: artifacts
+          path: |
+            server
+            sync
 
   deploy:
     runs-on: ubuntu-latest
     needs: build
 
     steps:
-      - name: Download server artifact from build job
+      - name: Download artifacts from build job
         uses: actions/download-artifact@v3
         with:
-          name: server-artifact
-      
-      - name: Download sync artifact from build job
-        uses: actions/download-artifact@v3
-        with:
-          name: sync-artifact
+          name: artifacts
 
       - name: Deploy server
         uses: appleboy/scp-action@master
