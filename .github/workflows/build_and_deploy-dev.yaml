@@ -71,3 +71,4 @@ jobs:
           script: |
             chmod +x ${{ vars.OUTPUT_DIR_DEV }}/server
             sudo systemctl restart ${{ vars.SERVICE_NAME_DEV }}
+            chmod +x ${{ vars.OUTPUT_DIR_DEV }}/sync
