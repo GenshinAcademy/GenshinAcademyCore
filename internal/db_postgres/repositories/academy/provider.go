@@ -13,7 +13,7 @@ type PostgresAcademyProvider struct {
     cache *cache.Cache
 }
 
-func CreateAcademyProvider(connection *gorm.DB, language models.Language, cache *cache.Cache) PostgresAcademyProvider{
+func CreateAcademyProvider(connection *gorm.DB, language models.Language, cache *cache.Cache) repositories.IRepositoryProvider {
     return PostgresAcademyProvider{
         gormConnection: connection,
         language: language,
@@ -27,6 +27,15 @@ func (provider PostgresAcademyProvider) GetLanguage() models.Language {
 
 func (provider PostgresAcademyProvider) NewCharacterRepo() repositories.ICharacterRepository {
     var academyRepository = CreatePostgresCharacterRepository(
+        provider.gormConnection,
+        provider.language,
+        provider.cache)
+
+    return academyRepository
+}
+
+func (provider PostgresAcademyProvider) CreateNewsRepo() repositories.INewsRepository {
+    var academyRepository = CreatePostgresNewsRepository(
         provider.gormConnection,
         provider.language,
         provider.cache)
