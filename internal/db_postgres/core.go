@@ -31,4 +31,5 @@ func MigrateDatabase(connection *gorm.DB) {
 	connection.AutoMigrate(&db_models.Character{})
 	connection.AutoMigrate(&db_models.CharacterIcon{})
 	connection.AutoMigrate(&db_models.ArtifactProfit{})
+    connection.AutoMigrate(&db_models.News{})
 }
