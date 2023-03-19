@@ -12,30 +12,6 @@ import (
 	"gorm.io/gorm"
 )
 
-// PostgresCharacterRepository Character repository
-type PostgresCharacterRepository struct {
-	mapper         db_mappers.Mapper
-	language       academy_models.Language
-	gormConnection *gorm.DB
-}
-
-func CreatePostgresCharacterRepository(connection *gorm.DB, language academy_models.Language, cache *cache.Cache) PostgresCharacterRepository {
-	return PostgresCharacterRepository{
-		gormConnection: connection,
-		mapper:         db_mappers.CreateMapper(language.LanguageName, language, cache),
-		language:       language,
-	}
-}
-
-func (repo PostgresCharacterRepository) preloadStrings(preloads []string) *gorm.DB {
-	var connection = repo.gormConnection
-	for _, preload := range preloads {
-		connection = connection.Preload(preload, "language_id = ?", repo.language.Id)
-	}
-
-	return connection
-}
-
 var (
 	characterStringPreloads []string = []string{
 		"Name.StringValues",
@@ -43,30 +19,49 @@ var (
 		"Description.StringValues",
 		"Title.StringValues",
 	}
+	characterPreloads []string = []string{
+		"Icons",
+		"ArtifactProfits",
+	}
 )
 
-// Automatically adds all preloads
-func (repo PostgresCharacterRepository) addCharacterPreloads() *gorm.DB {
-
-	return repo.preloadStrings(characterStringPreloads).
-		Preload("Icons").
-		Preload("ArtifactProfits")
+// PostgresCharacterRepository Character repository
+type PostgresCharacterRepository struct {
+	PostgresBaseRepository
 }
 
-func (repo PostgresCharacterRepository) GetLanguage() academy_models.Language {
-	return repo.language
+func CreatePostgresCharacterRepository(connection *gorm.DB, language academy_models.Language, cache *cache.Cache) PostgresCharacterRepository {
+	return PostgresCharacterRepository{
+		PostgresBaseRepository: PostgresBaseRepository{
+			language:       language,
+			gormConnection: connection,
+			mapper:         db_mappers.CreateMapper(language.LanguageName, language, cache),
+		},
+	}
+}
+
+func (repo PostgresCharacterRepository) GetIdField() string {
+	return genericIdField
+}
+
+func (repo PostgresCharacterRepository) GetPreloads() []string {
+	return characterPreloads
+}
+
+func (repo PostgresCharacterRepository) GetStringPreloads() []string {
+	return characterStringPreloads
 }
 
 func (repo PostgresCharacterRepository) FindCharacterById(characterId academy_models.AcademyId) (academy_models.Character, bool) {
 	var selectedCharacter db_models.Character
-	repo.addCharacterPreloads().Where("id = ?", characterId).First(&selectedCharacter)
+	PreloadAll(repo).Where("id = ?", characterId).First(&selectedCharacter)
 
 	return repo.mapper.MapAcademyCharacterFromDbModel(&selectedCharacter), selectedCharacter.Id != db_models.DBKey(academy_models.UNDEFINED_ID)
 }
 
 func (repo PostgresCharacterRepository) FindCharacterByGenshinId(characterId genshin_models.ModelId) (academy_models.Character, bool) {
 	var selectedCharacter db_models.Character
-	repo.addCharacterPreloads().Where("character_id = ?", characterId).First(&selectedCharacter)
+	PreloadAll(repo).Where("character_id = ?", characterId).First(&selectedCharacter)
 
 	return repo.mapper.MapAcademyCharacterFromDbModel(&selectedCharacter), selectedCharacter.Id != db_models.DBKey(academy_models.UNDEFINED_ID)
 }
@@ -75,10 +70,10 @@ func (repo PostgresCharacterRepository) FindCharacters(parameters find_parameter
 
 	var selectedChacters = make([]db_models.Character, 0)
 	var result = make([]academy_models.Character, 0)
-	gormConnection := repo.addCharacterPreloads()
+	gormConnection := PreloadAll(repo)
 
 	if len(parameters.Ids) > 0 {
-		gormConnection.Find(&selectedChacters, parameters.Ids)
+		FilterById(repo, parameters.Ids)
 	} else {
 		if len(parameters.CharacterFindParameters.Ids) > 0 {
 			gormConnection = gormConnection.Where("character_id IN ?", parameters.CharacterFindParameters.Ids)
@@ -90,10 +85,11 @@ func (repo PostgresCharacterRepository) FindCharacters(parameters find_parameter
 				bytes = append(bytes, uint8(cByte))
 			}
 			gormConnection = gormConnection.Where("element IN ?", bytes)
-		}
-
-		gormConnection.Find(&selectedChacters)
+        }
+        gormConnection = Slice(gormConnection, &parameters.SliceOptions)
 	}
+
+	gormConnection.Find(&selectedChacters)
 
 	for _, character := range selectedChacters {
 		result = append(result, repo.mapper.MapAcademyCharacterFromDbModel(&character))
