@@ -30,12 +30,17 @@ type ICharacterRepository interface {
 	UpdateCharacter(character *models.Character)
 }
 
-/*type ICharacterIconRepository interface {
-	FindIconsByCharacterId(characterId models.ModelId) []models.CharacterIcon
-}*/
+type INewsRepository interface {
+    IRepository
+    FindNewsById(id models.AcademyId) models.News
+    FindNews(parameters find_parameters.NewsFindParameters) []models.News
+    AddNews(news *models.News) (models.AcademyId, error)
+    UpdateNews(news *models.News) error
+}
 
 type IRepositoryProvider interface {
 	GetLanguage() models.Language
 	NewCharacterRepo() ICharacterRepository
+    CreateNewsRepo() INewsRepository
 	//NewCharacterIconRepo() ICharacterIconRepository
 }
