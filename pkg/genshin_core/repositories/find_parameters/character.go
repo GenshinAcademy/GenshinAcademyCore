@@ -19,6 +19,7 @@ func FindByCharacterId(characterId string) CharacterFindParameters {
 	return CharacterFindParameters{
 		FindParameters: FindParameters{
 			Ids: []models.ModelId{models.ModelId(characterId)},
+            SliceOptions: SliceParameters{Offset: 0, Amount: 1},
 		},
 	}
 }
