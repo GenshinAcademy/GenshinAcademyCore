@@ -12,16 +12,22 @@ import (
 	"ga/pkg/genshin_core/models/languages"
 	"ga/pkg/genshin_core/repositories"
 	"ga/pkg/genshin_core/value_objects"
+	gdb_enums "ga/pkg/genshindb_wrapper/enums"
 	gdb_models "ga/pkg/genshindb_wrapper/models"
 	"os"
 	"path/filepath"
 	"strings"
+	"sync"
+	"time"
+
+	"go.uber.org/zap"
 )
 
 const (
 	dataPath = ".data"
 )
 
+// getCharacter retrieves the character object from a specified JSON file in a given language, by matching the character's name.
 func getCharacter(name string, language string) (gdb_models.Character, error) {
 	var filePath = filepath.Join(".", dataPath, language, name)
 	fileData, err := os.ReadFile(filePath)
@@ -38,6 +44,7 @@ func getCharacter(name string, language string) (gdb_models.Character, error) {
 	return character, nil
 }
 
+// getCharacters retrieves []gdb_models.Character slice from all JSONs file in a given language.
 func getCharacters(language string) ([]gdb_models.Character, error) {
 	var path = filepath.Join(".", dataPath, language)
 	charactersFiles, err := os.ReadDir(path)
@@ -46,20 +53,34 @@ func getCharacters(language string) ([]gdb_models.Character, error) {
 		return nil, err
 	}
 
-	var characters = make([]gdb_models.Character, 0, len(charactersFiles))
+	var (
+		characters   = make([]gdb_models.Character, len(charactersFiles))
+		characterErr = make(chan error, len(charactersFiles))
+		wg           sync.WaitGroup
+	)
 
-	for _, characterFile := range charactersFiles {
-
-		character, err := getCharacter(characterFile.Name(), language)
-
-		if err != nil {
-			return nil, err
-		}
-
-		characters = append(characters, character)
+	for i, characterFile := range charactersFiles {
+		wg.Add(1)
+		go func(i int, fileName string) {
+			defer wg.Done()
+			character, err := getCharacter(fileName, language)
+			if err != nil {
+				characterErr <- err
+				return
+			}
+			characters[i] = character
+		}(i, characterFile.Name())
 	}
 
-	return characters, nil
+	wg.Wait()
+
+	// Check for errors in the channel after all goroutines have completed
+	select {
+	case err := <-characterErr:
+		return nil, err
+	default:
+		return characters, nil
+	}
 }
 
 func main() {
@@ -81,7 +102,8 @@ func main() {
 	}
 
 	academy_postgres.InitializePostgresDatabase(dbConfig)
-	defer academy_postgres.CleanupConnections()
+
+	defer academy_postgres.CleanupConnections() // Make sure to close the connection
 
 	//Initializing gacore config and configure it for postgres db
 	var config academy_core.AcademyCoreConfiguration = academy_core.AcademyCoreConfiguration{
@@ -89,14 +111,12 @@ func main() {
 			DefaultLanguage: languages.DefaultLanguage,
 		},
 	}
-	academy_postgres.ConfigurePostgresDB(&config)
 
-	//Create ga core
-	var gacore *academy_core.AcademyCore = academy_core.CreateAcademyCore(config)
+	academy_postgres.ConfigurePostgresDB(&config) // Configure postgres database
 
-	var langRepo = gacore.GetLanguageRepository()
+	var gacore *academy_core.AcademyCore = academy_core.CreateAcademyCore(config) //Create ga core
 
-	//Create enLanguage if it does not exist
+	var langRepo = gacore.GetLanguageRepository() // Get language repository
 
 	// Get character repositories for all languages
 	characterRepos := make(map[languages.Language]repositories.CharacterRepository, len(languages.Languages))
@@ -109,18 +129,18 @@ func main() {
 				LanguageName: string(languageCode),
 			}
 			langRepo.AddLanguage(&language)
-			logger.Sugar().Infow("Language created successfully!",
-				"language", language)
+			logger.Info("Language created successfully!",
+				zap.String("language", language.LanguageName))
 		} else {
-			logger.Sugar().Infow("Language found successfully!",
-				"language", language)
+			logger.Info("Language found successfully!",
+				zap.String("language", language.LanguageName))
 		}
 
 		characterRepos[languageCode] = gacore.AsGenshinCore().GetProvider(languageCode).NewCharacterRepo()
 	}
 
-	logger.Sugar().Infow("Getting default language characters from theBowja's data",
-		"language", languages.DefaultLanguage)
+	logger.Info("Getting default language characters from theBowja's data",
+		zap.String("language", string(languages.DefaultLanguage)))
 
 	gdbCharacters, err := getCharacters(languages.Languages[languages.DefaultLanguage])
 
@@ -130,43 +150,61 @@ func main() {
 
 	defaultCharacterRepo := characterRepos[languages.DefaultLanguage]
 
+	timerStart := time.Now() // Gorutine test
+
 	for _, gdbCharacter := range gdbCharacters {
-		logger.Sugar().Infow("Coverting character from theBowja's data to Genshin Academy format",
-			"character", gdbCharacter.Name)
+		logger.Info("Coverting character from theBowja's data to Genshin Academy format",
+			zap.String("character", gdbCharacter.Name))
 
 		character := convertCharacter(gdbCharacter)
 
-		logger.Sugar().Infow("Adding character to database",
-			"character", character.Id)
+		logger.Info("Adding character to database",
+			zap.String("character", character.Name))
 
 		if err = defaultCharacterRepo.AddCharacter(&character); err != nil {
 			panic(err)
 		}
+
+		var wg sync.WaitGroup // Create a WaitGroup to wait for all language updates to finish
 
 		for languageCode := range languages.Languages {
 			if languageCode == languages.DefaultLanguage {
 				continue
 			}
 
-			logger.Sugar().Infow("Adding localization info to database",
-				"character", character.Id,
-				"language", languageCode)
+			wg.Add(1) // Increment WaitGroup counter
 
-			localCharFromRepo, _ := characterRepos[languageCode].FindCharacterById(character.Id)
+			go func(language languages.Language, id gc_models.ModelId) { // Launch a goroutine
+				defer wg.Done() // Decrement WaitGroup counter when finished
 
-			localChar, err := getCharacter(strings.ToLower(strings.ReplaceAll(character.Name, " ", ""))+".json", languages.Languages[languageCode])
+				logger.Info("Adding localization info to database",
+					zap.String("character", string(id)),
+					zap.String("language", string(language)))
 
-			if err != nil {
-				panic(err)
-			}
+				// Find character in database for localization updates
+				localCharFromRepo, _ := characterRepos[language].FindCharacterById(id)
 
-			addStrings(localChar, &localCharFromRepo)
+				// Find character in data files by theBowja
+				localChar, err := getCharacter(strings.ToLower(strings.ReplaceAll(character.Name, " ", ""))+".json", languages.Languages[language])
 
-			if err = characterRepos[languageCode].UpdateCharacter(&localCharFromRepo); err != nil {
-				panic(err)
-			}
+				if err != nil {
+					panic(err)
+				}
+
+				addStrings(localChar, &localCharFromRepo)
+
+				// Commit updates
+				if err = characterRepos[language].UpdateCharacter(&localCharFromRepo); err != nil {
+					panic(err)
+				}
+			}(languageCode, character.Id)
 		}
+
+		wg.Wait() // Wait for all language updates to finish before continuing to next character
 	}
+
+	timerEnd := time.Now() // Gorutine test
+	logger.Info("Program has finished", zap.Float64("time", timerEnd.Sub(timerStart).Seconds()))
 }
 
 // convertCharacter converts character from genshin-db by theBowja to genshin-core model
@@ -176,19 +214,19 @@ func convertCharacter(input gdb_models.Character) (output gc_models.Character) {
 	addStrings(input, &output)
 
 	switch input.Element {
-	case "Geo":
+	case gdb_enums.Geo:
 		output.Element = gc_enums.Geo
-	case "Dendro":
+	case gdb_enums.Dendro:
 		output.Element = gc_enums.Dendro
-	case "Cryo":
+	case gdb_enums.Cryo:
 		output.Element = gc_enums.Cryo
-	case "Pyro":
+	case gdb_enums.Pyro:
 		output.Element = gc_enums.Pyro
-	case "Hydro":
+	case gdb_enums.Hydro:
 		output.Element = gc_enums.Hydro
-	case "Electro":
+	case gdb_enums.Electro:
 		output.Element = gc_enums.Electro
-	case "Anemo":
+	case gdb_enums.Anemo:
 		output.Element = gc_enums.Anemo
 	default:
 		output.Element = gc_enums.UndefinedElement
@@ -202,15 +240,15 @@ func convertCharacter(input gdb_models.Character) (output gc_models.Character) {
 	}
 
 	switch input.Weapontype {
-	case "Sword":
+	case gdb_enums.Sword:
 		output.Weapon = gc_enums.Sword
-	case "Bow":
+	case gdb_enums.Bow:
 		output.Weapon = gc_enums.Bow
-	case "Claymore":
+	case gdb_enums.Claymore:
 		output.Weapon = gc_enums.Claymore
-	case "Catalyst":
+	case gdb_enums.Catalyst:
 		output.Weapon = gc_enums.Catalyst
-	case "Polearm":
+	case gdb_enums.Polearm:
 		output.Weapon = gc_enums.Polearm
 	default:
 		output.Weapon = gc_enums.UndefinedWeapon
