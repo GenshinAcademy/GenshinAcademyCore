@@ -24,7 +24,7 @@ jobs:
 
       - name: Build Synchronization
         run: |
-          go build -o sync ./cmd/sync/main.go
+          go build -o sync ./cmd/sync/v2/main.go
 
       - name: Upload artifacts for deploy job
         uses: actions/upload-artifact@v3
