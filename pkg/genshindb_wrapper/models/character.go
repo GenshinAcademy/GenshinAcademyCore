@@ -1,27 +1,29 @@
 package models
 
+import "ga/pkg/genshindb_wrapper/enums"
+
 type Character struct {
-	Name          string `json:"name"`
-	FullName      string `json:"fullname"`
-	Title         string `json:"title"`
-	Description   string `json:"description"`
-	Rarity        string `json:"rarity"`
-	Element       string `json:"element"`
-	Weapontype    string `json:"weapontype"`
-	Substat       string `json:"substat"`
-	Gender        string `json:"gender"`
-	Body          string `json:"body"`
-	Association   string `json:"association"`
-	Region        string `json:"region"`
-	Affiliation   string `json:"affiliation"`
-	Birthdaymmdd  string `json:"birthdaymmdd"`
-	Birthday      string `json:"birthday"`
-	Constellation string `json:"constellation"`
-	Cv            cv     `json:"cv"`
-	Costs         costs  `json:"costs"`
-	Images        images `json:"images"`
-	URL           url    `json:"url"`
-	Version       string `json:"version"`
+	Name          string        `json:"name"`
+	FullName      string        `json:"fullname"`
+	Title         string        `json:"title"`
+	Description   string        `json:"description"`
+	Rarity        string        `json:"rarity"`
+	Element       enums.Element `json:"element"`
+	Weapontype    enums.Weapon  `json:"weapontype"`
+	Substat       string        `json:"substat"`
+	Gender        string        `json:"gender"`
+	Body          string        `json:"body"`
+	Association   string        `json:"association"`
+	Region        string        `json:"region"`
+	Affiliation   string        `json:"affiliation"`
+	Birthdaymmdd  string        `json:"birthdaymmdd"`
+	Birthday      string        `json:"birthday"`
+	Constellation string        `json:"constellation"`
+	Cv            cv            `json:"cv"`
+	Costs         costs         `json:"costs"`
+	Images        images        `json:"images"`
+	URL           url           `json:"url"`
+	Version       string        `json:"version"`
 }
 
 type images struct {
