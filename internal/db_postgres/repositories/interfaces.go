@@ -1,4 +1,4 @@
-package academy
+package repositories
 
 import (
     "ga/internal/academy_core/models"

@@ -8,7 +8,8 @@ import (
 	"ga/internal/db_postgres/cache"
 	db_mappers "ga/internal/db_postgres/mappers"
 	db_models "ga/internal/db_postgres/models"
-	"gorm.io/gorm"
+    "ga/internal/db_postgres/repositories"
+    "gorm.io/gorm"
 )
 
 var (
@@ -51,9 +52,12 @@ func (repo PostgresNewsRepository) FindNewsById(id academy_models.AcademyId) aca
 	var ids = make([]academy_models.AcademyId, 1)
 	ids[0] = id
 
-	PreloadAll(repo)
-	FilterById(repo, ids)
-	repo.gormConnection.Find(&selectedNews)
+    var connection = repositories.CreateQueryBuilder(repo.GetConnection()).
+        PreloadAll(repo).
+        FilterById(repo, ids).
+        GetConnection()
+
+	connection.Find(&selectedNews)
 
 	return repo.mapper.MapNewsFromDbModel(&selectedNews)
 }
@@ -61,14 +65,15 @@ func (repo PostgresNewsRepository) FindNewsById(id academy_models.AcademyId) aca
 func (repo PostgresNewsRepository) FindNews(parameters find_parameters.NewsFindParameters) []academy_models.News {
 	var selectedNews []db_models.News = make([]db_models.News, 0)
 
-	var connection = PreloadAll(repo)
+    var queryBuilder = repositories.CreateQueryBuilder(repo.GetConnection()).PreloadAll(repo)
+
 	if len(parameters.Ids) > 0 {
-		FilterById(repo, parameters.Ids)
+		queryBuilder = queryBuilder.FilterById(repo, parameters.Ids)
 	} else {
-		connection = ApplyFindParameters(connection, &parameters)
+		queryBuilder = ApplyFindParameters(queryBuilder, &parameters)
 	}
 
-	connection.Find(&selectedNews)
+	queryBuilder.GetConnection().Find(&selectedNews)
 
 	var resultNews = make([]academy_models.News, len(selectedNews))
 	for index, news := range selectedNews {
@@ -85,8 +90,10 @@ func (repo PostgresNewsRepository) AddNews(news *academy_models.News) (academy_m
 
 	var dbNews = repo.mapper.MapDbNewsFromModel(news)
 
-	PreloadAll(repo)
-	repo.gormConnection.Create(&dbNews)
+    var connection = repositories.CreateQueryBuilder(repo.GetConnection()).
+        PreloadAll(repo).
+        GetConnection()
+	connection.Create(&dbNews)
 
 	db_postgres.GetCache().UpdateNewsStrings(&dbNews)
 
@@ -103,15 +110,17 @@ func (repo PostgresNewsRepository) UpdateNews(news *academy_models.News) error {
 
 	var dbNews = repo.mapper.MapDbNewsFromModel(news)
 
-	PreloadAll(repo)
-	repo.gormConnection.Save(&dbNews)
+    var connection = repositories.CreateQueryBuilder(repo.GetConnection()).
+        PreloadAll(repo).
+        GetConnection()
+	connection.Save(&dbNews)
 
 	db_postgres.GetCache().UpdateNewsStrings(&dbNews)
 
 	return nil
 }
 
-func ApplyFindParameters(connection *gorm.DB, parameters *find_parameters.NewsFindParameters) *gorm.DB {
+func ApplyFindParameters(builder repositories.QueryBuilder, parameters *find_parameters.NewsFindParameters) repositories.QueryBuilder {
 	if parameters.PublishTimeFrom != nil {
 		//TODO
 	}
@@ -124,7 +133,5 @@ func ApplyFindParameters(connection *gorm.DB, parameters *find_parameters.NewsFi
 		//TODO
 	}
 
-	connection = Slice(connection, &parameters.SliceOptions)
-
-	return connection
+	return builder.Slice(&parameters.SliceOptions)
 }
