@@ -19,8 +19,8 @@ type NewsStrings struct {
 func (cache *Cache) GetCharacterStrings(key db_models.DBKey) *CharacterStrings {
 	var val, ok = cache.characterStrings[key]
     if !ok {
-        cache.Lock()
         val = new(CharacterStrings)
+        cache.Lock()
         cache.characterStrings[key] = val
         cache.Unlock()
 	}
@@ -28,8 +28,9 @@ func (cache *Cache) GetCharacterStrings(key db_models.DBKey) *CharacterStrings {
 }
 
 func (cache *Cache) UpdateCharacterStrings(model *db_models.Character) *CharacterStrings {
+    var strings = cache.GetCharacterStrings(model.Id)
+
 	cache.Lock()
-	var strings = cache.GetCharacterStrings(model.Id)
 	if strings == nil {
 		strings = new(CharacterStrings)
 		cache.characterStrings[model.Id] = strings
@@ -56,8 +57,9 @@ func (cache *Cache) GetNewsStrings(key db_models.DBKey) *NewsStrings {
 }
 
 func (cache *Cache) UpdateNewsStrings(model *db_models.News) *NewsStrings{
-    cache.Lock()
     var strings = cache.GetNewsStrings(model.Id)
+
+    cache.Lock()
     if strings == nil {
         strings = new(NewsStrings)
         cache.newsStrings[model.Id] = strings
