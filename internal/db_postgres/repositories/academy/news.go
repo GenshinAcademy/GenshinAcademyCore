@@ -14,8 +14,8 @@ import (
 
 var (
 	newsStringPreloads = []string{
-		"Title",
-		"Description",
+		"Title.StringValues",
+		"Description.StringValues",
 	}
 
 	newsPreloads = make([]string, 0)
