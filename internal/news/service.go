@@ -1,6 +1,7 @@
 package news
 
 import (
+	"errors"
 	"ga/internal/academy_core"
 	"ga/internal/academy_core/models"
 	"ga/internal/academy_core/repositories"
@@ -137,12 +138,12 @@ func (service *NewsService) UpdateNews(c *gin.Context) {
 		return
 	}
 
-	if !requestData.Preview.IsUrl() || requestData.Preview == "" {
+	if !requestData.Preview.IsUrl() && requestData.Preview != "" {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid url provided", "message": requestData.Preview})
 		return
 	}
 
-	if !requestData.Redirect.IsUrl() || requestData.Redirect == "" {
+	if !requestData.Redirect.IsUrl() && requestData.Redirect != "" {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid url provided", "message": requestData.Redirect})
 		return
 	}
@@ -162,25 +163,27 @@ func (service *NewsService) UpdateNews(c *gin.Context) {
 
 	// Commit to database
 	if err = defaultRepo.UpdateNews(&news); err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to update news"})
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to update news", "message": err.Error()})
 		return
 	}
 
 	// Update localization fields
-	updateLocaliztionFields(c, models.AcademyId(id), requestData, newsRepos)
+	if err := updateLocaliztionFields(c, models.AcademyId(id), requestData, newsRepos); err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to update news", "message": err.Error()})
+		return
+	}
 
 	c.JSON(http.StatusOK, "success")
 }
 
 // TODO: Delete news
 
-func updateLocaliztionFields(c *gin.Context, id models.AcademyId, requestData newsJson, newsRepos map[languages.Language]repositories.INewsRepository) {
+func updateLocaliztionFields(c *gin.Context, id models.AcademyId, requestData newsJson, newsRepos map[languages.Language]repositories.INewsRepository) error {
 	if len(requestData.Title) > 0 || len(requestData.Description) > 0 {
 		for lang, repo := range newsRepos {
 			result := repo.FindNewsById(models.AcademyId(id))
 			if result == *new(models.News) {
-				c.JSON(http.StatusNotFound, gin.H{"error": "News not found"})
-				return
+				return errors.New("news not found")
 			}
 
 			if value, ok := requestData.Title[lang]; ok {
@@ -192,11 +195,11 @@ func updateLocaliztionFields(c *gin.Context, id models.AcademyId, requestData ne
 			}
 
 			if err := repo.UpdateNews(&result); err != nil {
-				c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to update news"})
-				return
+				return err
 			}
 		}
 	}
+	return nil
 }
 
 type newsJson struct {
@@ -204,6 +207,6 @@ type newsJson struct {
 	Title       map[languages.Language]string `json:"title,omitempty"`
 	Description map[languages.Language]string `json:"description,omitempty"`
 	Preview     url.Url                       `json:"preview,omitempty"`
-	Redirect    url.Url                       `json:"redirect_url,omitempty"`
+	Redirect    url.Url                       `json:"redirect,omitempty"`
 	CreatedAt   time.Time                     `json:"created_at,omitempty"`
 }
