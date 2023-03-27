@@ -7,34 +7,11 @@ import (
 	"ga/internal/db_postgres/cache"
 	db_mappers "ga/internal/db_postgres/mappers"
 	db_models "ga/internal/db_postgres/models"
-	genshin_models "ga/pkg/genshin_core/models"
+    "ga/internal/db_postgres/repositories"
+    genshin_models "ga/pkg/genshin_core/models"
 
 	"gorm.io/gorm"
 )
-
-// PostgresCharacterRepository Character repository
-type PostgresCharacterRepository struct {
-	mapper         db_mappers.Mapper
-	language       academy_models.Language
-	gormConnection *gorm.DB
-}
-
-func CreatePostgresCharacterRepository(connection *gorm.DB, language academy_models.Language, cache *cache.Cache) PostgresCharacterRepository {
-	return PostgresCharacterRepository{
-		gormConnection: connection,
-		mapper:         db_mappers.CreateMapper(language.LanguageName, language, cache),
-		language:       language,
-	}
-}
-
-func (repo PostgresCharacterRepository) preloadStrings(preloads []string) *gorm.DB {
-	var connection = repo.gormConnection
-	for _, preload := range preloads {
-		connection = connection.Preload(preload, "language_id = ?", repo.language.Id)
-	}
-
-	return connection
-}
 
 var (
 	characterStringPreloads []string = []string{
@@ -43,30 +20,59 @@ var (
 		"Description.StringValues",
 		"Title.StringValues",
 	}
+	characterPreloads []string = []string{
+		"Icons",
+		"ArtifactProfits",
+	}
 )
 
-// Automatically adds all preloads
-func (repo PostgresCharacterRepository) addCharacterPreloads() *gorm.DB {
-
-	return repo.preloadStrings(characterStringPreloads).
-		Preload("Icons").
-		Preload("ArtifactProfits")
+// PostgresCharacterRepository Character repository
+type PostgresCharacterRepository struct {
+	PostgresBaseRepository
 }
 
-func (repo PostgresCharacterRepository) GetLanguage() academy_models.Language {
-	return repo.language
+func CreatePostgresCharacterRepository(connection *gorm.DB, language academy_models.Language, cache *cache.Cache) PostgresCharacterRepository {
+	return PostgresCharacterRepository{
+		PostgresBaseRepository: PostgresBaseRepository{
+			language:       language,
+			gormConnection: connection,
+			mapper:         db_mappers.CreateMapper(language.LanguageName, language, cache),
+		},
+	}
+}
+
+func (repo PostgresCharacterRepository) GetIdField() string {
+	return genericIdField
+}
+
+func (repo PostgresCharacterRepository) GetPreloads() []string {
+	return characterPreloads
+}
+
+func (repo PostgresCharacterRepository) GetStringPreloads() []string {
+	return characterStringPreloads
 }
 
 func (repo PostgresCharacterRepository) FindCharacterById(characterId academy_models.AcademyId) (academy_models.Character, bool) {
 	var selectedCharacter db_models.Character
-	repo.addCharacterPreloads().Where("id = ?", characterId).First(&selectedCharacter)
+
+    var connection = repositories.CreateQueryBuilder(repo.GetConnection()).
+        PreloadAll(repo).
+        FilterById(repo, []academy_models.AcademyId{ characterId }).
+        GetConnection()
+	connection.First(&selectedCharacter)
 
 	return repo.mapper.MapAcademyCharacterFromDbModel(&selectedCharacter), selectedCharacter.Id != db_models.DBKey(academy_models.UNDEFINED_ID)
 }
 
 func (repo PostgresCharacterRepository) FindCharacterByGenshinId(characterId genshin_models.ModelId) (academy_models.Character, bool) {
 	var selectedCharacter db_models.Character
-	repo.addCharacterPreloads().Where("character_id = ?", characterId).First(&selectedCharacter)
+
+    var connection = repositories.CreateQueryBuilder(repo.GetConnection()).
+        PreloadAll(repo).
+        GetConnection().
+        Where("character_id = ?", characterId)
+    connection.First(&selectedCharacter)
 
 	return repo.mapper.MapAcademyCharacterFromDbModel(&selectedCharacter), selectedCharacter.Id != db_models.DBKey(academy_models.UNDEFINED_ID)
 }
@@ -75,13 +81,14 @@ func (repo PostgresCharacterRepository) FindCharacters(parameters find_parameter
 
 	var selectedChacters = make([]db_models.Character, 0)
 	var result = make([]academy_models.Character, 0)
-	gormConnection := repo.addCharacterPreloads()
+    var queryBuilder = repositories.CreateQueryBuilder(repo.GetConnection()).PreloadAll(repo)
 
 	if len(parameters.Ids) > 0 {
-		gormConnection.Find(&selectedChacters, parameters.Ids)
+		queryBuilder = queryBuilder.FilterById(repo, parameters.Ids)
 	} else {
+        var connection = queryBuilder.GetConnection()
 		if len(parameters.CharacterFindParameters.Ids) > 0 {
-			gormConnection = gormConnection.Where("character_id IN ?", parameters.CharacterFindParameters.Ids)
+            connection = connection.Where("character_id IN ?", parameters.CharacterFindParameters.Ids)
 		}
 
 		if len(parameters.CharacterFindParameters.Elements) > 0 {
@@ -89,11 +96,12 @@ func (repo PostgresCharacterRepository) FindCharacters(parameters find_parameter
 			for _, cByte := range parameters.Elements {
 				bytes = append(bytes, uint8(cByte))
 			}
-			gormConnection = gormConnection.Where("element IN ?", bytes)
-		}
-
-		gormConnection.Find(&selectedChacters)
+            connection = connection.Where("element IN ?", bytes)
+        }
+        queryBuilder = repositories.CreateQueryBuilder(connection).Slice(&parameters.SliceOptions)
 	}
+
+	queryBuilder.GetConnection().Find(&selectedChacters)
 
 	for _, character := range selectedChacters {
 		result = append(result, repo.mapper.MapAcademyCharacterFromDbModel(&character))
@@ -105,7 +113,10 @@ func (repo PostgresCharacterRepository) FindCharacters(parameters find_parameter
 func (repo PostgresCharacterRepository) AddCharacter(character *academy_models.Character) (academy_models.AcademyId, error) {
 	var newCharacter = repo.mapper.MapDbCharacterFromModel(character)
 
-	repo.gormConnection.Create(&newCharacter)
+    var connection = repositories.CreateQueryBuilder(repo.GetConnection()).
+        PreloadAll(repo).
+        GetConnection()
+	connection.Create(&newCharacter)
 
 	db_postgres.GetCache().UpdateCharacterStrings(&newCharacter)
 
@@ -118,7 +129,11 @@ func (repo PostgresCharacterRepository) UpdateCharacter(character *academy_model
 	}
 
 	var characterToUpdate = repo.mapper.MapDbCharacterFromModel(character)
-	repo.gormConnection.Save(&characterToUpdate)
+
+    var connection = repositories.CreateQueryBuilder(repo.GetConnection()).
+        PreloadAll(repo).
+        GetConnection()
+	connection.Save(&characterToUpdate)
 
 	db_postgres.GetCache().UpdateCharacterStrings(&characterToUpdate)
 }

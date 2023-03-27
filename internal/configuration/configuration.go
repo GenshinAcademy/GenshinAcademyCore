@@ -13,6 +13,7 @@ type Config struct {
 	ServerPort     string `mapstructure:"SERVER_PORT"`
 	LogLevel       byte   `mapstructure:"LOG_LEVEL"`
 	GinMode        string `mapstructure:"GIN_MODE"`
+	SecretKey      string `mapstructure:"SECRET_KEY"`
 }
 
 var (

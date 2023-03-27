@@ -7,6 +7,7 @@ import (
 	academy_models "ga/internal/academy_core/models"
 	artifact_profit "ga/internal/academy_core/value_objects/artifact_profit"
 	localized_string "ga/internal/academy_core/value_objects/localized_string"
+	url "ga/internal/academy_core/value_objects/url"
 
 	// Genshin specific imports
 	genshin_models "ga/pkg/genshin_core/models"
@@ -229,5 +230,34 @@ func (mapper Mapper) MapDbCharacterIcon(parentId db_models.DBKey, model *genshin
 		CharacterId: parentId,
 		IconType:    uint8(model.Type),
 		Url:         model.Url,
+	}
+}
+
+func (mapper Mapper) MapNewsFromDbModel(model *db_models.News) academy_models.News {
+	var modelNews = academy_models.News{
+		AcademyModel: academy_models.AcademyModel{
+			Id: academy_models.AcademyId(model.Id),
+		},
+		Title:       mapper.StringFromDbModel(&model.Title),
+		Description: mapper.StringFromDbModel(&model.Description),
+		Preview:     url.Url(model.PreviewUrl),
+		RedirectUrl: url.Url(model.RedirectUrl),
+		CreatedAt:   model.CreatedAt,
+	}
+    mapper.cache.UpdateNewsStrings(model)
+
+    return modelNews
+}
+
+func (mapper Mapper) MapDbNewsFromModel(model *academy_models.News) db_models.News {
+	var newsStrings = mapper.cache.GetNewsStrings(db_models.DBKey(model.Id))
+
+	return db_models.News{
+		Id:          db_models.DBKey(model.Id),
+		Title:       mapper.MapDbStringFromString(newsStrings.Title, model.Title),
+		Description: mapper.MapDbStringFromString(newsStrings.Description, model.Description),
+		PreviewUrl:  string(model.Preview),
+		RedirectUrl: string(model.RedirectUrl),
+		CreatedAt:   model.CreatedAt,
 	}
 }

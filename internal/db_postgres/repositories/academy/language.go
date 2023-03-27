@@ -14,6 +14,10 @@ type PostgresLanguageRepository struct {
 	gormConnection *gorm.DB
 }
 
+func (repo PostgresLanguageRepository) GetConnection() *gorm.DB {
+    return repo.gormConnection
+}
+
 // CreatePostresLanguageRepository Creates language repository with provided gorm connection
 func CreatePostresLanguageRepository(connection *gorm.DB) PostgresLanguageRepository {
 	return PostgresLanguageRepository{

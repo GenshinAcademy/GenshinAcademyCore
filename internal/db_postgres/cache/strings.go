@@ -11,17 +11,26 @@ type CharacterStrings struct {
 	Title       db_models.DBKey
 }
 
+type NewsStrings struct {
+	Title       db_models.DBKey
+	Description db_models.DBKey
+}
+
 func (cache *Cache) GetCharacterStrings(key db_models.DBKey) *CharacterStrings {
 	var val, ok = cache.characterStrings[key]
-	if !ok {
-		return nil
+    if !ok {
+        val = new(CharacterStrings)
+        cache.Lock()
+        cache.characterStrings[key] = val
+        cache.Unlock()
 	}
 	return val
 }
 
 func (cache *Cache) UpdateCharacterStrings(model *db_models.Character) *CharacterStrings {
+    var strings = cache.GetCharacterStrings(model.Id)
+
 	cache.Lock()
-	var strings = cache.GetCharacterStrings(model.Id)
 	if strings == nil {
 		strings = new(CharacterStrings)
 		cache.characterStrings[model.Id] = strings
@@ -34,4 +43,31 @@ func (cache *Cache) UpdateCharacterStrings(model *db_models.Character) *Characte
 	cache.Unlock()
 
 	return strings
+}
+
+func (cache *Cache) GetNewsStrings(key db_models.DBKey) *NewsStrings {
+    var val, ok = cache.newsStrings[key]
+    if !ok {
+        val = new(NewsStrings)
+        cache.Lock()
+        cache.newsStrings[key] = val
+        cache.Unlock()
+    }
+    return val
+}
+
+func (cache *Cache) UpdateNewsStrings(model *db_models.News) *NewsStrings{
+    var strings = cache.GetNewsStrings(model.Id)
+
+    cache.Lock()
+    if strings == nil {
+        strings = new(NewsStrings)
+        cache.newsStrings[model.Id] = strings
+    }
+
+    strings.Title = model.TitleId
+    strings.Description = model.DescriptionId
+    cache.Unlock()
+
+    return strings
 }
