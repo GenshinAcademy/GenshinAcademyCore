@@ -5,6 +5,7 @@ import (
 	"ga/internal/configuration"
 	academy_postgres "ga/internal/db_postgres/implementation/academy"
 	"ga/internal/genshin"
+	"ga/internal/middlewares"
 
 	"ga/internal/news"
 	core "ga/pkg/genshin_core"
@@ -81,7 +82,8 @@ func main() {
 	news := mainRoute.Group("/news")
 	{
 		news.GET("/", newsService.GetAllNews)
-		news.POST("/", newsService.CreateNews)
+		news.POST("/", middlewares.Authenticate(configuration.ENV.SecretKey), newsService.CreateNews)
+		news.PATCH("/:id", middlewares.Authenticate(configuration.ENV.SecretKey), newsService.UpdateNews)
 	}
 
 	r.NoRoute(func(c *gin.Context) {
