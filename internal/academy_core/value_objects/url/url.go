@@ -1,17 +1,10 @@
 package models
 
+import "net/url"
+
 type Url string
 
-func CreateUrl(url string) (Url, error) {
-    var err = VerifyUrl(url)
-    if err != nil {
-        return "", err
-    }
-
-    return Url(url), nil
-}
-
-func VerifyUrl(url string) error {
-    //TODO
-    return nil
+func (str *Url) IsUrl() bool {
+	u, err := url.Parse(string(*str))
+	return err == nil && u.Scheme != "" && u.Host != ""
 }
