@@ -18,6 +18,9 @@ var (
 
 	// DefaultLanguage is default language to operate with database
 	DefaultLanguage Language = English
+
+	// Languages is a list of languages' full names
+	Languages = map[Language]string{English: "English", Russian: "Russian"}
 )
 
 // GetLanguage returns first found language or default language
