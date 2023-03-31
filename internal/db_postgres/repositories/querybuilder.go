@@ -6,16 +6,26 @@ import (
 	"gorm.io/gorm"
 )
 
+var(
+	fullSaveSessionRef = &gorm.Session{
+		FullSaveAssociations: true,
+	}
+)
+
 type QueryBuilder struct {
 	connection *gorm.DB
 }
 
 func CreateQueryBuilder(dbConnection *gorm.DB) QueryBuilder {
-	return QueryBuilder{connection: dbConnection}
+	return QueryBuilder{connection: dbConnection.Session(fullSaveSessionRef)}
 }
 
 func (builder QueryBuilder) GetConnection() *gorm.DB {
 	return builder.connection
+}
+
+func (builder QueryBuilder) UpdateAssociations() QueryBuilder {
+	return QueryBuilder{connection: builder.connection.Session(fullSaveSessionRef)}
 }
 
 func (builder QueryBuilder) PreloadAll(repo PostgresRepositoryWithStrings) QueryBuilder {
