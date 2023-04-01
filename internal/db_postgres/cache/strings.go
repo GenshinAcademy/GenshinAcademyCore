@@ -16,6 +16,11 @@ type NewsStrings struct {
 	Description db_models.DBKey
 }
 
+type TableStrings struct {
+    Title       db_models.DBKey
+    Description db_models.DBKey
+}
+
 func (cache *Cache) GetCharacterStrings(key db_models.DBKey) *CharacterStrings {
 	var val, ok = cache.characterStrings[key]
     if !ok {
@@ -63,6 +68,33 @@ func (cache *Cache) UpdateNewsStrings(model *db_models.News) *NewsStrings{
     if strings == nil {
         strings = new(NewsStrings)
         cache.newsStrings[model.Id] = strings
+    }
+
+    strings.Title = model.TitleId
+    strings.Description = model.DescriptionId
+    cache.Unlock()
+
+    return strings
+}
+
+func (cache *Cache) GetTableStrings(key db_models.DBKey) *TableStrings {
+    var val, ok = cache.tableStrings[key]
+    if !ok {
+        val = new(TableStrings)
+        cache.Lock()
+        cache.tableStrings[key] = val
+        cache.Unlock()
+    }
+    return val
+}
+
+func (cache *Cache) UpdateTableStrings(model *db_models.Table) *TableStrings{
+    var strings = cache.GetTableStrings(model.Id)
+
+    cache.Lock()
+    if strings == nil {
+        strings = new(TableStrings)
+        cache.tableStrings[model.Id] = strings
     }
 
     strings.Title = model.TitleId
