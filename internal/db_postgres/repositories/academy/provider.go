@@ -42,3 +42,12 @@ func (provider PostgresAcademyProvider) CreateNewsRepo() repositories.INewsRepos
 
     return academyRepository
 }
+
+func (provider PostgresAcademyProvider) CreateTableRepo() repositories.ITableRepository {
+    var academyRepository = CreatePostgresTableRepository(
+        provider.gormConnection,
+        provider.language,
+        provider.cache)
+
+    return academyRepository
+}
