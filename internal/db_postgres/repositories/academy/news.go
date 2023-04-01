@@ -110,7 +110,7 @@ func (repo PostgresNewsRepository) UpdateNews(news *academy_models.News) error {
 
 	var dbNews = repo.mapper.MapDbNewsFromModel(news)
 
-    var connection = repositories.CreateQueryBuilder(repo.GetConnection()).
+    var connection = repositories.CreateUpdateQueryBuilder(repo.GetConnection()).
         PreloadAll(repo).
         GetConnection()
 	connection.Save(&dbNews)

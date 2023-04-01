@@ -244,9 +244,9 @@ func (mapper Mapper) MapNewsFromDbModel(model *db_models.News) academy_models.Ne
 		RedirectUrl: url.Url(model.RedirectUrl),
 		CreatedAt:   model.CreatedAt,
 	}
-    mapper.cache.UpdateNewsStrings(model)
+	mapper.cache.UpdateNewsStrings(model)
 
-    return modelNews
+	return modelNews
 }
 
 func (mapper Mapper) MapDbNewsFromModel(model *academy_models.News) db_models.News {
@@ -259,5 +259,32 @@ func (mapper Mapper) MapDbNewsFromModel(model *academy_models.News) db_models.Ne
 		PreviewUrl:  string(model.Preview),
 		RedirectUrl: string(model.RedirectUrl),
 		CreatedAt:   model.CreatedAt,
+	}
+}
+
+func (mapper Mapper) MapTableFromDbModel(model *db_models.Table) academy_models.Table {
+	var modelNews = academy_models.Table{
+		AcademyModel: academy_models.AcademyModel{
+			Id: academy_models.AcademyId(model.Id),
+		},
+		Title:       mapper.StringFromDbModel(&model.Title),
+		Description: mapper.StringFromDbModel(&model.Description),
+		Preview:     url.Url(model.PreviewUrl),
+		RedirectUrl: url.Url(model.RedirectUrl),
+	}
+	mapper.cache.UpdateTableStrings(model)
+
+	return modelNews
+}
+
+func (mapper Mapper) MapDbTableFromModel(model *academy_models.Table) db_models.Table {
+	var tableStrings = mapper.cache.GetTableStrings(db_models.DBKey(model.Id))
+
+	return db_models.Table{
+		Id:          db_models.DBKey(model.Id),
+		Title:       mapper.MapDbStringFromString(tableStrings.Title, model.Title),
+		Description: mapper.MapDbStringFromString(tableStrings.Description, model.Description),
+		PreviewUrl:  string(model.Preview),
+		RedirectUrl: string(model.RedirectUrl),
 	}
 }

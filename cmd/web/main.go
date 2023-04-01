@@ -6,6 +6,7 @@ import (
 	academy_postgres "ga/internal/db_postgres/implementation/academy"
 	"ga/internal/genshin"
 	"ga/internal/middlewares"
+	"ga/internal/tables"
 
 	"ga/internal/news"
 	core "ga/pkg/genshin_core"
@@ -24,6 +25,7 @@ var (
 	ferretService  *ferret.FerretService
 	genshinService *genshin.GenshinService
 	newsService    *news.NewsService
+	tablesService  *tables.TablesService
 )
 
 func init() {
@@ -59,6 +61,7 @@ func init() {
 	ferretService = ferret.CreateService(gacore)
 	genshinService = genshin.CreateService(gacore)
 	newsService = news.CreateService(gacore)
+	tablesService = tables.CreateService(gacore)
 }
 
 // Web server here
@@ -84,6 +87,13 @@ func main() {
 		news.GET("/", newsService.GetAllNews)
 		news.POST("/", middlewares.Authenticate(configuration.ENV.SecretKey), newsService.CreateNews)
 		news.PATCH("/:id", middlewares.Authenticate(configuration.ENV.SecretKey), newsService.UpdateNews)
+	}
+
+	tables := mainRoute.Group("/tables")
+	{
+		tables.GET("/", tablesService.GetAllTables)
+		tables.POST("/", middlewares.Authenticate(configuration.ENV.SecretKey), tablesService.CreateTable)
+		tables.PATCH("/:id", middlewares.Authenticate(configuration.ENV.SecretKey), tablesService.UpdateTable)
 	}
 
 	r.NoRoute(func(c *gin.Context) {
