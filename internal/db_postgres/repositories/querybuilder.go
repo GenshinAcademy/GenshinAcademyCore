@@ -17,6 +17,10 @@ type QueryBuilder struct {
 }
 
 func CreateQueryBuilder(dbConnection *gorm.DB) QueryBuilder {
+	return QueryBuilder{connection: dbConnection}
+}
+
+func CreateUpdateQueryBuilder(dbConnection *gorm.DB) QueryBuilder {
 	return QueryBuilder{connection: dbConnection.Session(fullSaveSessionRef)}
 }
 

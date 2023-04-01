@@ -130,7 +130,7 @@ func (repo PostgresCharacterRepository) UpdateCharacter(character *academy_model
 
 	var characterToUpdate = repo.mapper.MapDbCharacterFromModel(character)
 
-    var connection = repositories.CreateQueryBuilder(repo.GetConnection()).
+    var connection = repositories.CreateUpdateQueryBuilder(repo.GetConnection()).
         PreloadAll(repo).
         GetConnection()
 	connection.Save(&characterToUpdate)

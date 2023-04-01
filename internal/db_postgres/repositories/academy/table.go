@@ -110,7 +110,7 @@ func (repo PostgresTableRepository) UpdateTable(table *academy_models.Table) err
 
 	var dbTable = repo.mapper.MapDbTableFromModel(table)
 
-	var connection = repositories.CreateQueryBuilder(repo.GetConnection()).
+	var connection = repositories.CreateUpdateQueryBuilder(repo.GetConnection()).
 		PreloadAll(repo).
 		GetConnection()
 	connection.Save(&dbTable)
