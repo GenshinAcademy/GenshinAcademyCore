@@ -41,8 +41,8 @@ type INewsRepository interface {
 type ITableRepository interface {
 	IRepository
 	FindTableById(id models.AcademyId) models.Table
-	FindTables(parameters find_parameters.FindParameters) []models.Table
-	AddTable(table *models.Table) (models.Table, error)
+	FindTables(parameters find_parameters.TableFindParameters) []models.Table
+	AddTable(table *models.Table) (models.AcademyId, error)
 	UpdateTable(table *models.Table) error
 }
 
@@ -50,5 +50,6 @@ type IRepositoryProvider interface {
 	GetLanguage() models.Language
 	NewCharacterRepo() ICharacterRepository
     CreateNewsRepo() INewsRepository
+	CreateTableRepo() ITableRepository
 	//NewCharacterIconRepo() ICharacterIconRepository
 }
