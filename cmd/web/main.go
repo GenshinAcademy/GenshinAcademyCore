@@ -7,6 +7,7 @@ import (
 	"ga/internal/genshin"
 	"ga/internal/middlewares"
 	"ga/internal/tables"
+	"time"
 
 	"ga/internal/news"
 	core "ga/pkg/genshin_core"
@@ -72,7 +73,12 @@ func main() {
 	gin.SetMode(configuration.ENV.GinMode)
 
 	// TODO: Move all router related code to internal/router package
-	r.Use(cors.Default())
+	r.Use(cors.New(cors.Config{
+		AllowAllOrigins: true,
+		AllowMethods:    []string{"GET"},
+		AllowHeaders:    []string{"Origin", "Content-Length", "Content-Type", "Accept-Language"},
+		MaxAge:          12 * time.Hour,
+	}))
 
 	mainRoute := r.Group("/api")
 
