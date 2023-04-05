@@ -1,0 +1,40 @@
+version: '3.7'
+
+services:
+  ga_server:
+    image: ${DOCKER_IMAGE}
+    depends_on:
+      - ga_postgredb
+    ports:
+      - ${SERVER_PORT}:${SERVER_PORT}
+    networks:
+      - internal
+    env_file:
+      - .env
+
+  ga_postgredb:
+    image: postgres
+    restart: always
+    ports:
+      - 8310:${POSTGRES_PORT}
+    volumes:
+      - postgres-db:/var/lib/postgresql/data
+    networks:
+      - internal
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_DB: ${POSTGRES_DB}
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+volumes:
+  postgres-db:
+
+
+networks:
+  internal:
+    driver: bridge
