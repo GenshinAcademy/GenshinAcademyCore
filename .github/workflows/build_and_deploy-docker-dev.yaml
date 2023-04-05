@@ -1,9 +1,9 @@
-name: Build and Deploy DEV
+name: Build and Deploy Docker DEV
 
 on:
   push:
     branches:
-      - docker
+      - dev
 
 jobs:
   build:
@@ -66,12 +66,11 @@ jobs:
           script: |
             echo "${{ secrets.ENV_DEV }}" > ${{ vars.OUTPUT_DIR_DEV }}/.env
 
-      - name: Pull and restart docker container
+      - name: Pull and restart docker container using service
         uses: appleboy/ssh-action@master
         with:
           host: ${{ secrets.HOST }}
           username: ${{ secrets.USERNAME }}
           key: ${{ secrets.SSH_KEY }}
           script: |
-            cd ${{ vars.OUTPUT_DIR_DEV }}
-            ./restart.sh
+            sudo systemctl restart ${{ vars.SERVICE_NAME_DEV }}
