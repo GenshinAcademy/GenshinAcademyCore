@@ -11,7 +11,7 @@ type Config struct {
 	DBName         string `mapstructure:"POSTGRES_DB"`
 	DBPort         uint16 `mapstructure:"POSTGRES_PORT"`
 	ServerPort     string `mapstructure:"SERVER_PORT"`
-	LogLevel       byte   `mapstructure:"LOG_LEVEL"`
+	LogLevel       uint16 `mapstructure:"LOG_LEVEL"`
 	GinMode        string `mapstructure:"GIN_MODE"`
 	SecretKey      string `mapstructure:"SECRET_KEY"`
 }
@@ -23,22 +23,29 @@ var (
 func loadENV() error {
 	viper.SetConfigFile(".env")
 
-	err := viper.ReadInConfig()
-	if err != nil {
-		return err
-	}
+	viper.AutomaticEnv()
 
-	err = viper.Unmarshal(&ENV)
-	if err != nil {
-		return err
+	if err := viper.ReadInConfig(); err != nil {
+		ENV.DBHost = viper.GetString("POSTGRES_HOST")
+		ENV.DBUserName = viper.GetString("POSTGRES_USER")
+		ENV.DBUserPassword = viper.GetString("POSTGRES_PASSWORD")
+		ENV.DBName = viper.GetString("POSTGRES_DB")
+		ENV.DBPort = viper.GetUint16("POSTGRES_PORT")
+		ENV.ServerPort = viper.GetString("SERVER_PORT")
+		ENV.LogLevel = viper.GetUint16("LOG_LEVEL")
+		ENV.GinMode = viper.GetString("GIN_MODE")
+		ENV.SecretKey = viper.GetString("SECRET_KEY")
+	} else {
+		if err := viper.Unmarshal(&ENV); err != nil {
+			return err
+		}
 	}
 
 	return nil
 }
 
 func Init() error {
-	err := loadENV()
-	if err != nil {
+	if err := loadENV(); err != nil {
 		return err
 	}
 

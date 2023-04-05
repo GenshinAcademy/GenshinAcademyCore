@@ -45,7 +45,9 @@ func init() {
 		Port:         configuration.ENV.DBPort,
 	}
 
-	academy_postgres.InitializePostgresDatabase(dbConfig)
+	if err := academy_postgres.InitializePostgresDatabase(dbConfig); err != nil {
+		panic(err)
+	}
 
 	//Initializing gacore config and configure it for postgres db
 	var config academy_core.AcademyCoreConfiguration = academy_core.AcademyCoreConfiguration{
@@ -90,7 +92,7 @@ func main() {
 
 	news := mainRoute.Group("/news")
 	{
-		news.GET("/", newsService.GetAllNews)
+		news.GET("", newsService.GetAllNews)
 		news.POST("/", middlewares.Authenticate(configuration.ENV.SecretKey), newsService.CreateNews)
 		news.PATCH("/:id", middlewares.Authenticate(configuration.ENV.SecretKey), newsService.UpdateNews)
 	}
