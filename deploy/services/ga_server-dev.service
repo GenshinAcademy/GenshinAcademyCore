@@ -1,0 +1,10 @@
+[Unit]
+Description=Runs Genshin Academy API DEV Server
+
+[Service]
+Type=simple
+WorkingDirectory=/home/academy/GenshinAcademy/dev/server
+ExecStart=/home/academy/GenshinAcademy/dev/server/server
+
+[Install]
+WantedBy=multi-user.target
