@@ -1,0 +1,6 @@
+- name: Full deployment for Genshin Academy project
+  hosts: genshinacademy
+  become: yes
+
+  roles:
+    - nginx
