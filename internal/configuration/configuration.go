@@ -14,6 +14,9 @@ type Config struct {
 	LogLevel       uint16 `mapstructure:"LOG_LEVEL"`
 	GinMode        string `mapstructure:"GIN_MODE"`
 	SecretKey      string `mapstructure:"SECRET_KEY"`
+	AssetsPath     string `mapstructure:"ASSETS_PATH"`
+	AssetsHost     string `mapstructure:"ASSETS_HOST"`
+	AssetsFormat   string `mapstructure:"ASSETS_FORMAT"`
 }
 
 var (

@@ -2,6 +2,7 @@ package ferret
 
 import (
 	"ga/internal/academy_core/models"
+	"ga/internal/configuration"
 	"ga/internal/ferret/web_models"
 )
 
@@ -11,7 +12,7 @@ func (service *FerretService) mapCharacter(input models.Character) web_models.Fe
 	output.CharacterId = string(input.Character.Id)
 	output.Name = input.Name
 	output.Element = uint8(input.Element)
-	output.IconUrl = input.Icons[0].Url
+	output.IconUrl = configuration.ENV.AssetsHost + input.Icons[0].Url + configuration.ENV.AssetsFormat
 	output.StatsProfit = make([]web_models.StatsProfit, len(input.Profits))
 
 	for i, stat := range input.Profits {

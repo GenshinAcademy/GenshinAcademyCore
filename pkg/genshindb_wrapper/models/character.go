@@ -21,9 +21,13 @@ type Character struct {
 	Constellation string        `json:"constellation"`
 	Cv            cv            `json:"cv"`
 	Costs         costs         `json:"costs"`
-	Images        images        `json:"images"`
-	URL           url           `json:"url"`
-	Version       string        `json:"version"`
+}
+
+type CharacterWeb struct {
+	Character
+	Images  images `json:"images"`
+	URL     url    `json:"url"`
+	Version string `json:"version"`
 }
 
 type images struct {

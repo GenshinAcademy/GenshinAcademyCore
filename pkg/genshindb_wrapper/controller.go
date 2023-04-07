@@ -38,8 +38,8 @@ func Create(host string, language enums.Language, logger *zap.SugaredLogger) *ge
 	return &api
 }
 
-func (api *genshinDbApi) GetCharacter(query string) (models.Character, error) {
-	var character models.Character
+func (api *genshinDbApi) GetCharacter(query string) (models.CharacterWeb, error) {
+	var character models.CharacterWeb
 
 	response, err := api.makeRequest(api.URL + "/characters" + "?query=" + url.QueryEscape(query) + "&resultLanguage=" + string(api.Language))
 	if err != nil {
@@ -54,8 +54,8 @@ func (api *genshinDbApi) GetCharacter(query string) (models.Character, error) {
 	return character, nil
 }
 
-func (api *genshinDbApi) GetAllCharacters() ([]models.Character, error) {
-	var characters []models.Character
+func (api *genshinDbApi) GetAllCharacters() ([]models.CharacterWeb, error) {
+	var characters []models.CharacterWeb
 	charactersNames, err := api.GetAllCharactersNames()
 
 	if err != nil {
