@@ -1,0 +1,6 @@
+- name: Deploy NGINX configurations for Genshin Academy
+  hosts: genshinacademy
+  become: yes
+
+  roles:
+    - nginx
