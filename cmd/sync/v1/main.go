@@ -111,7 +111,7 @@ func main() {
 }
 
 // convertCharacter converts character from genshin-db by theBowja to genshin-core model
-func convertCharacter(input gdb_models.Character) (output gc_models.Character) {
+func convertCharacter(input gdb_models.CharacterWeb) (output gc_models.Character) {
 	output.Id = gc_models.ModelId(strings.ToLower(strings.ReplaceAll(input.Name, " ", "_")))
 
 	addStrings(input, &output)
@@ -161,7 +161,7 @@ func convertCharacter(input gdb_models.Character) (output gc_models.Character) {
 	return output
 }
 
-func addStrings(input gdb_models.Character, output *gc_models.Character) {
+func addStrings(input gdb_models.CharacterWeb, output *gc_models.Character) {
 	output.Name = input.Name
 	output.FullName = input.FullName
 	output.Description = input.Description

@@ -254,7 +254,7 @@ func convertCharacter(input gdb_models.Character) (output gc_models.Character) {
 		output.Weapon = gc_enums.UndefinedWeapon
 	}
 
-	output.Icons = []value_objects.CharacterIcon{{Type: 0, Url: input.Images.Icon}}
+	output.Icons = []value_objects.CharacterIcon{{Type: 0, Url: "/characters/icon/" + string(output.Id)}}
 	return output
 }
 
