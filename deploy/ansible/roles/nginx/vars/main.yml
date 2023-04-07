@@ -22,5 +22,3 @@ sites:
     proxy:
       - location: api
         pass: http://localhost:8300
-      - location: assets
-        pass: https://assets-dev.academy-project.info
