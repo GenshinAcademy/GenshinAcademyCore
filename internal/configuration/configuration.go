@@ -38,6 +38,10 @@ func loadENV() error {
 		ENV.LogLevel = viper.GetUint16("LOG_LEVEL")
 		ENV.GinMode = viper.GetString("GIN_MODE")
 		ENV.SecretKey = viper.GetString("SECRET_KEY")
+		ENV.AssetsPath = viper.GetString("ASSETS_PATH")
+		ENV.AssetsHost = viper.GetString("ASSETS_HOST")
+		ENV.AssetsFormat = viper.GetString("ASSETS_FORMAT")
+
 	} else {
 		if err := viper.Unmarshal(&ENV); err != nil {
 			return err
