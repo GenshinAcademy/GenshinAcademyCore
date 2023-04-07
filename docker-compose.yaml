@@ -8,7 +8,7 @@ services:
     ports:
       - ${SERVER_PORT_OUT}:${SERVER_PORT}
     volumes:
-      - ${ASSETS_PATH}:${ASSETS_PATH}
+      - ${ASSETS_PATH_OUT}:${ASSETS_PATH}
     networks:
       - internal
     env_file:
