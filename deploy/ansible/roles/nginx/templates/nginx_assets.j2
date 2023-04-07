@@ -23,10 +23,12 @@ server {
         try_files $uri $uri/ /index.html;
     }
     
-{% if item.proxy_pass_path is defined %}
-    location /{{item.proxy_pass_path}} {
-        proxy_pass {{item.proxy_pass_adress}};
+{% if item.proxy is defined %}
+{% for proxy in item.proxy %}
+    location /{{proxy.location}} {
+        proxy_pass {{proxy.pass}};
     }
+{% endfor %}
 {% endif %}
 {% endif %}
 
