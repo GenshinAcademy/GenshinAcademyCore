@@ -3,6 +3,7 @@ package academy_core
 import (
 	"ga/internal/academy_core/models"
 	"ga/internal/academy_core/repositories"
+	url "ga/internal/academy_core/value_objects/url"
 
 	"ga/pkg/genshin_core"
 	"ga/pkg/genshin_core/models/languages"
@@ -15,12 +16,14 @@ type AcademyCoreConfiguration struct {
 	genshin_core.GenshinCoreConfiguration
 	ProviderFunc     GetAcademyProviderFunc
 	LanguageRepoFunc GetLanguageRepositoryFunc
+	AssetsPath       string
 }
 
 type AcademyCore struct {
 	getLanguageRepository GetLanguageRepositoryFunc
 	getProvider           GetAcademyProviderFunc
 	genshinCore           *genshin_core.GenshinCore
+	assetsPath            string
 }
 
 func CreateAcademyCore(configuration AcademyCoreConfiguration) *AcademyCore {
@@ -36,6 +39,7 @@ func CreateAcademyCore(configuration AcademyCoreConfiguration) *AcademyCore {
 	if configuration.ProviderFunc != nil {
 		core.getProvider = configuration.ProviderFunc
 	}
+	core.assetsPath = configuration.AssetsPath
 
 	return core
 }
@@ -70,4 +74,9 @@ func (core *AcademyCore) GetDefaultProvider() repositories.IRepositoryProvider {
 func (core *AcademyCore) GetProvider(languageName languages.Language) repositories.IRepositoryProvider {
 	var language = core.getLanguageRepository().FindLanguage(languageName)
 	return core.getProvider(language)
+}
+
+func (core *AcademyCore) GetAssetPath(assetPath string) (url.Url, error) {
+	url, err := url.CreateUrl(core.assetsPath, assetPath)
+	return url, err
 }

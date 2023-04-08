@@ -2,17 +2,22 @@ package ferret
 
 import (
 	"ga/internal/academy_core/models"
-	"ga/internal/configuration"
 	"ga/internal/ferret/web_models"
 )
 
 // mapCharacter converts academy_core model to ferret model
-func (service *FerretService) mapCharacter(input models.Character) web_models.FerretCharacter {
+func (service *FerretService) mapCharacter(input models.Character) (web_models.FerretCharacter, error) {
 	var output web_models.FerretCharacter
 	output.CharacterId = string(input.Character.Id)
 	output.Name = input.Name
 	output.Element = uint8(input.Element)
-	output.IconUrl = configuration.ENV.AssetsHost + input.Icons[0].Url + configuration.ENV.AssetsFormat
+
+	url, err := service.core.GetAssetPath(input.Icons[0].Url)
+	if err != nil {
+		return output, err
+	}
+	output.IconUrl = url
+
 	output.StatsProfit = make([]web_models.StatsProfit, len(input.Profits))
 
 	for i, stat := range input.Profits {
@@ -33,5 +38,5 @@ func (service *FerretService) mapCharacter(input models.Character) web_models.Fe
 		statProfit.PhysicalDamage = int(stat.PhysicalDamage)
 	}
 
-	return output
+	return output, nil
 }

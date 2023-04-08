@@ -34,7 +34,14 @@ func (service *FerretService) GetAllCharactersWithProfits(c *gin.Context) {
 		if len(char.Profits) == 0 {
 			continue
 		}
-		characters = append(characters, service.mapCharacter(char))
+
+		character, err := service.mapCharacter(char)
+		if err != nil {
+			c.JSON(http.StatusInternalServerError, gin.H{"error": "Internal server error, please contact administrator"})
+			return
+		}
+
+		characters = append(characters, character)
 	}
 
 	c.JSON(http.StatusOK,
