@@ -1,54 +1,62 @@
 package configuration
 
 import (
+	"fmt"
+	"os"
+	"reflect"
+	"strconv"
+
 	"github.com/spf13/viper"
 )
 
-type Config struct {
-	DBHost         string `mapstructure:"POSTGRES_HOST"`
-	DBUserName     string `mapstructure:"POSTGRES_USER"`
-	DBUserPassword string `mapstructure:"POSTGRES_PASSWORD"`
-	DBName         string `mapstructure:"POSTGRES_DB"`
-	DBPort         uint16 `mapstructure:"POSTGRES_PORT"`
-	ServerPort     string `mapstructure:"SERVER_PORT"`
-	LogLevel       uint16 `mapstructure:"LOG_LEVEL"`
-	GinMode        string `mapstructure:"GIN_MODE"`
-	SecretKey      string `mapstructure:"SECRET_KEY"`
-	AssetsPath     string `mapstructure:"ASSETS_PATH"`
-	AssetsHost     string `mapstructure:"ASSETS_HOST"`
-	AssetsFormat   string `mapstructure:"ASSETS_FORMAT"`
+type Config[T any] struct {
+	ENV T
 }
 
-var (
-	ENV Config
-)
+func New[T any]() (*Config[T], error) {
+	config := new(Config[T])
 
-func loadENV() error {
-	viper.SetConfigFile(".env")
+	if err := config.unmarshalConfig(); err != nil {
+		val := reflect.ValueOf(&config.ENV).Elem()
 
-	viper.AutomaticEnv()
-
-	if err := viper.ReadInConfig(); err != nil {
-		ENV.DBHost = viper.GetString("POSTGRES_HOST")
-		ENV.DBUserName = viper.GetString("POSTGRES_USER")
-		ENV.DBUserPassword = viper.GetString("POSTGRES_PASSWORD")
-		ENV.DBName = viper.GetString("POSTGRES_DB")
-		ENV.DBPort = viper.GetUint16("POSTGRES_PORT")
-		ENV.ServerPort = viper.GetString("SERVER_PORT")
-		ENV.LogLevel = viper.GetUint16("LOG_LEVEL")
-		ENV.GinMode = viper.GetString("GIN_MODE")
-		ENV.SecretKey = viper.GetString("SECRET_KEY")
-	} else {
-		if err := viper.Unmarshal(&ENV); err != nil {
-			return err
+		for i := 0; i < val.NumField(); i++ {
+			field := val.Field(i)
+			key := val.Type().Field(i).Tag.Get("mapstructure")
+			envValue := os.Getenv(key)
+			switch field.Kind() {
+			case reflect.String:
+				field.SetString(envValue)
+			case reflect.Bool:
+				field.SetBool(envValue == "true")
+			case reflect.Int, reflect.Int8, reflect.Int16, reflect.Int32, reflect.Int64:
+				intValue, err := strconv.ParseInt(envValue, 10, 64)
+				if err != nil {
+					return config, fmt.Errorf("failed to parse %s: %w", key, err)
+				}
+				field.SetInt(intValue)
+			case reflect.Uint, reflect.Uint8, reflect.Uint16, reflect.Uint32, reflect.Uint64:
+				uintValue, err := strconv.ParseUint(envValue, 10, 64)
+				if err != nil {
+					return config, fmt.Errorf("failed to parse %s: %w", key, err)
+				}
+				field.SetUint(uintValue)
+			default:
+				return config, fmt.Errorf("unsupported field type for %s", key)
+			}
 		}
 	}
 
-	return nil
+	return config, nil
 }
 
-func Init() error {
-	if err := loadENV(); err != nil {
+func (config *Config[T]) unmarshalConfig() error {
+	viper.SetConfigFile(".env")
+
+	if err := viper.ReadInConfig(); err != nil {
+		return err
+	}
+
+	if err := viper.Unmarshal(&config.ENV); err != nil {
 		return err
 	}
 

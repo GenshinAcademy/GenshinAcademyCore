@@ -27,38 +27,56 @@ var (
 	genshinService *genshin.GenshinService
 	newsService    *news.NewsService
 	tablesService  *tables.TablesService
+	env            Config
 )
 
+type Config struct {
+	DBHost         string `mapstructure:"POSTGRES_HOST"`
+	DBUserName     string `mapstructure:"POSTGRES_USER"`
+	DBUserPassword string `mapstructure:"POSTGRES_PASSWORD"`
+	DBName         string `mapstructure:"POSTGRES_DB"`
+	DBPort         uint16 `mapstructure:"POSTGRES_PORT"`
+	ServerPort     string `mapstructure:"SERVER_PORT"`
+	LogLevel       int8   `mapstructure:"LOG_LEVEL"`
+	GinMode        string `mapstructure:"GIN_MODE"`
+	SecretKey      string `mapstructure:"SECRET_KEY"`
+	AssetsPath     string `mapstructure:"ASSETS_PATH"`
+	AssetsHost     string `mapstructure:"ASSETS_HOST"`
+}
+
 func init() {
-	err := configuration.Init()
+
+	cfg, err := configuration.New[Config]()
 	if err != nil {
 		panic(err)
 	}
 
-	logger = configuration.GetLogger()
+	env = cfg.ENV
+	logger = configuration.GetLogger(env.LogLevel)
 
 	var dbConfig academy_postgres.PostgresDatabaseConfiguration = academy_postgres.PostgresDatabaseConfiguration{
-		Host:         configuration.ENV.DBHost,
-		UserName:     configuration.ENV.DBUserName,
-		UserPassword: configuration.ENV.DBUserPassword,
-		DatabaseName: configuration.ENV.DBName,
-		Port:         configuration.ENV.DBPort,
+		Host:         env.DBHost,
+		UserName:     env.DBUserName,
+		UserPassword: env.DBUserPassword,
+		DatabaseName: env.DBName,
+		Port:         env.DBPort,
 	}
 
 	if err := academy_postgres.InitializePostgresDatabase(dbConfig); err != nil {
-		panic(err)
+		logger.Sugar().Panic(err)
 	}
 
-	//Initializing gacore config and configure it for postgres db
-	var config academy_core.AcademyCoreConfiguration = academy_core.AcademyCoreConfiguration{
+	//Initializing gacore ga_config and configure it for postgres db
+	var ga_config academy_core.AcademyCoreConfiguration = academy_core.AcademyCoreConfiguration{
 		GenshinCoreConfiguration: core.GenshinCoreConfiguration{
 			DefaultLanguage: languages.English,
 		},
+		AssetsPath: env.AssetsHost,
 	}
-	academy_postgres.ConfigurePostgresDB(&config)
+	academy_postgres.ConfigurePostgresDB(&ga_config)
 
 	// Create ga core
-	gacore := academy_core.CreateAcademyCore(config)
+	gacore := academy_core.CreateAcademyCore(ga_config)
 
 	// Create ferret service
 	ferretService = ferret.CreateService(gacore)
@@ -70,9 +88,11 @@ func init() {
 // Web server here
 func main() {
 	defer academy_postgres.CleanupConnections()
+	defer logger.Sync()
+
 	r := gin.Default()
 
-	gin.SetMode(configuration.ENV.GinMode)
+	gin.SetMode(env.GinMode)
 
 	// TODO: Move all router related code to internal/router package
 	r.Use(cors.New(cors.Config{
@@ -93,15 +113,15 @@ func main() {
 	news := mainRoute.Group("/news")
 	{
 		news.GET("", newsService.GetAllNews)
-		news.POST("/", middlewares.Authenticate(configuration.ENV.SecretKey), newsService.CreateNews)
-		news.PATCH("/:id", middlewares.Authenticate(configuration.ENV.SecretKey), newsService.UpdateNews)
+		news.POST("/", middlewares.Authenticate(env.SecretKey), newsService.CreateNews)
+		news.PATCH("/:id", middlewares.Authenticate(env.SecretKey), newsService.UpdateNews)
 	}
 
 	tables := mainRoute.Group("/tables")
 	{
 		tables.GET("/", tablesService.GetAllTables)
-		tables.POST("/", middlewares.Authenticate(configuration.ENV.SecretKey), tablesService.CreateTable)
-		tables.PATCH("/:id", middlewares.Authenticate(configuration.ENV.SecretKey), tablesService.UpdateTable)
+		tables.POST("/", middlewares.Authenticate(env.SecretKey), tablesService.CreateTable)
+		tables.PATCH("/:id", middlewares.Authenticate(env.SecretKey), tablesService.UpdateTable)
 	}
 
 	r.NoRoute(func(c *gin.Context) {
@@ -110,7 +130,7 @@ func main() {
 		})
 	})
 
-	err := r.Run(":" + configuration.ENV.ServerPort)
+	err := r.Run(":" + env.ServerPort)
 	if err != nil {
 		logger.Sugar().Panic(err)
 	}
