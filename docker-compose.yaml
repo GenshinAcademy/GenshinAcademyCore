@@ -4,17 +4,17 @@ services:
   ga_server:
     image: ${DOCKER_IMAGE}
     depends_on:
-      - ga_postgredb
+      - ga_postgresdb
     ports:
       - ${SERVER_PORT_OUT}:${SERVER_PORT}
     volumes:
-      - ${ASSETS_PATH}:${ASSETS_PATH}
+      - ${ASSETS_PATH_OUT}:${ASSETS_PATH}
     networks:
       - internal
     env_file:
       - .env
 
-  ga_postgredb:
+  ga_postgresdb:
     image: postgres
     restart: always
     ports:

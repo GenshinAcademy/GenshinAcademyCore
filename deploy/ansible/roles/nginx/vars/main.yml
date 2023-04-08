@@ -4,26 +4,21 @@ certificates:
   - cert.pem
   - key.pem
 sites:
-  - {
-      server_name: assets-dev.academy-project.info,
-      ssl_certificate: /etc/ssl/cert.pem,
-      ssl_certificate_key: /etc/ssl/key.pem,
-      root_path: /var/www/genshinacademy/dev/assets,
-      auto_index: true
-    }
-  - {
-      server_name: assets.academy-project.info,
-      ssl_certificate: /etc/ssl/cert.pem,
-      ssl_certificate_key: /etc/ssl/key.pem,
-      root_path: /var/www/genshinacademy/prod/assets,
-      auto_index: true
-    }
-  - {
-      server_name: genshin-dev.academy-project.info,
-      ssl_certificate: /etc/ssl/cert.pem,
-      ssl_certificate_key: /etc/ssl/key.pem,
-      root_path: /var/www/genshinacademy/dev/site,
-      auto_index: false,
-      proxy_pass_path: api,
-      proxy_pass_adress: http://localhost:8301
-    }
+  - server_name: assets-dev.academy-project.info
+    ssl_certificate: /etc/ssl/cert.pem
+    ssl_certificate_key: /etc/ssl/key.pem
+    root_path: /var/www/genshinacademy/dev/assets
+    auto_index: true
+  - server_name: assets.academy-project.info
+    ssl_certificate: /etc/ssl/cert.pem
+    ssl_certificate_key: /etc/ssl/key.pem
+    root_path: /var/www/genshinacademy/prod/assets
+    auto_index: true
+  - server_name: genshin-dev.academy-project.info
+    ssl_certificate: /etc/ssl/cert.pem
+    ssl_certificate_key: /etc/ssl/key.pem
+    root_path: /var/www/genshinacademy/dev/site
+    auto_index: false
+    proxy:
+      - location: api
+        pass: http://localhost:8300
