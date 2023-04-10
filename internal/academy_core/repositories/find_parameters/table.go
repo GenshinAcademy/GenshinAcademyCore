@@ -12,7 +12,7 @@ type TableFindParameters struct {
 func (parameters TableFindParameters) Slice(offset uint32, limit uint32) TableFindParameters {
 	parameters.SliceOptions = find_parameters.SliceParameters{
 		Offset: offset,
-		Amount: limit,
+		Limit:  limit,
 	}
 
 	return parameters

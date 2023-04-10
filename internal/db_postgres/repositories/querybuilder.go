@@ -3,10 +3,11 @@ package repositories
 import (
 	"ga/internal/academy_core/models"
 	"ga/pkg/genshin_core/repositories/find_parameters"
+
 	"gorm.io/gorm"
 )
 
-var(
+var (
 	fullSaveSessionRef = &gorm.Session{
 		FullSaveAssociations: true,
 	}
@@ -74,10 +75,10 @@ func (builder QueryBuilder) Preload(repo PostgresRepositoryWithPreloads) QueryBu
 func (builder QueryBuilder) Slice(parameters *find_parameters.SliceParameters) QueryBuilder {
 	var connect = builder.connection
 
-	if parameters.Amount != 0 || parameters.Offset != 0 {
+	if parameters.Limit != 0 || parameters.Offset != 0 {
 		connect = connect.
 			Offset(int(parameters.Offset)).
-			Limit(int(parameters.Amount))
+			Limit(int(parameters.Limit))
 	}
 
 	return QueryBuilder{connection: connect}

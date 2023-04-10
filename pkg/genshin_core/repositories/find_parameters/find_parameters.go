@@ -3,20 +3,20 @@ package find_parameters
 import "ga/pkg/genshin_core/models"
 
 type SliceParameters struct {
-    Offset uint32
-    Amount uint32
+	Offset uint32
+	Limit  uint32
 }
 
 func SelectSingle() SliceParameters {
-    return SliceParameters{
-        Offset: 0,
-        Amount: 1,
-    }
+	return SliceParameters{
+		Offset: 0,
+		Limit:  1,
+	}
 }
 
 type FindParameters struct {
-	Ids []models.ModelId
-    SliceOptions SliceParameters
+	Ids          []models.ModelId
+	SliceOptions SliceParameters
 }
 
 func (param FindParameters) AddId(id models.ModelId) FindParameters {
