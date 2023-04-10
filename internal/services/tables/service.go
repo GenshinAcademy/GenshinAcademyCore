@@ -33,7 +33,11 @@ func (service *Service) GetAllTables(c *gin.Context) {
 	var language = languages.GetLanguage(languages.ConvertStringsToLanguages(strings.Split(c.GetHeader("Accept-Language"), ",")))
 
 	var tablesRepo = service.core.GetProvider(language).CreateTableRepo()
-	var result = tablesRepo.FindTables(find_parameters.TableFindParameters{SliceOptions: gFindParameters.SliceParameters{Offset: uint32(c.GetUint("offset")), Limit: uint32(c.GetUint("limit"))}})
+	var result = tablesRepo.FindTables(
+		find_parameters.TableFindParameters{
+			SliceOptions: gFindParameters.SliceParameters{
+				Offset: uint32(c.GetUint("offset")),
+				Limit:  uint32(c.GetUint("limit"))}})
 
 	var tables []academyModels.Table = result
 

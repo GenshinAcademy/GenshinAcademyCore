@@ -36,7 +36,11 @@ func (service *Service) GetAllNews(c *gin.Context) {
 	// TODO: GetProvider should return error if provider is not found
 	var newsRepo = service.core.GetProvider(language).CreateNewsRepo()
 
-	var result = newsRepo.FindNews(find_parameters.NewsFindParameters{SliceOptions: gFindParameters.SliceParameters{Offset: uint32(c.GetUint("offset")), Limit: uint32(c.GetUint("limit"))}})
+	var result = newsRepo.FindNews(
+		find_parameters.NewsFindParameters{
+			SliceOptions: gFindParameters.SliceParameters{
+				Offset: uint32(c.GetUint("offset")),
+				Limit:  uint32(c.GetUint("limit"))}})
 
 	var news []academyModels.News = result
 
