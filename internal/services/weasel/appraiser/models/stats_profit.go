@@ -1,4 +1,4 @@
-package web_models
+package models
 
 type StatsProfit struct {
 	Slot              string `json:"slot"`
