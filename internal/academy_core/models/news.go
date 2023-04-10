@@ -9,7 +9,7 @@ type News struct {
 	AcademyModel
 	Title       string
 	Description string
-	Preview     url.Url
+	Preview     string
 	RedirectUrl url.Url
 	CreatedAt   time.Time
 }

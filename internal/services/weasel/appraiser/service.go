@@ -3,7 +3,7 @@ package appraiser
 import (
 	"ga/internal/academy_core"
 	"ga/internal/academy_core/repositories/find_parameters"
-	"ga/internal/services/weasel/appraiser/web_models"
+	"ga/internal/services/weasel/appraiser/models"
 	"ga/pkg/genshin_core/models/languages"
 	"net/http"
 	"strings"
@@ -29,7 +29,7 @@ func (service *Service) GetAllCharactersWithProfits(c *gin.Context) {
 
 	var characterRepo = service.core.GetProvider(language).NewCharacterRepo()
 	var result = characterRepo.FindCharacters(find_parameters.CharacterFindParameters{})
-	var characters []web_models.WeaselAppraiserCharacter
+	var characters []models.WeaselAppraiserCharacter
 	for _, char := range result {
 		if len(char.Profits) == 0 {
 			continue

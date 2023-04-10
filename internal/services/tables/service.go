@@ -1,13 +1,15 @@
 package tables
 
 import (
-	"errors"
 	"ga/internal/academy_core"
-	"ga/internal/academy_core/models"
+	academyModels "ga/internal/academy_core/models"
 	"ga/internal/academy_core/repositories"
 	"ga/internal/academy_core/repositories/find_parameters"
-	url "ga/internal/academy_core/value_objects/url"
+	"ga/internal/services/tables/models"
 	"ga/pkg/genshin_core/models/languages"
+	gFindParameters "ga/pkg/genshin_core/repositories/find_parameters"
+
+	"errors"
 	"net/http"
 	"strconv"
 	"strings"
@@ -31,9 +33,9 @@ func (service *Service) GetAllTables(c *gin.Context) {
 	var language = languages.GetLanguage(languages.ConvertStringsToLanguages(strings.Split(c.GetHeader("Accept-Language"), ",")))
 
 	var tablesRepo = service.core.GetProvider(language).CreateTableRepo()
-	var result = tablesRepo.FindTables(find_parameters.TableFindParameters{})
+	var result = tablesRepo.FindTables(find_parameters.TableFindParameters{SliceOptions: gFindParameters.SliceParameters{Offset: uint32(c.GetUint("offset")), Limit: uint32(c.GetUint("limit"))}})
 
-	var tables []models.Table = result
+	var tables []academyModels.Table = result
 
 	c.JSON(http.StatusOK,
 		tables)
@@ -54,13 +56,13 @@ func (service *Service) CreateTable(c *gin.Context) {
 	}
 
 	// Read request body
-	var requestData tablesJson
+	var requestData models.TablesLocalized
 	if err := c.BindJSON(&requestData); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid request data"})
 		return
 	}
 
-	if len(requestData.Title) == 0 || len(requestData.Description) == 0 || requestData.Preview == "" || requestData.Redirect == "" {
+	if len(requestData.Title) == 0 || len(requestData.Description) == 0 || requestData.Icon == "" || requestData.Redirect == "" {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "All fields are required"})
 		return
 	}
@@ -70,20 +72,20 @@ func (service *Service) CreateTable(c *gin.Context) {
 		return
 	}
 
-	if !requestData.Preview.IsUrl() || requestData.Preview == "" {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid url provided", "message": requestData.Preview})
+	if requestData.Icon == "" {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid Icon provided", "message": requestData.Icon})
 		return
 	}
 
 	if !requestData.Redirect.IsUrl() || requestData.Redirect == "" {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid url provided", "message": requestData.Redirect})
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid Redirect provided", "message": requestData.Redirect})
 		return
 	}
 
 	// Create general fields using default repository
 	defaultRepo := service.core.GetProvider(languages.DefaultLanguage).CreateTableRepo()
-	var table models.Table
-	table.Preview = requestData.Preview
+	var table academyModels.Table
+	table.Icon = requestData.Icon
 	table.RedirectUrl = requestData.Redirect
 	table.Title = requestData.Title[languages.DefaultLanguage]
 	table.Description = requestData.Description[languages.DefaultLanguage]
@@ -96,7 +98,7 @@ func (service *Service) CreateTable(c *gin.Context) {
 	}
 
 	// Update localization fields
-	updateLocaliztionFields(c, models.AcademyId(result), requestData, tablesRepos)
+	updateLocaliztionFields(c, academyModels.AcademyId(result), requestData, tablesRepos)
 
 	c.JSON(http.StatusOK,
 		result)
@@ -124,20 +126,20 @@ func (service *Service) UpdateTable(c *gin.Context) {
 	}
 
 	// Read & validate request body
-	var requestData tablesJson
+	var requestData models.TablesLocalized
 	err = c.BindJSON(&requestData)
 	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid request data"})
 		return
 	}
 
-	if len(requestData.Title) == 0 && len(requestData.Description) == 0 && requestData.Preview == "" && requestData.Redirect == "" {
+	if len(requestData.Title) == 0 && len(requestData.Description) == 0 && requestData.Icon == "" && requestData.Redirect == "" {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "No update fields provided"})
 		return
 	}
 
-	if !requestData.Preview.IsUrl() && requestData.Preview != "" {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid url provided", "message": requestData.Preview})
+	if requestData.Icon != "" {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid icon provided", "message": requestData.Icon})
 		return
 	}
 
@@ -148,9 +150,9 @@ func (service *Service) UpdateTable(c *gin.Context) {
 
 	// Update general fields
 	defaultRepo := service.core.GetProvider(languages.DefaultLanguage).CreateTableRepo()
-	table := defaultRepo.FindTableById(models.AcademyId(id))
-	if requestData.Preview != "" {
-		table.Preview = requestData.Preview
+	table := defaultRepo.FindTableById(academyModels.AcademyId(id))
+	if requestData.Icon != "" {
+		table.Icon = requestData.Icon
 	}
 	if requestData.Redirect != "" {
 		table.RedirectUrl = requestData.Redirect
@@ -163,7 +165,7 @@ func (service *Service) UpdateTable(c *gin.Context) {
 	}
 
 	// Update localization fields
-	if err := updateLocaliztionFields(c, models.AcademyId(id), requestData, tablesRepos); err != nil {
+	if err := updateLocaliztionFields(c, academyModels.AcademyId(id), requestData, tablesRepos); err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to update table", "message": err.Error()})
 		return
 	}
@@ -173,11 +175,11 @@ func (service *Service) UpdateTable(c *gin.Context) {
 
 // TODO: Delete table
 
-func updateLocaliztionFields(c *gin.Context, id models.AcademyId, requestData tablesJson, tablesRepos map[languages.Language]repositories.ITableRepository) error {
+func updateLocaliztionFields(c *gin.Context, id academyModels.AcademyId, requestData models.TablesLocalized, tablesRepos map[languages.Language]repositories.ITableRepository) error {
 	if len(requestData.Title) > 0 || len(requestData.Description) > 0 {
 		for lang, repo := range tablesRepos {
-			result := repo.FindTableById(models.AcademyId(id))
-			if result == *new(models.Table) {
+			result := repo.FindTableById(academyModels.AcademyId(id))
+			if result == *new(academyModels.Table) {
 				return errors.New("table not found")
 			}
 
@@ -195,12 +197,4 @@ func updateLocaliztionFields(c *gin.Context, id models.AcademyId, requestData ta
 		}
 	}
 	return nil
-}
-
-type tablesJson struct {
-	Id          models.AcademyId              `json:"id,omitempty"`
-	Title       map[languages.Language]string `json:"title,omitempty"`
-	Description map[languages.Language]string `json:"description,omitempty"`
-	Preview     url.Url                       `json:"preview,omitempty"`
-	Redirect    url.Url                       `json:"redirect,omitempty"`
 }

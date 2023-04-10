@@ -2,12 +2,12 @@ package appraiser
 
 import (
 	"ga/internal/academy_core/models"
-	"ga/internal/services/weasel/appraiser/web_models"
+	webModels "ga/internal/services/weasel/appraiser/models"
 )
 
 // mapCharacter converts academy_core model to weaselAppraiser model
-func (service *Service) mapCharacter(input models.Character) (web_models.WeaselAppraiserCharacter, error) {
-	var output web_models.WeaselAppraiserCharacter
+func (service *Service) mapCharacter(input models.Character) (webModels.WeaselAppraiserCharacter, error) {
+	var output webModels.WeaselAppraiserCharacter
 	output.CharacterId = string(input.Character.Id)
 	output.Name = input.Name
 	output.Element = uint8(input.Element)
@@ -18,7 +18,7 @@ func (service *Service) mapCharacter(input models.Character) (web_models.WeaselA
 	}
 	output.IconUrl = url
 
-	output.StatsProfit = make([]web_models.StatsProfit, len(input.Profits))
+	output.StatsProfit = make([]webModels.StatsProfit, len(input.Profits))
 
 	for i, stat := range input.Profits {
 		var statProfit = &output.StatsProfit[i]

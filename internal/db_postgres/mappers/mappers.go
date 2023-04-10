@@ -240,7 +240,7 @@ func (mapper Mapper) MapNewsFromDbModel(model *db_models.News) academy_models.Ne
 		},
 		Title:       mapper.StringFromDbModel(&model.Title),
 		Description: mapper.StringFromDbModel(&model.Description),
-		Preview:     url.Url(model.PreviewUrl),
+		Preview:     model.PreviewUrl,
 		RedirectUrl: url.Url(model.RedirectUrl),
 		CreatedAt:   model.CreatedAt,
 	}
@@ -269,7 +269,7 @@ func (mapper Mapper) MapTableFromDbModel(model *db_models.Table) academy_models.
 		},
 		Title:       mapper.StringFromDbModel(&model.Title),
 		Description: mapper.StringFromDbModel(&model.Description),
-		Preview:     url.Url(model.PreviewUrl),
+		Icon:        model.PreviewUrl,
 		RedirectUrl: url.Url(model.RedirectUrl),
 	}
 	mapper.cache.UpdateTableStrings(model)
@@ -284,7 +284,7 @@ func (mapper Mapper) MapDbTableFromModel(model *academy_models.Table) db_models.
 		Id:          db_models.DBKey(model.Id),
 		Title:       mapper.MapDbStringFromString(tableStrings.Title, model.Title),
 		Description: mapper.MapDbStringFromString(tableStrings.Description, model.Description),
-		PreviewUrl:  string(model.Preview),
+		PreviewUrl:  string(model.Icon),
 		RedirectUrl: string(model.RedirectUrl),
 	}
 }

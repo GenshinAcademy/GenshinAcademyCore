@@ -1,16 +1,19 @@
 package news
 
 import (
-	"errors"
 	"ga/internal/academy_core"
-	"ga/internal/academy_core/models"
+	academyModels "ga/internal/academy_core/models"
 	"ga/internal/academy_core/repositories"
 	"ga/internal/academy_core/repositories/find_parameters"
-	url "ga/internal/academy_core/value_objects/url"
+	"ga/internal/services/news/models"
 	"ga/pkg/genshin_core/models/languages"
+	gFindParameters "ga/pkg/genshin_core/repositories/find_parameters"
+
+	"errors"
 	"net/http"
 	"strconv"
 	"strings"
+	"sync"
 	"time"
 
 	"github.com/gin-gonic/gin"
@@ -28,13 +31,14 @@ func CreateService(core *academy_core.AcademyCore) *Service {
 
 // GetAllNews returns all news in specified language
 func (service *Service) GetAllNews(c *gin.Context) {
-	// TODO: GetProvider should return error if provider is not found
 	var language = languages.GetLanguage(languages.ConvertStringsToLanguages(strings.Split(c.GetHeader("Accept-Language"), ",")))
 
+	// TODO: GetProvider should return error if provider is not found
 	var newsRepo = service.core.GetProvider(language).CreateNewsRepo()
-	var result = newsRepo.FindNews(find_parameters.NewsFindParameters{})
 
-	var news []models.News = result
+	var result = newsRepo.FindNews(find_parameters.NewsFindParameters{SliceOptions: gFindParameters.SliceParameters{Offset: uint32(c.GetUint("offset")), Limit: uint32(c.GetUint("limit"))}})
+
+	var news []academyModels.News = result
 
 	c.JSON(http.StatusOK,
 		news)
@@ -55,7 +59,7 @@ func (service *Service) CreateNews(c *gin.Context) {
 	}
 
 	// Read request body
-	var requestData newsJson
+	var requestData models.NewsLocalized
 	if err := c.BindJSON(&requestData); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid request data"})
 		return
@@ -71,19 +75,19 @@ func (service *Service) CreateNews(c *gin.Context) {
 		return
 	}
 
-	if !requestData.Preview.IsUrl() || requestData.Preview == "" {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid url provided", "message": requestData.Preview})
+	if requestData.Preview == "" {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid Preview provided", "message": requestData.Preview})
 		return
 	}
 
 	if !requestData.Redirect.IsUrl() || requestData.Redirect == "" {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid url provided", "message": requestData.Redirect})
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid Redirect provided", "message": requestData.Redirect})
 		return
 	}
 
 	// Create general fields using default repository
 	defaultRepo := service.core.GetProvider(languages.DefaultLanguage).CreateNewsRepo()
-	var news models.News
+	var news academyModels.News
 	news.Preview = requestData.Preview
 	news.RedirectUrl = requestData.Redirect
 	news.CreatedAt = time.Now()
@@ -98,8 +102,25 @@ func (service *Service) CreateNews(c *gin.Context) {
 	}
 
 	// Update localization fields
-	updateLocaliztionFields(c, models.AcademyId(result), requestData, newsRepos)
+	if len(requestData.Title) > 0 || len(requestData.Description) > 0 {
+		var wg sync.WaitGroup
+		errChan := make(chan error)
 
+		for lang, repo := range newsRepos {
+			wg.Add(1)
+			go func(id academyModels.AcademyId, data models.NewsLocalized, repo repositories.INewsRepository, lang languages.Language) {
+				defer wg.Done()
+				if err := updateLocalizationFields(id, data, repo, lang); err != nil {
+					errChan <- err
+				}
+			}(academyModels.AcademyId(result), requestData, repo, lang)
+		}
+
+		if err := <-errChan; err != nil {
+			c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to update localization fields"})
+			return
+		}
+	}
 	c.JSON(http.StatusOK,
 		result)
 }
@@ -126,7 +147,7 @@ func (service *Service) UpdateNews(c *gin.Context) {
 	}
 
 	// Read & validate request body
-	var requestData newsJson
+	var requestData models.NewsLocalized
 	err = c.BindJSON(&requestData)
 	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid request data"})
@@ -138,19 +159,19 @@ func (service *Service) UpdateNews(c *gin.Context) {
 		return
 	}
 
-	if !requestData.Preview.IsUrl() && requestData.Preview != "" {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid url provided", "message": requestData.Preview})
+	if requestData.Preview != "" {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid Preview provided", "message": requestData.Preview})
 		return
 	}
 
 	if !requestData.Redirect.IsUrl() && requestData.Redirect != "" {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid url provided", "message": requestData.Redirect})
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid Redirect provided", "message": requestData.Redirect})
 		return
 	}
 
 	// Update general fields
 	defaultRepo := service.core.GetProvider(languages.DefaultLanguage).CreateNewsRepo()
-	news := defaultRepo.FindNewsById(models.AcademyId(id))
+	news := defaultRepo.FindNewsById(academyModels.AcademyId(id))
 	if requestData.Preview != "" {
 		news.Preview = requestData.Preview
 	}
@@ -168,8 +189,21 @@ func (service *Service) UpdateNews(c *gin.Context) {
 	}
 
 	// Update localization fields
-	if err := updateLocaliztionFields(c, models.AcademyId(id), requestData, newsRepos); err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to update news", "message": err.Error()})
+	var wg sync.WaitGroup
+	errChan := make(chan error)
+
+	for lang, repo := range newsRepos {
+		wg.Add(1)
+		go func(id academyModels.AcademyId, data models.NewsLocalized, repo repositories.INewsRepository, lang languages.Language) {
+			defer wg.Done()
+			if err := updateLocalizationFields(id, data, repo, lang); err != nil {
+				errChan <- err
+			}
+		}(academyModels.AcademyId(id), requestData, repo, lang)
+	}
+
+	if err := <-errChan; err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to update news"})
 		return
 	}
 
@@ -178,35 +212,23 @@ func (service *Service) UpdateNews(c *gin.Context) {
 
 // TODO: Delete news
 
-func updateLocaliztionFields(c *gin.Context, id models.AcademyId, requestData newsJson, newsRepos map[languages.Language]repositories.INewsRepository) error {
-	if len(requestData.Title) > 0 || len(requestData.Description) > 0 {
-		for lang, repo := range newsRepos {
-			result := repo.FindNewsById(models.AcademyId(id))
-			if result == *new(models.News) {
-				return errors.New("news not found")
-			}
-
-			if value, ok := requestData.Title[lang]; ok {
-				result.Title = value
-			}
-
-			if value, ok := requestData.Description[lang]; ok {
-				result.Description = value
-			}
-
-			if err := repo.UpdateNews(&result); err != nil {
-				return err
-			}
-		}
+func updateLocalizationFields(id academyModels.AcademyId, requestData models.NewsLocalized, repo repositories.INewsRepository, lang languages.Language) error {
+	result := repo.FindNewsById(id)
+	if result == *new(academyModels.News) {
+		return errors.New("news not found")
 	}
-	return nil
-}
 
-type newsJson struct {
-	Id          models.AcademyId              `json:"id,omitempty"`
-	Title       map[languages.Language]string `json:"title,omitempty"`
-	Description map[languages.Language]string `json:"description,omitempty"`
-	Preview     url.Url                       `json:"preview,omitempty"`
-	Redirect    url.Url                       `json:"redirect,omitempty"`
-	CreatedAt   time.Time                     `json:"created_at,omitempty"`
+	if value, ok := requestData.Title[lang]; ok {
+		result.Title = value
+	}
+
+	if value, ok := requestData.Description[lang]; ok {
+		result.Description = value
+	}
+
+	if err := repo.UpdateNews(&result); err != nil {
+		return err
+	}
+
+	return nil
 }

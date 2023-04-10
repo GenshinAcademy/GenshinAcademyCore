@@ -1,9 +1,12 @@
 package characters
 
 import (
+	"fmt"
 	"ga/internal/academy_core"
 	"ga/pkg/genshin_core/models/languages"
 	"ga/pkg/genshin_core/repositories/find_parameters"
+	gFindParameters "ga/pkg/genshin_core/repositories/find_parameters"
+
 	"net/http"
 	"strings"
 
@@ -26,8 +29,15 @@ func (service *Service) GetAllCharacters(c *gin.Context) {
 	// TODO: GetProvider should return error if provider is not found
 	var language = languages.GetLanguage(languages.ConvertStringsToLanguages(strings.Split(c.GetHeader("Accept-Language"), ",")))
 
+	fmt.Println(uint32(c.GetUint("limit")))
+	fmt.Println(uint32(c.GetUint("offset")))
 	var characterRepo = service.core.AsGenshinCore().GetProvider(language).NewCharacterRepo()
-	var result = characterRepo.FindCharacters(find_parameters.CharacterFindParameters{})
+	var result = characterRepo.FindCharacters(
+		find_parameters.CharacterFindParameters{
+			FindParameters: gFindParameters.FindParameters{
+				SliceOptions: gFindParameters.SliceParameters{
+					Offset: uint32(c.GetUint("offset")),
+					Limit:  uint32(c.GetUint("limit"))}}})
 
 	c.JSON(http.StatusOK,
 		result)
