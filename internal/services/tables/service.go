@@ -15,18 +15,18 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-type TablesService struct {
+type Service struct {
 	core *academy_core.AcademyCore
 }
 
-func CreateService(core *academy_core.AcademyCore) *TablesService {
-	var result *TablesService = new(TablesService)
+func CreateService(core *academy_core.AcademyCore) *Service {
+	var result *Service = new(Service)
 	result.core = core
 	return result
 }
 
 // GetAllTables returns all tables in specified language
-func (service *TablesService) GetAllTables(c *gin.Context) {
+func (service *Service) GetAllTables(c *gin.Context) {
 	// TODO: GetProvider should return error if provider is not found
 	var language = languages.GetLanguage(languages.ConvertStringsToLanguages(strings.Split(c.GetHeader("Accept-Language"), ",")))
 
@@ -39,7 +39,7 @@ func (service *TablesService) GetAllTables(c *gin.Context) {
 		tables)
 }
 
-func (service *TablesService) CreateTable(c *gin.Context) {
+func (service *Service) CreateTable(c *gin.Context) {
 	// Get languages repositories
 	langs := languages.ConvertStringsToLanguages(strings.Split(c.GetHeader("Accept-Language"), ","))
 	tablesRepos := make(map[languages.Language]repositories.ITableRepository, len(langs))
@@ -102,7 +102,7 @@ func (service *TablesService) CreateTable(c *gin.Context) {
 		result)
 }
 
-func (service *TablesService) UpdateTable(c *gin.Context) {
+func (service *Service) UpdateTable(c *gin.Context) {
 	// Get languages repositories
 	langs := languages.ConvertStringsToLanguages(strings.Split(c.GetHeader("Accept-Language"), ","))
 	tablesRepos := make(map[languages.Language]repositories.ITableRepository, len(langs))

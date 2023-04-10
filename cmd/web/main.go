@@ -1,20 +1,21 @@
 package main
 
 import (
-	"ga/internal/academy_core"
+	academy "ga/internal/academy_core"
+	db "ga/internal/db_postgres/implementation/academy"
+	genshin "ga/pkg/genshin_core"
+
 	"ga/internal/configuration"
-	academy_postgres "ga/internal/db_postgres/implementation/academy"
-	"ga/internal/genshin"
-	"ga/internal/middlewares"
-	"ga/internal/tables"
-	"time"
-
-	"ga/internal/news"
-	core "ga/pkg/genshin_core"
 	"ga/pkg/genshin_core/models/languages"
-	"net/http"
 
-	"ga/internal/ferret"
+	"ga/internal/services/genshin/characters"
+	"ga/internal/services/middlewares"
+	"ga/internal/services/news"
+	"ga/internal/services/tables"
+	"ga/internal/services/weasel/appraiser"
+
+	"net/http"
+	"time"
 
 	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
@@ -22,12 +23,12 @@ import (
 )
 
 var (
-	logger         *zap.Logger
-	ferretService  *ferret.FerretService
-	genshinService *genshin.GenshinService
-	newsService    *news.NewsService
-	tablesService  *tables.TablesService
-	env            Config
+	logger                 *zap.Logger
+	weaselAppraiserService *appraiser.Service
+	genshinService         *characters.Service
+	newsService            *news.Service
+	tablesService          *tables.Service
+	env                    Config
 )
 
 type Config struct {
@@ -54,7 +55,7 @@ func init() {
 	env = cfg.ENV
 	logger = configuration.GetLogger(env.LogLevel)
 
-	var dbConfig academy_postgres.PostgresDatabaseConfiguration = academy_postgres.PostgresDatabaseConfiguration{
+	var dbConfig db.PostgresDatabaseConfiguration = db.PostgresDatabaseConfiguration{
 		Host:         env.DBHost,
 		UserName:     env.DBUserName,
 		UserPassword: env.DBUserPassword,
@@ -62,32 +63,32 @@ func init() {
 		Port:         env.DBPort,
 	}
 
-	if err := academy_postgres.InitializePostgresDatabase(dbConfig); err != nil {
+	if err := db.InitializePostgresDatabase(dbConfig); err != nil {
 		logger.Sugar().Panic(err)
 	}
 
 	//Initializing gacore ga_config and configure it for postgres db
-	var ga_config academy_core.AcademyCoreConfiguration = academy_core.AcademyCoreConfiguration{
-		GenshinCoreConfiguration: core.GenshinCoreConfiguration{
+	var ga_config academy.AcademyCoreConfiguration = academy.AcademyCoreConfiguration{
+		GenshinCoreConfiguration: genshin.GenshinCoreConfiguration{
 			DefaultLanguage: languages.English,
 		},
 		AssetsPath: env.AssetsHost,
 	}
-	academy_postgres.ConfigurePostgresDB(&ga_config)
+	db.ConfigurePostgresDB(&ga_config)
 
 	// Create ga core
-	gacore := academy_core.CreateAcademyCore(ga_config)
+	gacore := academy.CreateAcademyCore(ga_config)
 
-	// Create ferret service
-	ferretService = ferret.CreateService(gacore)
-	genshinService = genshin.CreateService(gacore)
+	// Create services
+	weaselAppraiserService = appraiser.CreateService(gacore)
+	genshinService = characters.CreateService(gacore)
 	newsService = news.CreateService(gacore)
 	tablesService = tables.CreateService(gacore)
 }
 
 // Web server here
 func main() {
-	defer academy_postgres.CleanupConnections()
+	defer db.CleanupConnections()
 	defer logger.Sync()
 
 	r := gin.Default()
@@ -107,7 +108,7 @@ func main() {
 	characters := mainRoute.Group("/characters")
 	{
 		characters.GET("/", genshinService.GetAllCharacters)
-		characters.GET("/stats", ferretService.GetAllCharactersWithProfits)
+		characters.GET("/stats", weaselAppraiserService.GetAllCharactersWithProfits)
 	}
 
 	news := mainRoute.Group("/news")

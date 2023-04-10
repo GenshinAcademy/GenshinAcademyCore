@@ -2,7 +2,7 @@ package web_models
 
 import url "ga/internal/academy_core/value_objects/url"
 
-type FerretCharacter struct {
+type WeaselAppraiserCharacter struct {
 	CharacterId string        `json:"character_id"`
 	Name        string        `json:"name"`
 	Element     uint8         `json:"element"`
