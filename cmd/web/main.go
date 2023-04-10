@@ -107,20 +107,20 @@ func main() {
 
 	characters := mainRoute.Group("/characters")
 	{
-		characters.GET("/", genshinService.GetAllCharacters)
-		characters.GET("/stats", weaselAppraiserService.GetAllCharactersWithProfits)
+		characters.GET("/", middlewares.GetLimitOffset(), genshinService.GetAllCharacters)
+		characters.GET("/stats", middlewares.GetLimitOffset(), weaselAppraiserService.GetAllCharactersWithProfits)
 	}
 
 	news := mainRoute.Group("/news")
 	{
-		news.GET("", newsService.GetAllNews)
+		news.GET("/", middlewares.GetLimitOffset(), newsService.GetAllNews)
 		news.POST("/", middlewares.Authenticate(env.SecretKey), newsService.CreateNews)
 		news.PATCH("/:id", middlewares.Authenticate(env.SecretKey), newsService.UpdateNews)
 	}
 
 	tables := mainRoute.Group("/tables")
 	{
-		tables.GET("/", tablesService.GetAllTables)
+		tables.GET("/", middlewares.GetLimitOffset(), tablesService.GetAllTables)
 		tables.POST("/", middlewares.Authenticate(env.SecretKey), tablesService.CreateTable)
 		tables.PATCH("/:id", middlewares.Authenticate(env.SecretKey), tablesService.UpdateTable)
 	}

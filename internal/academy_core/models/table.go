@@ -8,6 +8,6 @@ type Table struct {
 	AcademyModel
 	Title       string
 	Description string
-	Preview     url.Url
+	Icon        string
 	RedirectUrl url.Url
 }

@@ -1,13 +1,13 @@
 package find_parameters
 
 import (
-    "ga/pkg/genshin_core/models"
-    "ga/pkg/genshin_core/models/enums"
+	"ga/pkg/genshin_core/models"
+	"ga/pkg/genshin_core/models/enums"
 )
 
 type CharacterFindParameters struct {
-    FindParameters
-    Elements []enums.Element
+	FindParameters
+	Elements []enums.Element
 }
 
 func (param CharacterFindParameters) AddElement(element enums.Element) CharacterFindParameters {
@@ -18,8 +18,8 @@ func (param CharacterFindParameters) AddElement(element enums.Element) Character
 func FindByCharacterId(characterId string) CharacterFindParameters {
 	return CharacterFindParameters{
 		FindParameters: FindParameters{
-			Ids: []models.ModelId{models.ModelId(characterId)},
-            SliceOptions: SliceParameters{Offset: 0, Amount: 1},
+			Ids:          []models.ModelId{models.ModelId(characterId)},
+			SliceOptions: SliceParameters{Offset: 0, Limit: 1},
 		},
 	}
 }

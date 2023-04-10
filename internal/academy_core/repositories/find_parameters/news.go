@@ -16,7 +16,7 @@ type NewsFindParameters struct {
 func (parameters NewsFindParameters) Slice(offset uint32, limit uint32) NewsFindParameters {
 	parameters.SliceOptions = find_parameters.SliceParameters{
 		Offset: offset,
-		Amount: limit,
+		Limit:  limit,
 	}
 
 	return parameters
