@@ -1,13 +1,13 @@
-package ferret
+package appraiser
 
 import (
 	"ga/internal/academy_core/models"
-	"ga/internal/ferret/web_models"
+	"ga/internal/services/weasel/appraiser/web_models"
 )
 
-// mapCharacter converts academy_core model to ferret model
-func (service *FerretService) mapCharacter(input models.Character) (web_models.FerretCharacter, error) {
-	var output web_models.FerretCharacter
+// mapCharacter converts academy_core model to weaselAppraiser model
+func (service *Service) mapCharacter(input models.Character) (web_models.WeaselAppraiserCharacter, error) {
+	var output web_models.WeaselAppraiserCharacter
 	output.CharacterId = string(input.Character.Id)
 	output.Name = input.Name
 	output.Element = uint8(input.Element)

@@ -16,18 +16,18 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-type NewsService struct {
+type Service struct {
 	core *academy_core.AcademyCore
 }
 
-func CreateService(core *academy_core.AcademyCore) *NewsService {
-	var result *NewsService = new(NewsService)
+func CreateService(core *academy_core.AcademyCore) *Service {
+	var result *Service = new(Service)
 	result.core = core
 	return result
 }
 
 // GetAllNews returns all news in specified language
-func (service *NewsService) GetAllNews(c *gin.Context) {
+func (service *Service) GetAllNews(c *gin.Context) {
 	// TODO: GetProvider should return error if provider is not found
 	var language = languages.GetLanguage(languages.ConvertStringsToLanguages(strings.Split(c.GetHeader("Accept-Language"), ",")))
 
@@ -40,7 +40,7 @@ func (service *NewsService) GetAllNews(c *gin.Context) {
 		news)
 }
 
-func (service *NewsService) CreateNews(c *gin.Context) {
+func (service *Service) CreateNews(c *gin.Context) {
 	// Get languages repositories
 	langs := languages.ConvertStringsToLanguages(strings.Split(c.GetHeader("Accept-Language"), ","))
 	newsRepos := make(map[languages.Language]repositories.INewsRepository, len(langs))
@@ -104,7 +104,7 @@ func (service *NewsService) CreateNews(c *gin.Context) {
 		result)
 }
 
-func (service *NewsService) UpdateNews(c *gin.Context) {
+func (service *Service) UpdateNews(c *gin.Context) {
 	// Get languages repositories
 	langs := languages.ConvertStringsToLanguages(strings.Split(c.GetHeader("Accept-Language"), ","))
 	newsRepos := make(map[languages.Language]repositories.INewsRepository, len(langs))
