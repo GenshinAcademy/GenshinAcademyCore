@@ -8,8 +8,9 @@ import (
 	"ga/internal/db_postgres/cache"
 	db_mappers "ga/internal/db_postgres/mappers"
 	db_models "ga/internal/db_postgres/models"
-    "ga/internal/db_postgres/repositories"
-    "gorm.io/gorm"
+	"ga/internal/db_postgres/repositories"
+
+	"gorm.io/gorm"
 )
 
 var (
@@ -25,7 +26,7 @@ type PostgresNewsRepository struct {
 	PostgresBaseRepository
 }
 
-func CreatePostgresNewsRepository(connection *gorm.DB, language academy_models.Language, cache *cache.Cache) PostgresNewsRepository {
+func CreatePostgresNewsRepository(connection *gorm.DB, language *academy_models.Language, cache *cache.Cache) PostgresNewsRepository {
 	return PostgresNewsRepository{
 		PostgresBaseRepository: PostgresBaseRepository{
 			language:       language,
@@ -47,25 +48,24 @@ func (repo PostgresNewsRepository) GetPreloads() []string {
 	return newsPreloads
 }
 
-func (repo PostgresNewsRepository) FindNewsById(id academy_models.AcademyId) academy_models.News {
-	var selectedNews db_models.News
+func (repo PostgresNewsRepository) FindNewsById(id academy_models.AcademyId) *academy_models.News {
+	var selectedNews *db_models.News
 	var ids = make([]academy_models.AcademyId, 1)
 	ids[0] = id
 
-    var connection = repositories.CreateQueryBuilder(repo.GetConnection()).
-        PreloadAll(repo).
-        FilterById(repo, ids).
-        GetConnection()
+	var connection = repositories.CreateQueryBuilder(repo.GetConnection()).
+		PreloadAll(repo).
+		FilterById(repo, ids).
+		GetConnection()
 
 	connection.Find(&selectedNews)
-
-	return repo.mapper.MapNewsFromDbModel(&selectedNews)
+	return repo.mapper.MapNewsFromDbModel(selectedNews)
 }
 
 func (repo PostgresNewsRepository) FindNews(parameters find_parameters.NewsFindParameters) []academy_models.News {
 	var selectedNews []db_models.News = make([]db_models.News, 0)
 
-    var queryBuilder = repositories.CreateQueryBuilder(repo.GetConnection()).PreloadAll(repo)
+	var queryBuilder = repositories.CreateQueryBuilder(repo.GetConnection()).PreloadAll(repo)
 
 	if len(parameters.Ids) > 0 {
 		queryBuilder = queryBuilder.FilterById(repo, parameters.Ids)
@@ -77,60 +77,70 @@ func (repo PostgresNewsRepository) FindNews(parameters find_parameters.NewsFindP
 
 	var resultNews = make([]academy_models.News, len(selectedNews))
 	for index, news := range selectedNews {
-		resultNews[index] = repo.mapper.MapNewsFromDbModel(&news)
+		resultNews[index] = *repo.mapper.MapNewsFromDbModel(&news)
 	}
 
 	return resultNews
 }
 
-func (repo PostgresNewsRepository) AddNews(news *academy_models.News) (academy_models.AcademyId, error) {
+func (repo PostgresNewsRepository) AddNews(news *academy_models.News) (*academy_models.News, error) {
 	if news == nil {
-		return academy_models.UNDEFINED_ID, errors.New("null value provided")
+		return nil, errors.New("null value provided")
 	}
 
 	var dbNews = repo.mapper.MapDbNewsFromModel(news)
 
-    var connection = repositories.CreateQueryBuilder(repo.GetConnection()).
-        PreloadAll(repo).
-        GetConnection()
-	connection.Create(&dbNews)
+	var connection = repositories.CreateQueryBuilder(repo.GetConnection()).
+		PreloadAll(repo).
+		GetConnection()
 
-	db_postgres.GetCache().UpdateNewsStrings(&dbNews)
+	if err := connection.Create(dbNews).Error; err != nil {
+		return nil, err
+	}
 
-	return academy_models.AcademyId(dbNews.Id), nil
+	db_postgres.GetCache().UpdateNewsStrings(dbNews)
+
+	news.Id = academy_models.AcademyId(dbNews.Id)
+	return news, nil
 }
 
-func (repo PostgresNewsRepository) UpdateNews(news *academy_models.News) error {
+func (repo PostgresNewsRepository) UpdateNews(news *academy_models.News) (*academy_models.News, error) {
 	if news == nil {
-		return errors.New("null value provided")
+		return nil, errors.New("null value provided")
 	}
 	if news.Id == academy_models.UNDEFINED_ID {
-		return errors.New("not existing news provided")
+		return nil, errors.New("not existing news provided")
 	}
 
 	var dbNews = repo.mapper.MapDbNewsFromModel(news)
 
-    var connection = repositories.CreateUpdateQueryBuilder(repo.GetConnection()).
-        PreloadAll(repo).
-        GetConnection()
-	connection.Save(&dbNews)
+	var connection = repositories.CreateUpdateQueryBuilder(repo.GetConnection()).
+		PreloadAll(repo).
+		GetConnection()
+	if err := connection.Save(&dbNews).Error; err != nil {
+		return nil, err
+	}
 
-	db_postgres.GetCache().UpdateNewsStrings(&dbNews)
+	db_postgres.GetCache().UpdateNewsStrings(dbNews)
 
-	return nil
+	news.Id = academy_models.AcademyId(dbNews.Id)
+	return news, nil
 }
 
 func ApplyFindParameters(builder repositories.QueryBuilder, parameters *find_parameters.NewsFindParameters) repositories.QueryBuilder {
 	if parameters.PublishTimeFrom != nil {
 		//TODO
+		panic("not implemented")
 	}
 
 	if parameters.PublishTimeTo != nil {
 		//TODO
+		panic("not implemented")
 	}
 
 	if parameters.SortByDescendingTime {
 		//TODO
+		panic("not implemented")
 	}
 
 	return builder.Slice(&parameters.SliceOptions)

@@ -8,7 +8,7 @@ import (
 )
 
 type IRepository interface {
-	GetLanguage() models.Language
+	GetLanguage() *models.Language
 }
 
 type ILanguageRepository interface {
@@ -17,39 +17,39 @@ type ILanguageRepository interface {
 
 	// FindLanguage finds language in database.
 	// If none is found returned ID is 0.
-	FindLanguage(lang languages.Language) models.Language
+	FindLanguage(lang *languages.Language) *models.Language
 }
 
 type ICharacterRepository interface {
 	IRepository
 	GetCharacterIds(parameters find_parameters.CharacterFindParameters) []genshin_models.ModelId
-	FindCharacterById(characterId models.AcademyId) (models.Character, bool)
-	FindCharacterByGenshinId(characterId genshin_models.ModelId) (models.Character, bool)
+	FindCharacterById(characterId models.AcademyId) (*models.Character, bool)
+	FindCharacterByGenshinId(characterId genshin_models.ModelId) (*models.Character, bool)
 	FindCharacters(parameters find_parameters.CharacterFindParameters) []models.Character
-	AddCharacter(character *models.Character) (models.AcademyId, error)
-	UpdateCharacter(character *models.Character)
+	AddCharacter(character *models.Character) (*models.Character, error)
+	UpdateCharacter(character *models.Character) (*models.Character, error)
 }
 
 type INewsRepository interface {
-    IRepository
-    FindNewsById(id models.AcademyId) models.News
-    FindNews(parameters find_parameters.NewsFindParameters) []models.News
-    AddNews(news *models.News) (models.AcademyId, error)
-    UpdateNews(news *models.News) error
+	IRepository
+	FindNewsById(id models.AcademyId) *models.News
+	FindNews(parameters find_parameters.NewsFindParameters) []models.News
+	AddNews(news *models.News) (*models.News, error)
+	UpdateNews(news *models.News) (*models.News, error)
 }
 
 type ITableRepository interface {
 	IRepository
-	FindTableById(id models.AcademyId) models.Table
+	FindTableById(id models.AcademyId) *models.Table
 	FindTables(parameters find_parameters.TableFindParameters) []models.Table
-	AddTable(table *models.Table) (models.AcademyId, error)
-	UpdateTable(table *models.Table) error
+	AddTable(table *models.Table) (*models.Table, error)
+	UpdateTable(table *models.Table) (*models.Table, error)
 }
 
 type IRepositoryProvider interface {
-	GetLanguage() models.Language
+	GetLanguage() *models.Language
 	NewCharacterRepo() ICharacterRepository
-    CreateNewsRepo() INewsRepository
+	CreateNewsRepo() INewsRepository
 	CreateTableRepo() ITableRepository
 	//NewCharacterIconRepo() ICharacterIconRepository
 }

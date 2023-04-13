@@ -24,14 +24,14 @@ var (
 )
 
 // GetLanguage returns first found language or default language
-func GetLanguage(languages []Language) Language {
+func GetLanguage(languages []Language) *Language {
 	for _, lang := range languages {
 		if AcceptedLanguages[lang] {
-			return lang
+			return &lang
 		}
 	}
 
-	return DefaultLanguage
+	return &DefaultLanguage
 }
 
 // ConvertStringsToLanguages converts a slice of strings type to a slice of Language type

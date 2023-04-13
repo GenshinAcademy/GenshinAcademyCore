@@ -1,14 +1,14 @@
 package repositories
 
 import (
-    "ga/pkg/genshin_core/models"
+	"ga/pkg/genshin_core/models"
 	"ga/pkg/genshin_core/models/languages"
 	"ga/pkg/genshin_core/repositories/find_parameters"
-    "ga/pkg/genshin_core/value_objects"
+	"ga/pkg/genshin_core/value_objects"
 )
 
 type Repository interface {
-	GetLanguage() languages.Language
+	GetLanguage() *languages.Language
 }
 
 type CharacterRepository interface {
@@ -25,7 +25,7 @@ type CharacterIconRepository interface {
 }
 
 type RepositoryProvider interface {
-	GetLanguage() languages.Language
+	GetLanguage() *languages.Language
 	NewCharacterRepo() CharacterRepository
 	//NewCharacterIconRepo() ICharacterIconRepository
 }

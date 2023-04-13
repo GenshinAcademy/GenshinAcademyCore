@@ -54,7 +54,7 @@ func (dbConfig PostgresDatabaseConfiguration) GetConnectionString() string {
 // createPostgresProvider creates a provider to operate with Genshin database.
 //
 // @param language - Language to operate with.
-func createPostgresProvider(language languages.Language) repositories.RepositoryProvider {
+func createPostgresProvider(language *languages.Language) repositories.RepositoryProvider {
 	return genshin_repositories.CreatePostgresGenshinCoreProvider(
 		database.Connections[0].ORMConnection,
 		language,

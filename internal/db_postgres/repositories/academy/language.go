@@ -15,7 +15,7 @@ type PostgresLanguageRepository struct {
 }
 
 func (repo PostgresLanguageRepository) GetConnection() *gorm.DB {
-    return repo.gormConnection
+	return repo.gormConnection
 }
 
 // CreatePostresLanguageRepository Creates language repository with provided gorm connection
@@ -27,7 +27,8 @@ func CreatePostresLanguageRepository(connection *gorm.DB) PostgresLanguageReposi
 
 // AddLanguage Adds language
 func (repo PostgresLanguageRepository) AddLanguage(language *academy_models.Language) {
-	var langModel = repo.FindLanguage(languages.Language(language.LanguageName))
+	var lang = languages.Language(language.LanguageName)
+	var langModel = repo.FindLanguage(&lang)
 	if langModel.Id != academy_models.UNDEFINED_ID {
 		panic("Language with this name already exists")
 	}
@@ -42,10 +43,10 @@ func (repo PostgresLanguageRepository) AddLanguage(language *academy_models.Lang
 }
 
 // FindLanguage Finds language by name
-func (repo PostgresLanguageRepository) FindLanguage(lang languages.Language) academy_models.Language {
-	var langDbModel = db_models.Language{}
+func (repo PostgresLanguageRepository) FindLanguage(lang *languages.Language) *academy_models.Language {
+	var langDbModel = &db_models.Language{}
 
-	repo.gormConnection.Where("name = ?", &lang).First(&langDbModel)
+	repo.gormConnection.Where("name = ?", lang).First(langDbModel)
 	//TODO: Error
-	return db_mappers.Mapper{}.MapLanguageFromDbModel(&langDbModel)
+	return db_mappers.Mapper{}.MapLanguageFromDbModel(langDbModel)
 }

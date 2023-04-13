@@ -5,7 +5,7 @@ import (
 	"ga/pkg/genshin_core/repositories"
 )
 
-type GetProviderFunc func(languages.Language) repositories.RepositoryProvider
+type GetProviderFunc func(*languages.Language) repositories.RepositoryProvider
 
 type GenshinCoreConfiguration struct {
 	DefaultLanguage languages.Language
@@ -17,11 +17,11 @@ type GenshinCore struct {
 	defaultLanguageName languages.Language
 }
 
-func (core *GenshinCore) GetDefaultLanguageName() languages.Language {
-	return core.defaultLanguageName
+func (core *GenshinCore) GetDefaultLanguageName() *languages.Language {
+	return &core.defaultLanguageName
 }
 
-func defaultGetProvider(languages.Language) repositories.RepositoryProvider {
+func defaultGetProvider(*languages.Language) repositories.RepositoryProvider {
 	panic("GetProviderFunc not specified!")
 }
 func CreateGenshinCore(config GenshinCoreConfiguration) *GenshinCore {
@@ -36,9 +36,9 @@ func CreateGenshinCore(config GenshinCoreConfiguration) *GenshinCore {
 }
 
 func (core *GenshinCore) GetDefaultProvider() repositories.RepositoryProvider {
-	return core.GetProvider(core.defaultLanguageName)
+	return core.GetProvider(&core.defaultLanguageName)
 }
 
-func (core *GenshinCore) GetProvider(language languages.Language) repositories.RepositoryProvider {
+func (core *GenshinCore) GetProvider(language *languages.Language) repositories.RepositoryProvider {
 	return core.providerFunc(language)
 }

@@ -9,7 +9,7 @@ import (
 	"ga/pkg/genshin_core/models/languages"
 )
 
-type GetAcademyProviderFunc func(models.Language) repositories.IRepositoryProvider
+type GetAcademyProviderFunc func(*models.Language) repositories.IRepositoryProvider
 type GetLanguageRepositoryFunc func() repositories.ILanguageRepository
 
 type AcademyCoreConfiguration struct {
@@ -48,7 +48,7 @@ func defaultGetLanguageRepository() repositories.ILanguageRepository {
 	panic("GetLanguagerepositoryFunc not specified!")
 }
 
-func defaultGetProvider(models.Language) repositories.IRepositoryProvider {
+func defaultGetProvider(*models.Language) repositories.IRepositoryProvider {
 	panic("GetProviderFunc not specified!")
 }
 
@@ -56,7 +56,7 @@ func (core *AcademyCore) AsGenshinCore() *genshin_core.GenshinCore {
 	return core.genshinCore
 }
 
-func (core *AcademyCore) GetDefaultLanguage() models.Language {
+func (core *AcademyCore) GetDefaultLanguage() *models.Language {
 	var language = core.getLanguageRepository().FindLanguage(core.genshinCore.GetDefaultLanguageName())
 	return language
 }
@@ -71,7 +71,7 @@ func (core *AcademyCore) GetDefaultProvider() repositories.IRepositoryProvider {
 	return core.getProvider(language)
 }
 
-func (core *AcademyCore) GetProvider(languageName languages.Language) repositories.IRepositoryProvider {
+func (core *AcademyCore) GetProvider(languageName *languages.Language) repositories.IRepositoryProvider {
 	var language = core.getLanguageRepository().FindLanguage(languageName)
 	return core.getProvider(language)
 }

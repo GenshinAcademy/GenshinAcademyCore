@@ -54,7 +54,7 @@ func (dbConfig PostgresDatabaseConfiguration) GetConnectionString() string {
 		dbConfig.Port)
 }
 
-func createPostgresGenshinCoreProvider(language languages.Language) genshin_core_repositories.RepositoryProvider {
+func createPostgresGenshinCoreProvider(language *languages.Language) genshin_core_repositories.RepositoryProvider {
 	return genshin_db_repositories.CreatePostgresGenshinCoreProvider(
 		database.Connections[0].ORMConnection,
 		language,
@@ -68,7 +68,7 @@ func createLanguageRepository() repositories.ILanguageRepository {
 // createPostgresProvider creates a provider to operate with Academy database.
 //
 // @param language - Language to operate with.
-func createPostgresProvider(language models.Language) repositories.IRepositoryProvider {
+func createPostgresProvider(language *models.Language) repositories.IRepositoryProvider {
 	return academy_repositories.CreateAcademyProvider(
 		database.Connections[0].ORMConnection,
 		language,
