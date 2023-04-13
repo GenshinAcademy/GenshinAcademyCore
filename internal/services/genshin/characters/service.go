@@ -22,9 +22,9 @@ func CreateService(core *academy_core.AcademyCore) *Service {
 	return result
 }
 
-// GetAllCharacters returns all characters raw
+// GetAll returns all characters raw
 // Requires Accept-Language header in request
-func (service *Service) GetAllCharacters(c *gin.Context) {
+func (service *Service) GetAll(c *gin.Context) {
 	// TODO: GetProvider should return error if provider is not found
 	var language = languages.GetLanguage(languages.ConvertStringsToLanguages(strings.Split(c.GetHeader("Accept-Language"), ",")))
 

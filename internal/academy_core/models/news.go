@@ -1,7 +1,6 @@
 package models
 
 import (
-	url "ga/internal/academy_core/value_objects/url"
 	"time"
 )
 
@@ -10,6 +9,6 @@ type News struct {
 	Title       string
 	Description string
 	Preview     string
-	RedirectUrl url.Url
+	RedirectUrl string
 	CreatedAt   time.Time
 }

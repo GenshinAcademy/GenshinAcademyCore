@@ -107,22 +107,22 @@ func main() {
 
 	characters := mainRoute.Group("/characters")
 	{
-		characters.GET("/", middlewares.GetLimitOffset(), genshinService.GetAllCharacters)
-		characters.GET("/stats", middlewares.GetLimitOffset(), weaselAppraiserService.GetAllCharactersWithProfits)
+		characters.GET("/", middlewares.GetLimitOffset(), genshinService.GetAll)
+		characters.GET("/stats", middlewares.GetLimitOffset(), weaselAppraiserService.GetAll)
 	}
 
 	news := mainRoute.Group("/news")
 	{
-		news.GET("/", middlewares.GetLimitOffset(), newsService.GetAllNews)
-		news.POST("/", middlewares.Authenticate(env.SecretKey), newsService.CreateNews)
-		news.PATCH("/:id", middlewares.Authenticate(env.SecretKey), newsService.UpdateNews)
+		news.GET("/", middlewares.GetLimitOffset(), newsService.GetAll)
+		news.POST("/", middlewares.Authenticate(env.SecretKey), newsService.Create)
+		news.PATCH("/:id", middlewares.Authenticate(env.SecretKey), newsService.Update)
 	}
 
 	tables := mainRoute.Group("/tables")
 	{
-		tables.GET("/", middlewares.GetLimitOffset(), tablesService.GetAllTables)
-		tables.POST("/", middlewares.Authenticate(env.SecretKey), tablesService.CreateTable)
-		tables.PATCH("/:id", middlewares.Authenticate(env.SecretKey), tablesService.UpdateTable)
+		tables.GET("/", middlewares.GetLimitOffset(), tablesService.GetAll)
+		tables.POST("/", middlewares.Authenticate(env.SecretKey), tablesService.Create)
+		tables.PATCH("/:id", middlewares.Authenticate(env.SecretKey), tablesService.Update)
 	}
 
 	r.NoRoute(func(c *gin.Context) {

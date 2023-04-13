@@ -83,10 +83,10 @@ func main() {
 	var enLanguage = gacore.GetDefaultLanguage()
 
 	if enLanguage.Id == 0 {
-		enLanguage = academy_models.Language{
+		enLanguage = &academy_models.Language{
 			LanguageName: string(languages.DefaultLanguage),
 		}
-		langRepo.AddLanguage(&enLanguage)
+		langRepo.AddLanguage(enLanguage)
 		logger.Sugar().Infow("Language created successfully!",
 			"language", enLanguage)
 	} else {

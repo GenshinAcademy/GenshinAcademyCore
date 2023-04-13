@@ -21,9 +21,9 @@ func CreateService(core *academy_core.AcademyCore) *Service {
 	return result
 }
 
-// GetAllCharactersWithProfits returns all characters profit information in specified language
+// GetAll returns all characters profit information in specified language
 // Requires Accept-Language header in request
-func (service *Service) GetAllCharactersWithProfits(c *gin.Context) {
+func (service *Service) GetAll(c *gin.Context) {
 	// TODO: GetProvider should return error if provider is not found
 	var language = languages.GetLanguage(languages.ConvertStringsToLanguages(strings.Split(c.GetHeader("Accept-Language"), ",")))
 

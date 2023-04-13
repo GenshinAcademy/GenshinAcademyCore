@@ -140,13 +140,13 @@ func main() {
 	characterRepos := make(map[languages.Language]repositories.CharacterRepository, len(languages.Languages))
 
 	for languageCode := range languages.Languages {
-		var language = gacore.GetLanguageRepository().FindLanguage(languageCode)
+		var language = gacore.GetLanguageRepository().FindLanguage(&languageCode)
 
 		if language.Id == 0 {
-			language = academy_models.Language{
+			language = &academy_models.Language{
 				LanguageName: string(languageCode),
 			}
-			langRepo.AddLanguage(&language)
+			langRepo.AddLanguage(language)
 			logger.Info("Language created successfully!",
 				zap.String("language", language.LanguageName))
 		} else {
@@ -154,7 +154,7 @@ func main() {
 				zap.String("language", language.LanguageName))
 		}
 
-		characterRepos[languageCode] = gacore.AsGenshinCore().GetProvider(languageCode).NewCharacterRepo()
+		characterRepos[languageCode] = gacore.AsGenshinCore().GetProvider(&languageCode).NewCharacterRepo()
 	}
 
 	logger.Info("Getting default language characters from theBowja's data",
