@@ -2,6 +2,14 @@ package find_parameters
 
 import "ga/internal/academy_core/models"
 
+type SortMode uint8
+
+const(
+	SortNone SortMode = iota
+	SortByAscending
+	SortByDescending
+)
+
 type FindParameters struct {
 	Ids []models.AcademyId
 }

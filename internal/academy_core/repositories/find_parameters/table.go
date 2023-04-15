@@ -4,9 +4,14 @@ import (
 	"ga/pkg/genshin_core/repositories/find_parameters"
 )
 
+type TableSortParameters struct {
+	IdSort SortMode
+}
+
 type TableFindParameters struct {
 	FindParameters
 	SliceOptions find_parameters.SliceParameters
+	SortParameters TableSortParameters
 }
 
 func (parameters TableFindParameters) Slice(offset uint32, limit uint32) TableFindParameters {

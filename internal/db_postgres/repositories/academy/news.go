@@ -13,6 +13,10 @@ import (
 	"gorm.io/gorm"
 )
 
+const(
+	newsTimeField = "created_at"
+)
+
 var (
 	newsStringPreloads = []string{
 		"Title.StringValues",
@@ -130,17 +134,17 @@ func (repo PostgresNewsRepository) UpdateNews(news *academy_models.News) (*acade
 func ApplyFindParameters(builder repositories.QueryBuilder, parameters *find_parameters.NewsFindParameters) repositories.QueryBuilder {
 	if parameters.PublishTimeFrom != nil {
 		//TODO
-		panic("not implemented")
 	}
 
 	if parameters.PublishTimeTo != nil {
 		//TODO
-		panic("not implemented")
 	}
 
-	if parameters.SortByDescendingTime {
-		//TODO
-		panic("not implemented")
+	if parameters.SortOptions.IdSort != find_parameters.SortNone {
+		builder = builder.OrderBy(genericIdField, parameters.SortOptions.IdSort)
+	}
+	if parameters.SortOptions.CreatedTimeSort != find_parameters.SortNone {
+		builder = builder.OrderBy(newsTimeField, parameters.SortOptions.CreatedTimeSort)
 	}
 
 	return builder.Slice(&parameters.SliceOptions)

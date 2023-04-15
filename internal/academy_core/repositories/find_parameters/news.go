@@ -5,12 +5,17 @@ import (
 	"time"
 )
 
+type NewsSortParameters struct {
+	IdSort          SortMode
+	CreatedTimeSort SortMode
+}
+
 type NewsFindParameters struct {
 	FindParameters
+	SortOptions          NewsSortParameters
 	SliceOptions         find_parameters.SliceParameters
 	PublishTimeFrom      *time.Time
 	PublishTimeTo        *time.Time
-	SortByDescendingTime bool
 }
 
 func (parameters NewsFindParameters) Slice(offset uint32, limit uint32) NewsFindParameters {

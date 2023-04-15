@@ -71,6 +71,10 @@ func (repo PostgresTableRepository) FindTables(parameters find_parameters.TableF
 	if len(parameters.Ids) > 0 {
 		queryBuilder = queryBuilder.FilterById(repo, parameters.Ids)
 	} else {
+		if parameters.SortParameters.IdSort != find_parameters.SortNone {
+			queryBuilder = queryBuilder.OrderBy(genericIdField, parameters.SortParameters.IdSort)
+		}
+
 		queryBuilder = queryBuilder.Slice(&parameters.SliceOptions)
 	}
 
