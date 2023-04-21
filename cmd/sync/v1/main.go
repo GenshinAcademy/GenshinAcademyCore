@@ -96,14 +96,15 @@ func main() {
 
 	var characterRepoEn = gacore.AsGenshinCore().GetDefaultProvider().NewCharacterRepo()
 
+	var lang = languages.Russian
 	//Get provider for russian language
-	var ruLanguage = gacore.GetLanguageRepository().FindLanguage(languages.Russian)
+	var ruLanguage = gacore.GetLanguageRepository().FindLanguage(&lang)
 
 	if ruLanguage.Id == 0 {
-		ruLanguage = academy_models.Language{
+		ruLanguage = &academy_models.Language{
 			LanguageName: string(languages.Russian),
 		}
-		langRepo.AddLanguage(&ruLanguage)
+		langRepo.AddLanguage(ruLanguage)
 		logger.Sugar().Infow("Language created successfully!",
 			"language", ruLanguage)
 	} else {
@@ -111,7 +112,7 @@ func main() {
 			"language", ruLanguage)
 	}
 
-	var characterRepoRu = gacore.AsGenshinCore().GetProvider(languages.Russian).NewCharacterRepo()
+	var characterRepoRu = gacore.AsGenshinCore().GetProvider(&lang).NewCharacterRepo()
 
 	for _, character := range characters {
 		char := convertCharacter(character)
