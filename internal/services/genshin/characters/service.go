@@ -4,7 +4,6 @@ import (
 	"ga/internal/academy_core"
 	"ga/pkg/genshin_core/models/languages"
 	"ga/pkg/genshin_core/repositories/find_parameters"
-	gFindParameters "ga/pkg/genshin_core/repositories/find_parameters"
 
 	"net/http"
 	"strings"
@@ -31,8 +30,8 @@ func (service *Service) GetAll(c *gin.Context) {
 	var characterRepo = service.core.AsGenshinCore().GetProvider(language).NewCharacterRepo()
 	var result = characterRepo.FindCharacters(
 		find_parameters.CharacterFindParameters{
-			FindParameters: gFindParameters.FindParameters{
-				SliceOptions: gFindParameters.SliceParameters{
+			FindParameters: find_parameters.FindParameters{
+				SliceOptions: find_parameters.SliceParameters{
 					Offset: uint32(c.GetUint("offset")),
 					Limit:  uint32(c.GetUint("limit"))}}})
 

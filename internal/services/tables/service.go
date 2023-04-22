@@ -81,7 +81,7 @@ func (service *Service) Create(c *gin.Context) {
 	defaultRepo := service.core.GetProvider(&languages.DefaultLanguage).CreateTableRepo()
 	var table academyModels.Table
 	table.Icon = requestData.Icon
-	table.RedirectUrl = requestData.Redirect
+	table.RedirectUrl = requestData.Redirect[languages.DefaultLanguage]
 	table.Title = requestData.Title[languages.DefaultLanguage]
 	table.Description = requestData.Description[languages.DefaultLanguage]
 
@@ -157,19 +157,18 @@ func (service *Service) Update(c *gin.Context) {
 	// Update general fields
 	defaultRepo := service.core.GetProvider(&languages.DefaultLanguage).CreateTableRepo()
 	table := defaultRepo.FindTableById(academyModels.AcademyId(id))
-	if requestData.Icon != "" {
-		table.Icon = requestData.Icon
-	}
-	if requestData.Redirect != "" {
-		table.RedirectUrl = requestData.Redirect
-	}
-
 	if value, ok := requestData.Title[languages.DefaultLanguage]; ok {
 		table.Title = value
 	}
 
 	if value, ok := requestData.Description[languages.DefaultLanguage]; ok {
 		table.Description = value
+	}
+	if requestData.Icon != "" {
+		table.Icon = requestData.Icon
+	}
+	if value, ok := requestData.Redirect[languages.DefaultLanguage]; ok {
+		table.RedirectUrl = value
 	}
 
 	// Commit to database
@@ -220,6 +219,10 @@ func updateLocalizationFields(id academyModels.AcademyId, requestData models.Tab
 
 	if value, ok := requestData.Description[lang]; ok {
 		result.Description = value
+	}
+
+	if value, ok := requestData.Redirect[lang]; ok {
+		result.RedirectUrl = value
 	}
 
 	newResult, err := repo.UpdateTable(result)
