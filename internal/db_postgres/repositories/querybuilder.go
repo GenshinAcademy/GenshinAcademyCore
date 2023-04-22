@@ -2,6 +2,7 @@ package repositories
 
 import (
 	"ga/internal/academy_core/models"
+	academy_parameters "ga/internal/academy_core/repositories/find_parameters"
 	"ga/pkg/genshin_core/repositories/find_parameters"
 
 	"gorm.io/gorm"
@@ -80,6 +81,21 @@ func (builder QueryBuilder) Slice(parameters *find_parameters.SliceParameters) Q
 			Offset(int(parameters.Offset)).
 			Limit(int(parameters.Limit))
 	}
+
+	return QueryBuilder{connection: connect}
+}
+
+func (builder QueryBuilder) OrderBy(field string, mode academy_parameters.SortMode) QueryBuilder {
+	if mode == academy_parameters.SortNone {
+		return builder
+	}
+
+	var connect = builder.connection
+
+	if mode == academy_parameters.SortByDescending {
+		field = field + " desc"
+	}
+	connect = connect.Order(field)
 
 	return QueryBuilder{connection: connect}
 }

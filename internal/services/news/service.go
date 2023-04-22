@@ -38,6 +38,7 @@ func (service *Service) GetAll(c *gin.Context) {
 
 	var result = newsRepo.FindNews(
 		find_parameters.NewsFindParameters{
+			SortOptions: find_parameters.NewsSortParameters{CreatedTimeSort: find_parameters.SortByAscending},
 			SliceOptions: gFindParameters.SliceParameters{
 				Offset: uint32(c.GetUint("offset")),
 				Limit:  uint32(c.GetUint("limit"))}})
@@ -82,11 +83,11 @@ func (service *Service) Create(c *gin.Context) {
 	// Create general fields using default repository
 	defaultRepo := service.core.GetProvider(&languages.DefaultLanguage).CreateNewsRepo()
 	var news academyModels.News
-	news.Preview = requestData.Preview
-	news.RedirectUrl = requestData.Redirect
-	news.CreatedAt = time.Now()
 	news.Title = requestData.Title[languages.DefaultLanguage]
 	news.Description = requestData.Description[languages.DefaultLanguage]
+	news.Preview = requestData.Preview[languages.DefaultLanguage]
+	news.RedirectUrl = requestData.Redirect[languages.DefaultLanguage]
+	news.CreatedAt = time.Now()
 
 	// Add to database
 	var results []academyModels.News
@@ -160,12 +161,6 @@ func (service *Service) Update(c *gin.Context) {
 	// Update general fields
 	defaultRepo := service.core.GetProvider(&languages.DefaultLanguage).CreateNewsRepo()
 	news := defaultRepo.FindNewsById(academyModels.AcademyId(id))
-	if requestData.Preview != "" {
-		news.Preview = requestData.Preview
-	}
-	if requestData.Redirect != "" {
-		news.RedirectUrl = requestData.Redirect
-	}
 	if !requestData.CreatedAt.IsZero() {
 		news.CreatedAt = requestData.CreatedAt
 	}
@@ -174,6 +169,12 @@ func (service *Service) Update(c *gin.Context) {
 	}
 	if value, ok := requestData.Description[languages.DefaultLanguage]; ok {
 		news.Description = value
+	}
+	if value, ok := requestData.Preview[languages.DefaultLanguage]; ok {
+		news.Preview = value
+	}
+	if value, ok := requestData.Redirect[languages.DefaultLanguage]; ok {
+		news.RedirectUrl = value
 	}
 
 	// Commit to database
@@ -229,6 +230,14 @@ func updateLocalizationFields(id academyModels.AcademyId, requestData models.New
 
 	if value, ok := requestData.Description[lang]; ok {
 		result.Description = value
+	}
+
+	if value, ok := requestData.Preview[lang]; ok {
+		result.Preview = value
+	}
+
+	if value, ok := requestData.Redirect[lang]; ok {
+		result.RedirectUrl = value
 	}
 
 	newResult, err := repo.UpdateNews(result)
