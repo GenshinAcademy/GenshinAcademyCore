@@ -17,6 +17,7 @@ var (
 	tableStringPreloads = []string{
 		"Title.StringValues",
 		"Description.StringValues",
+		"RedirectUrl.StringValues",
 	}
 	tablePreloads = make([]string, 0)
 )

@@ -21,6 +21,8 @@ var (
 	newsStringPreloads = []string{
 		"Title.StringValues",
 		"Description.StringValues",
+		"Preview.StringValues",
+		"RedirectUrl.StringValues",
 	}
 
 	newsPreloads = make([]string, 0)

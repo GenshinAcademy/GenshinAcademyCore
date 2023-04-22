@@ -8,7 +8,9 @@ type News struct {
 	Title         String
 	DescriptionId DBKey `gorm:"column:description"`
 	Description   String
-	PreviewUrl    string    `gorm:"column:preview_url;type:varchar"`
-	RedirectUrl   string    `gorm:"column:redirect_url;type:varchar"`
+	PreviewId     DBKey `gorm:"column:preview_id"`
+	PreviewUrl    String
+	RedirectId    DBKey `gorm:"column:redirect_id"`
+	RedirectUrl   String
 	CreatedAt     time.Time `gorm:"column:created_at"`
 }

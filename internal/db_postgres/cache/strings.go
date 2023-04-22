@@ -13,12 +13,15 @@ type CharacterStrings struct {
 
 type NewsStrings struct {
 	Title       db_models.DBKey
-	Description db_models.DBKey
+    Description db_models.DBKey
+    Preview     db_models.DBKey
+    Redirect    db_models.DBKey
 }
 
 type TableStrings struct {
     Title       db_models.DBKey
     Description db_models.DBKey
+    Redirect    db_models.DBKey
 }
 
 func (cache *Cache) GetCharacterStrings(key db_models.DBKey) *CharacterStrings {
@@ -72,6 +75,8 @@ func (cache *Cache) UpdateNewsStrings(model *db_models.News) *NewsStrings{
 
     strings.Title = model.TitleId
     strings.Description = model.DescriptionId
+    strings.Preview = model.PreviewId
+    strings.Redirect = model.RedirectId
     cache.Unlock()
 
     return strings
@@ -99,6 +104,7 @@ func (cache *Cache) UpdateTableStrings(model *db_models.Table) *TableStrings{
 
     strings.Title = model.TitleId
     strings.Description = model.DescriptionId
+    strings.Redirect = model.RedirectId
     cache.Unlock()
 
     return strings
