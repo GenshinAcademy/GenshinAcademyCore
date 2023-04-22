@@ -7,6 +7,6 @@ type Table struct {
 	DescriptionId DBKey `gorm:"column:description"`
 	Description   String
 	PreviewUrl    string `gorm:"column:preview_url;type:varchar"`
-	RedirectId    DBKey  `gorm:"column:redirect_id"`
+	RedirectUrlId    DBKey  `gorm:"column:redirect_id"`
 	RedirectUrl   String
 }
