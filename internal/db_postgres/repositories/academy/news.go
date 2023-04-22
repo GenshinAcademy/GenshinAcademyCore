@@ -21,7 +21,7 @@ var (
 	newsStringPreloads = []string{
 		"Title.StringValues",
 		"Description.StringValues",
-		"Preview.StringValues",
+		"PreviewUrl.StringValues",
 		"RedirectUrl.StringValues",
 	}
 
