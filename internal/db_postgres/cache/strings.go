@@ -75,8 +75,8 @@ func (cache *Cache) UpdateNewsStrings(model *db_models.News) *NewsStrings{
 
     strings.Title = model.TitleId
     strings.Description = model.DescriptionId
-    strings.Preview = model.PreviewId
-    strings.Redirect = model.RedirectId
+    strings.Preview = model.PreviewUrlId
+    strings.Redirect = model.RedirectUrlId
     cache.Unlock()
 
     return strings
@@ -104,7 +104,7 @@ func (cache *Cache) UpdateTableStrings(model *db_models.Table) *TableStrings{
 
     strings.Title = model.TitleId
     strings.Description = model.DescriptionId
-    strings.Redirect = model.RedirectId
+    strings.Redirect = model.RedirectUrlId
     cache.Unlock()
 
     return strings
