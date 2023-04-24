@@ -31,7 +31,7 @@ func CreateService(core *academy_core.AcademyCore) *Service {
 // GetAll returns all tables in specified language
 func (service *Service) GetAll(c *gin.Context) {
 	// TODO: GetProvider should return error if provider is not found
-	var language = languages.GetLanguage(languages.ConvertStringsToLanguages(strings.Split(c.GetHeader("Accept-Language"), ",")))
+	var language = languages.GetLanguage(languages.ConvertStringsToLanguages(strings.Split(c.GetHeader("Accept-Languages"), ",")))
 
 	var tablesRepo = service.core.GetProvider(language).CreateTableRepo()
 	var result = tablesRepo.FindTables(
@@ -48,7 +48,7 @@ func (service *Service) GetAll(c *gin.Context) {
 
 func (service *Service) Create(c *gin.Context) {
 	// Get languages repositories
-	langs := languages.ConvertStringsToLanguages(strings.Split(c.GetHeader("Accept-Language"), ","))
+	langs := languages.ConvertStringsToLanguages(strings.Split(c.GetHeader("Accept-Languages"), ","))
 	tablesRepos := make(map[languages.Language]repositories.ITableRepository, len(langs))
 	for _, lang := range langs {
 		if lang == languages.DefaultLanguage {
@@ -122,7 +122,7 @@ func (service *Service) Create(c *gin.Context) {
 
 func (service *Service) Update(c *gin.Context) {
 	// Get languages repositories
-	langs := languages.ConvertStringsToLanguages(strings.Split(c.GetHeader("Accept-Language"), ","))
+	langs := languages.ConvertStringsToLanguages(strings.Split(c.GetHeader("Accept-Languages"), ","))
 	tablesRepos := make(map[languages.Language]repositories.ITableRepository, len(langs))
 	for _, lang := range langs {
 		if lang == languages.DefaultLanguage {

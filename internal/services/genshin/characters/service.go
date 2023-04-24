@@ -22,10 +22,10 @@ func CreateService(core *academy_core.AcademyCore) *Service {
 }
 
 // GetAll returns all characters raw
-// Requires Accept-Language header in request
+// Requires Accept-Languages header in request
 func (service *Service) GetAll(c *gin.Context) {
 	// TODO: GetProvider should return error if provider is not found
-	var language = languages.GetLanguage(languages.ConvertStringsToLanguages(strings.Split(c.GetHeader("Accept-Language"), ",")))
+	var language = languages.GetLanguage(languages.ConvertStringsToLanguages(strings.Split(c.GetHeader("Accept-Languages"), ",")))
 
 	var characterRepo = service.core.AsGenshinCore().GetProvider(language).NewCharacterRepo()
 	var result = characterRepo.FindCharacters(

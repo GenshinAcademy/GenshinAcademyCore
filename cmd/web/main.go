@@ -99,7 +99,7 @@ func main() {
 	r.Use(cors.New(cors.Config{
 		AllowAllOrigins: true,
 		AllowMethods:    []string{"GET"},
-		AllowHeaders:    []string{"Origin", "Content-Length", "Content-Type", "Accept-Language"},
+		AllowHeaders:    []string{"Origin", "Content-Length", "Content-Type", "Accept-Languages"},
 		MaxAge:          12 * time.Hour,
 	}))
 
