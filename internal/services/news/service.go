@@ -38,7 +38,7 @@ func (service *Service) GetAll(c *gin.Context) {
 
 	var result = newsRepo.FindNews(
 		find_parameters.NewsFindParameters{
-			SortOptions: find_parameters.NewsSortParameters{CreatedTimeSort: find_parameters.SortByAscending},
+			SortOptions: find_parameters.NewsSortParameters{CreatedTimeSort: find_parameters.SortByDescending},
 			SliceOptions: gFindParameters.SliceParameters{
 				Offset: uint32(c.GetUint("offset")),
 				Limit:  uint32(c.GetUint("limit"))}})
