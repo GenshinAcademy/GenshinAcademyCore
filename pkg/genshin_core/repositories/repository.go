@@ -20,6 +20,15 @@ type CharacterRepository interface {
 	UpdateCharacter(character *models.Character) error
 }
 
+type WeaponRepository interface {
+	Repository
+	GetWeaponIds(parameters find_parameters.WeaponFindParameters) []models.ModelId
+	FindWeaponById(weaponId models.ModelId) (models.Weapon, error)
+	FindWeapons(find_parameters.WeaponFindParameters) []models.Weapon
+	AddWeapon(weapon *models.Weapon) error
+	UpdateWeapon(weapon *models.Weapon) error
+}
+
 type CharacterIconRepository interface {
 	FindIconsByCharacterId(characterId models.ModelId) []value_objects.CharacterIcon
 }
@@ -27,5 +36,6 @@ type CharacterIconRepository interface {
 type RepositoryProvider interface {
 	GetLanguage() *languages.Language
 	NewCharacterRepo() CharacterRepository
+	NewWeaponRepo() WeaponRepository
 	//NewCharacterIconRepo() ICharacterIconRepository
 }
