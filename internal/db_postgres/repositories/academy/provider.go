@@ -52,3 +52,12 @@ func (provider PostgresAcademyProvider) CreateTableRepo() repositories.ITableRep
 
 	return academyRepository
 }
+
+func (provider PostgresAcademyProvider) CreateWeaponRepo() repositories.IWeaponRepository {
+	var academyRepository = CreatePostgresWeaponRepository(
+		provider.gormConnection,
+		provider.language,
+		provider.cache)
+
+	return academyRepository
+}

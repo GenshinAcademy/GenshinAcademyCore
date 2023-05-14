@@ -38,3 +38,15 @@ func (provider PostgresGenshinCoreProvder) NewCharacterRepo() repositories.Chara
 		academyRepo: &academyRepository,
 	}
 }
+
+func (provider PostgresGenshinCoreProvder) NewWeaponRepo() repositories.WeaponRepository {
+	var language = academy.CreatePostresLanguageRepository(provider.gormConnection).FindLanguage(provider.GetLanguage())
+	var academyRepository = academy.CreatePostgresWeaponRepository(
+		provider.gormConnection,
+		language,
+		provider.cache)
+
+	return PostgresGenshinWeaponRepository{
+		academyRepo: &academyRepository,
+	}
+}
