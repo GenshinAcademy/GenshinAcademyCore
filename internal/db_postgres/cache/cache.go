@@ -9,7 +9,8 @@ type Cache struct {
 	mutex            *sync.Mutex
 	characterStrings map[db_models.DBKey]*CharacterStrings
 	newsStrings      map[db_models.DBKey]*NewsStrings
-	tableStrings      map[db_models.DBKey]*TableStrings
+	tableStrings     map[db_models.DBKey]*TableStrings
+	weaponStrings    map[db_models.DBKey]*WeaponStrings
 }
 
 func MakeCache(size uint64) *Cache {
@@ -18,6 +19,7 @@ func MakeCache(size uint64) *Cache {
 	cachePtr.characterStrings = make(map[db_models.DBKey]*CharacterStrings, size)
 	cachePtr.newsStrings = make(map[db_models.DBKey]*NewsStrings, size)
 	cachePtr.tableStrings = make(map[db_models.DBKey]*TableStrings, size)
+	cachePtr.weaponStrings = make(map[db_models.DBKey]*WeaponStrings, size)
 	cachePtr.mutex = new(sync.Mutex)
 
 	return cachePtr

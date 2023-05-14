@@ -46,10 +46,21 @@ type ITableRepository interface {
 	UpdateTable(table *models.Table) (*models.Table, error)
 }
 
+type IWeaponRepository interface {
+	IRepository
+	GetWeaponIds(parameters find_parameters.WeaponFindParameters) []genshin_models.ModelId
+	FindWeaponById(id models.AcademyId) *models.Weapon
+	FindWeaponByGenshinId(characterId genshin_models.ModelId) (*models.Weapon, bool)
+	FindWeapons(parameters find_parameters.WeaponFindParameters) []models.Weapon
+	AddWeapon(weapon *models.Weapon) (*models.Weapon, error)
+	UpdateWeapon(weapon *models.Weapon) (*models.Weapon, error)
+}
+
 type IRepositoryProvider interface {
 	GetLanguage() *models.Language
 	NewCharacterRepo() ICharacterRepository
 	CreateNewsRepo() INewsRepository
 	CreateTableRepo() ITableRepository
+	CreateWeaponRepo() IWeaponRepository
 	//NewCharacterIconRepo() ICharacterIconRepository
 }

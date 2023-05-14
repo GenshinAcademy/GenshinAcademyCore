@@ -292,3 +292,99 @@ func (mapper Mapper) MapDbTableFromModel(model *academy_models.Table) *db_models
 		RedirectUrl: string(model.RedirectUrl),
 	}
 }
+
+func (mapper Mapper) MapWeaponIcon(model *db_models.WeaponIcon) *genshin_objects.WeaponIcon {
+	return &genshin_objects.WeaponIcon{
+		Type: genshin_objects.WeaponIconType(model.IconType),
+		Url:  model.Url,
+	}
+}
+
+func (mapper Mapper) MapDbWeaponIcon(parentId db_models.DBKey, model *genshin_objects.WeaponIcon) *db_models.WeaponIcon {
+	return &db_models.WeaponIcon{
+		WeaponId: parentId,
+		IconType: uint8(model.Type),
+		Url:      model.Url,
+	}
+}
+
+func (mapper Mapper) MapDbWeaponFromModel(model *academy_models.Weapon) *db_models.Weapon {
+	var strings = mapper.cache.GetWeaponStrings(db_models.DBKey(model.Id))
+
+	var weapon = &db_models.Weapon{
+		Id:                db_models.DBKey(model.Id),
+		WeaponId:          db_models.GenshinKey(model.Weapon.Id),
+		Name:              *mapper.MapDbStringFromString(strings.Name, model.Name),
+		Description:       *mapper.MapDbStringFromString(strings.Description, model.Description),
+		DescriptionRaw:    *mapper.MapDbStringFromString(strings.DescriptionRaw, model.DescriptionRaw),
+		EffectName:        *mapper.MapDbStringFromString(strings.EffectName, model.EffectName),
+		EffectTemplateRaw: *mapper.MapDbStringFromString(strings.EffectTemplateRaw, model.EffectTemplateRaw),
+		BaseAttack:        model.BaseAttackValue,
+		BaseStatText:      model.BaseStatText,
+		MainStatType:      model.MainStatType,
+		MainStatName:      model.MainStatName,
+		Rarity:            uint8(model.Rarity),
+		Type:              uint8(model.WeaponType),
+		Icons:             make([]db_models.WeaponIcon, 0),
+	}
+	mapper.mapDbWeaponArrays(weapon, model)
+
+	return weapon
+}
+
+// MapAcademyWeaponFromDbModel converts DB character model to Academy character model.
+func (mapper Mapper) MapAcademyWeaponFromDbModel(model *db_models.Weapon) *academy_models.Weapon {
+	var weapon = &academy_models.Weapon{
+		AcademyModel: academy_models.AcademyModel{
+			Id: academy_models.AcademyId(model.Id),
+		},
+		Weapon: *mapper.MapGenshinWeaponFromDbModel(model),
+	}
+	mapper.mapAcademyWeaponArrays(weapon, model)
+	mapper.cache.UpdateWeaponStrings(model)
+
+	return weapon
+}
+
+func (mapper Mapper) mapDbWeaponArrays(model *db_models.Weapon, srcModel *academy_models.Weapon) {
+	// Genshin related
+	for i := 0; i < len(srcModel.Icons); i += 1 {
+		model.Icons = append(model.Icons, *mapper.MapDbWeaponIcon(db_models.DBKey(srcModel.Id), &srcModel.Icons[i]))
+	}
+
+	//Academy related
+}
+
+func (mapper Mapper) mapAcademyWeaponArrays(model *academy_models.Weapon, srcModel *db_models.Weapon) {
+}
+
+func (mapper Mapper) mapGenshinWeaponArrays(model *genshin_models.Weapon, srcModel *db_models.Weapon) {
+	for i := 0; i < len(srcModel.Icons); i += 1 {
+		model.Icons = append(model.Icons, *mapper.MapWeaponIcon(&srcModel.Icons[i]))
+	}
+}
+
+// MapGenshinCharacterFromDbModel converts DB character model to Core character model
+func (mapper Mapper) MapGenshinWeaponFromDbModel(model *db_models.Weapon) *genshin_models.Weapon {
+	var weapon = genshin_models.Weapon{
+		BaseModel: genshin_models.BaseModel{
+			Id: genshin_models.ModelId(model.WeaponId),
+		},
+		Name:              mapper.StringFromDbModel(model.Name),
+		Description:       mapper.StringFromDbModel(model.Description),
+		DescriptionRaw:    mapper.StringFromDbModel(model.DescriptionRaw),
+		EffectName:        mapper.StringFromDbModel(model.EffectName),
+		EffectTemplateRaw: mapper.StringFromDbModel(model.EffectTemplateRaw),
+		BaseAttackValue:   model.BaseAttack,
+		BaseStatText:      model.BaseStatText,
+		MainStatType:      model.MainStatType,
+		MainStatName:      model.MainStatName,
+		Rarity:            genshin_enums.Rarity(model.Rarity),
+		WeaponType:        genshin_enums.WeaponType(model.Type),
+		Icons:             make([]genshin_objects.WeaponIcon, 0),
+	}
+	mapper.mapGenshinWeaponArrays(&weapon, model)
+	mapper.cache.UpdateWeaponStrings(model)
+
+	return &weapon
+}
