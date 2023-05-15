@@ -86,7 +86,7 @@ func init() {
 	genshinService = characters.CreateService(gacore)
 	newsService = news.CreateService(gacore)
 	tablesService = tables.CreateService(gacore)
-	assetsService = assets.CreateService(gacore)
+	assetsService = assets.CreateService(gacore, env.AssetsPath)
 }
 
 // Web server here

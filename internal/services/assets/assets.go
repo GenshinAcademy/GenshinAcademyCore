@@ -11,12 +11,14 @@ import (
 )
 
 type Service struct {
-	core *academy_core.AcademyCore
+	core       *academy_core.AcademyCore
+	assetsPath string
 }
 
-func CreateService(core *academy_core.AcademyCore) *Service {
+func CreateService(core *academy_core.AcademyCore, assetsPath string) *Service {
 	var result *Service = new(Service)
 	result.core = core
+	result.assetsPath = assetsPath
 	return result
 }
 
@@ -45,7 +47,6 @@ func (service *Service) Upload(c *gin.Context) {
 	}
 
 	path := strings.Trim(c.Param("path"), "/")
-	fmt.Println(path)
 	if !isValidAssetType(AssetsType(path)) {
 		c.JSON(http.StatusBadRequest, gin.H{
 			"error":    "wrong file type",
@@ -55,7 +56,8 @@ func (service *Service) Upload(c *gin.Context) {
 	}
 
 	for _, file := range files {
-		savePath := fmt.Sprintf("assets/%s/%s", path, file.Filename)
+		savePath := fmt.Sprintf("%s/%s/%s", service.assetsPath, path, file.Filename)
+		fmt.Println(savePath)
 		if err := c.SaveUploadedFile(file, savePath); err != nil {
 			c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 			return
@@ -68,7 +70,7 @@ func (service *Service) Upload(c *gin.Context) {
 func (service *Service) Delete(c *gin.Context) {
 	path := strings.Trim(c.Param("path"), "/")
 
-	if err := os.Remove(fmt.Sprintf("assets/%s", path)); err != nil {
+	if err := os.Remove(fmt.Sprintf("%s/%s", service.assetsPath, path)); err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
 	}
