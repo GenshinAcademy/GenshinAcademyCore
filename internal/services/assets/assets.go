@@ -55,27 +55,70 @@ func (service *Service) Upload(c *gin.Context) {
 		return
 	}
 
+	var (
+		successful []string
+		errors     []string
+	)
+
 	for _, file := range files {
 		savePath := fmt.Sprintf("%s/%s/%s", service.assetsPath, path, file.Filename)
-		fmt.Println(savePath)
 		if err := c.SaveUploadedFile(file, savePath); err != nil {
-			c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
-			return
+			errors = append(errors, fmt.Sprintf("failed to upload %s: %s", file.Filename, err.Error()))
+		} else {
+			successful = append(successful, file.Filename)
 		}
 	}
 
-	c.JSON(http.StatusOK, files)
+	assetsResult(c, successful, errors)
 }
 
 func (service *Service) Delete(c *gin.Context) {
-	path := strings.Trim(c.Param("path"), "/")
-
-	if err := os.Remove(fmt.Sprintf("%s/%s", service.assetsPath, path)); err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+	form, err := c.MultipartForm()
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
 
-	c.JSON(http.StatusOK, gin.H{"message": "deleted"})
+	paths := form.Value["path"]
+	if len(paths) == 0 {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "paths not specified"})
+		return
+	}
+
+	var (
+		successful []string
+		errors     []string
+	)
+
+	for _, path := range paths {
+		if err := os.Remove(fmt.Sprintf("%s/%s", service.assetsPath, path)); err != nil {
+			errors = append(errors, fmt.Sprintf("failed to delete %s: %s", path, err.Error()))
+		} else {
+			successful = append(successful, path)
+		}
+	}
+
+	assetsResult(c, successful, errors)
+}
+
+func assetsResult(c *gin.Context, successful []string, errors []string) {
+	if len(successful) > 0 && len(errors) > 0 {
+		response := gin.H{
+			"successful": successful,
+			"errors":     errors,
+		}
+		c.JSON(http.StatusOK, response)
+	} else if len(errors) > 0 {
+		response := gin.H{
+			"errors": errors,
+		}
+		c.JSON(http.StatusInternalServerError, response)
+	} else {
+		response := gin.H{
+			"successful": successful,
+		}
+		c.JSON(http.StatusOK, response)
+	}
 }
 
 func isValidAssetType(assetType AssetsType) bool {
