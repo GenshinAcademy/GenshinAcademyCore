@@ -8,6 +8,7 @@ import (
 	"ga/internal/configuration"
 	"ga/pkg/genshin_core/models/languages"
 
+	"ga/internal/services/assets"
 	"ga/internal/services/genshin/characters"
 	"ga/internal/services/middlewares"
 	"ga/internal/services/news"
@@ -28,6 +29,7 @@ var (
 	genshinService         *characters.Service
 	newsService            *news.Service
 	tablesService          *tables.Service
+	assetsService          *assets.Service
 	env                    Config
 )
 
@@ -84,6 +86,7 @@ func init() {
 	genshinService = characters.CreateService(gacore)
 	newsService = news.CreateService(gacore)
 	tablesService = tables.CreateService(gacore)
+	assetsService = assets.CreateService(gacore)
 }
 
 // Web server here
@@ -123,6 +126,12 @@ func main() {
 		tables.GET("/", middlewares.GetLimitOffset(), tablesService.GetAll)
 		tables.POST("/", middlewares.Authenticate(env.SecretKey), tablesService.Create)
 		tables.PATCH("/:id", middlewares.Authenticate(env.SecretKey), tablesService.Update)
+	}
+
+	assets := mainRoute.Group("/assets")
+	{
+		assets.POST("/*path", middlewares.Authenticate(env.SecretKey), assetsService.Upload)
+		assets.DELETE("/*path", middlewares.Authenticate(env.SecretKey), assetsService.Delete)
 	}
 
 	r.NoRoute(func(c *gin.Context) {
