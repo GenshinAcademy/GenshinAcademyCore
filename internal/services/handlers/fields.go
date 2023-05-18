@@ -23,10 +23,11 @@ func HasAllFields(fieldsStruct interface{}) gin.H {
 		tag := v.Type().Field(i).Tag.Get("ga")
 
 		if strings.Contains(tag, "required") {
-			if field.IsZero() || (field.Kind() == reflect.Ptr && field.IsNil()) {
+			if field.Kind() == reflect.Ptr && field.IsNil() {
 				emptyFields = append(emptyFields, jsonName)
 			}
 		}
+		// TODO: not null
 	}
 
 	if len(emptyFields) > 0 {

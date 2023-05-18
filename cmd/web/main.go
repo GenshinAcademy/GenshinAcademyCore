@@ -111,7 +111,9 @@ func main() {
 	characters := mainRoute.Group("/characters")
 	{
 		characters.GET("/", middlewares.GetLimitOffset(), genshinService.GetAll)
+		characters.POST("/", middlewares.Authenticate(env.SecretKey), genshinService.Create)
 		characters.GET("/stats", middlewares.GetLimitOffset(), weaselAppraiserService.GetAll)
+		characters.PATCH("/stats/:id", middlewares.Authenticate(env.SecretKey), weaselAppraiserService.UpdateStats)
 	}
 
 	news := mainRoute.Group("/news")
