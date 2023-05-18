@@ -1,4 +1,4 @@
-package artifact_proft
+package artifact_profit
 
 import "fmt"
 
@@ -27,20 +27,20 @@ const (
 )
 
 type ArtifactProfit struct {
-	Slot              ProfitSlot
-	Attack            StatProfit
-	AttackPercentage  StatProfit
-	Health            StatProfit
-	HealthPercentage  StatProfit
-	Defense           StatProfit
-	DefensePercentage StatProfit
-	ElementalMastery  StatProfit
-	EnergyRecharge    StatProfit
-	ElementalDamage   StatProfit
-	CritRate          StatProfit
-	CritDamage        StatProfit
-	PhysicalDamage    StatProfit
-	Heal              StatProfit
+	Slot              ProfitSlot `json:"slot" ga:"required"`
+	Attack            StatProfit `json:"ATK,omitempty" ga:"required"`
+	AttackPercentage  StatProfit `json:"ATK_P,omitempty" ga:"required"`
+	Health            StatProfit `json:"HP,omitempty" ga:"required"`
+	HealthPercentage  StatProfit `json:"HP_P,omitempty" ga:"required"`
+	Defense           StatProfit `json:"DEF,omitempty" ga:"required"`
+	DefensePercentage StatProfit `json:"DEF_P,omitempty" ga:"required"`
+	ElementalMastery  StatProfit `json:"EM,omitempty" ga:"required"`
+	EnergyRecharge    StatProfit `json:"ER,omitempty" ga:"required"`
+	ElementalDamage   StatProfit `json:"ELEM,omitempty" ga:"required"`
+	CritRate          StatProfit `json:"CR,omitempty" ga:"required"`
+	CritDamage        StatProfit `json:"CD,omitempty" ga:"required"`
+	PhysicalDamage    StatProfit `json:"PHYS,omitempty" ga:"required"`
+	Heal              StatProfit `json:"HEAL,omitempty" ga:"required"`
 }
 
 func CreateNew(slot ProfitSlot) ArtifactProfit {
