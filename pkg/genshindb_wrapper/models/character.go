@@ -3,24 +3,31 @@ package models
 import "ga/pkg/genshindb_wrapper/enums"
 
 type Character struct {
-	Name          string        `json:"name"`
-	FullName      string        `json:"fullname"`
-	Title         string        `json:"title"`
-	Description   string        `json:"description"`
-	Rarity        string        `json:"rarity"`
-	Element       enums.Element `json:"element"`
-	Weapontype    enums.Weapon  `json:"weapontype"`
-	Substat       string        `json:"substat"`
-	Gender        string        `json:"gender"`
-	Body          string        `json:"body"`
-	Association   string        `json:"association"`
-	Region        string        `json:"region"`
-	Affiliation   string        `json:"affiliation"`
-	Birthdaymmdd  string        `json:"birthdaymmdd"`
-	Birthday      string        `json:"birthday"`
-	Constellation string        `json:"constellation"`
-	Cv            cv            `json:"cv"`
-	Costs         costs         `json:"costs"`
+	Id           uint              `json:"id"`
+	Name         string            `json:"name"`
+	Title        string            `json:"title"`
+	Description  string            `json:"description"`
+	WeaponText   enums.WeaponText  `json:"weaponText"`
+	WeaponType   enums.WeaponType  `json:"weaponType"`
+	BodyType     enums.BodyType    `json:"bodyType"`
+	Gender       enums.Gender      `json:"gender"`
+	QualityType  enums.QualityType `json:"qualityType"`
+	Rarity       enums.Rarity      `json:"rarity"`
+	Birthdaymmdd string            `json:"birthdaymmdd"`
+	Birthday     string            `json:"birthday"`
+	ElementText  enums.ElementText `json:"elementText"`
+	ElementType  enums.ElementType `json:"elementType"`
+	Affiliation  string            `json:"affiliation"`
+	Association  string            `json:"association"`
+	Region       string            `json:"region"`
+	// TODO: Enums
+	SubstatText string `json:"substatType"`
+	// TODO: Enums
+	SubstatType string `json:"substatText"`
+	// TODO: Enums
+	Constellation string `json:"constellation"`
+	Cv            cv     `json:"cv"`
+	Costs         costs  `json:"costs"`
 }
 
 type CharacterWeb struct {

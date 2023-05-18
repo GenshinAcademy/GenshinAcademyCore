@@ -179,7 +179,8 @@ func main() {
 		logger.Info("Adding character to database",
 			zap.String("character", character.Name))
 
-		if err = defaultCharacterRepo.AddCharacter(&character); err != nil {
+		_, err = defaultCharacterRepo.AddCharacter(character)
+		if err != nil {
 			panic(err)
 		}
 
@@ -212,7 +213,8 @@ func main() {
 				addStrings(localChar, &localCharFromRepo)
 
 				// Commit updates
-				if err = characterRepos[language].UpdateCharacter(&localCharFromRepo); err != nil {
+				_, err = characterRepos[language].UpdateCharacter(localCharFromRepo)
+				if err != nil {
 					panic(err)
 				}
 			}(languageCode, character.Id)
@@ -231,7 +233,7 @@ func convertCharacter(input gdb_models.Character) (output gc_models.Character) {
 
 	addStrings(input, &output)
 
-	switch input.Element {
+	switch input.ElementText {
 	case gdb_enums.Geo:
 		output.Element = gc_enums.Geo
 	case gdb_enums.Dendro:
@@ -251,13 +253,13 @@ func convertCharacter(input gdb_models.Character) (output gc_models.Character) {
 	}
 
 	switch input.Rarity {
-	case "5":
+	case 5:
 		output.Rarity = gc_enums.Legendary
 	default:
 		output.Rarity = gc_enums.Epic
 	}
 
-	switch input.Weapontype {
+	switch input.WeaponText {
 	case gdb_enums.Sword:
 		output.Weapon = gc_enums.Sword
 	case gdb_enums.Bow:
@@ -278,7 +280,6 @@ func convertCharacter(input gdb_models.Character) (output gc_models.Character) {
 
 func addStrings(input gdb_models.Character, output *gc_models.Character) {
 	output.Name = input.Name
-	output.FullName = input.FullName
 	output.Description = input.Description
 	output.Title = input.Title
 }
