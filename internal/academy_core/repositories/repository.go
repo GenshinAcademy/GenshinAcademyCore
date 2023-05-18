@@ -23,11 +23,11 @@ type ILanguageRepository interface {
 type ICharacterRepository interface {
 	IRepository
 	GetCharacterIds(parameters find_parameters.CharacterFindParameters) []genshin_models.ModelId
-	FindCharacterById(characterId models.AcademyId) (*models.Character, bool)
-	FindCharacterByGenshinId(characterId genshin_models.ModelId) (*models.Character, bool)
+	FindCharacterById(characterId models.AcademyId) (models.Character, bool)
+	FindCharacterByGenshinId(characterId genshin_models.ModelId) (models.Character, bool)
 	FindCharacters(parameters find_parameters.CharacterFindParameters) []models.Character
-	AddCharacter(character *models.Character) (*models.Character, error)
-	UpdateCharacter(character *models.Character) (*models.Character, error)
+	AddCharacter(character models.Character) (models.Character, error)
+	UpdateCharacter(character models.Character) (models.Character, error)
 }
 
 type INewsRepository interface {

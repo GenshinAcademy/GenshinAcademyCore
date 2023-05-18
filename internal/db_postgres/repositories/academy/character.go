@@ -54,8 +54,8 @@ func (repo PostgresCharacterRepository) GetStringPreloads() []string {
 	return characterStringPreloads
 }
 
-func (repo PostgresCharacterRepository) FindCharacterById(characterId academy_models.AcademyId) (*academy_models.Character, bool) {
-	var selectedCharacter *db_models.Character
+func (repo PostgresCharacterRepository) FindCharacterById(characterId academy_models.AcademyId) (academy_models.Character, bool) {
+	var selectedCharacter db_models.Character
 
 	var connection = repositories.CreateQueryBuilder(repo.GetConnection()).
 		PreloadAll(repo).
@@ -66,14 +66,14 @@ func (repo PostgresCharacterRepository) FindCharacterById(characterId academy_mo
 	return repo.mapper.MapAcademyCharacterFromDbModel(selectedCharacter), selectedCharacter.Id != db_models.DBKey(academy_models.UNDEFINED_ID)
 }
 
-func (repo PostgresCharacterRepository) FindCharacterByGenshinId(characterId genshin_models.ModelId) (*academy_models.Character, bool) {
-	var selectedCharacter *db_models.Character
+func (repo PostgresCharacterRepository) FindCharacterByGenshinId(characterId genshin_models.ModelId) (academy_models.Character, bool) {
+	var selectedCharacter db_models.Character
 
 	var connection = repositories.CreateQueryBuilder(repo.GetConnection()).
 		PreloadAll(repo).
 		GetConnection().
 		Where("character_id = ?", characterId)
-	connection.First(selectedCharacter)
+	connection.First(&selectedCharacter)
 
 	return repo.mapper.MapAcademyCharacterFromDbModel(selectedCharacter), selectedCharacter.Id != db_models.DBKey(academy_models.UNDEFINED_ID)
 }
@@ -105,39 +105,32 @@ func (repo PostgresCharacterRepository) FindCharacters(parameters find_parameter
 	queryBuilder.GetConnection().Find(&selectedChacters)
 
 	for _, character := range selectedChacters {
-		result = append(result, *repo.mapper.MapAcademyCharacterFromDbModel(&character))
+		result = append(result, repo.mapper.MapAcademyCharacterFromDbModel(character))
 	}
 
 	return result
 }
 
-func (repo PostgresCharacterRepository) AddCharacter(character *academy_models.Character) (*academy_models.Character, error) {
-	if character == nil {
-		return nil, errors.New("null value provided")
-	}
-
+func (repo PostgresCharacterRepository) AddCharacter(character academy_models.Character) (academy_models.Character, error) {
 	var newCharacter = repo.mapper.MapDbCharacterFromModel(character)
 
 	var connection = repositories.CreateQueryBuilder(repo.GetConnection()).
 		PreloadAll(repo).
 		GetConnection()
 
-	if err := connection.Create(newCharacter).Error; err != nil {
-		return nil, err
+	if err := connection.Create(&newCharacter).Error; err != nil {
+		return academy_models.Character{}, err
 	}
+	character.Id = academy_models.AcademyId(newCharacter.Id)
 
 	db_postgres.GetCache().UpdateCharacterStrings(newCharacter)
 
 	return character, nil
 }
 
-func (repo PostgresCharacterRepository) UpdateCharacter(character *academy_models.Character) (*academy_models.Character, error) {
-	if character == nil {
-		return nil, errors.New("null value provided")
-	}
-
+func (repo PostgresCharacterRepository) UpdateCharacter(character academy_models.Character) (academy_models.Character, error) {
 	if character.Id == academy_models.UNDEFINED_ID {
-		return nil, errors.New("not existing character provided")
+		return academy_models.Character{}, errors.New("not existing character provided")
 	}
 
 	var characterToUpdate = repo.mapper.MapDbCharacterFromModel(character)
@@ -146,9 +139,10 @@ func (repo PostgresCharacterRepository) UpdateCharacter(character *academy_model
 		PreloadAll(repo).
 		GetConnection()
 
-	if err := connection.Save(characterToUpdate).Error; err != nil {
-		return nil, err
+	if err := connection.Save(&characterToUpdate).Error; err != nil {
+		return academy_models.Character{}, err
 	}
+	character.Id = academy_models.AcademyId(characterToUpdate.Id)
 
 	db_postgres.GetCache().UpdateCharacterStrings(characterToUpdate)
 

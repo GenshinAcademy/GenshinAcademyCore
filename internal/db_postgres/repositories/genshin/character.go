@@ -57,30 +57,37 @@ func (repo PostgresGenshinCharacterRepository) FindCharacters(parameters find_pa
 	return characters
 }
 
-func (repo PostgresGenshinCharacterRepository) AddCharacter(model *genshin_models.Character) error {
+func (repo PostgresGenshinCharacterRepository) AddCharacter(model genshin_models.Character) (genshin_models.Character, error) {
 	if model.Id == genshin_models.DEFAULT_ID {
-		return errors.EmptyId()
+		return genshin_models.Character{}, errors.EmptyId()
 	}
 
 	var academyCharacter, _ = repo.academyRepo.FindCharacterByGenshinId(model.Id)
-	academyCharacter.Character = *model
-	repo.academyRepo.AddCharacter(academyCharacter)
+	academyCharacter.Character = model
+	result, err := repo.academyRepo.AddCharacter(academyCharacter)
+	if err != nil {
+		return genshin_models.Character{}, err
+	}
 
-	return nil
+	return result.Character, nil
 }
 
-func (repo PostgresGenshinCharacterRepository) UpdateCharacter(model *genshin_models.Character) error {
+func (repo PostgresGenshinCharacterRepository) UpdateCharacter(model genshin_models.Character) (genshin_models.Character, error) {
 	if model.Id == genshin_models.DEFAULT_ID {
-		return errors.EmptyId()
+		return genshin_models.Character{}, errors.EmptyId()
 	}
 
 	var academyCharacter, found = repo.academyRepo.FindCharacterByGenshinId(model.Id)
 	if !found {
-		return errors.CharacterNotFound(model.Id)
+		return genshin_models.Character{}, errors.CharacterNotFound(model.Id)
 	}
 
-	academyCharacter.Character = *model
-	repo.academyRepo.UpdateCharacter(academyCharacter)
+	academyCharacter.Character = model
+	result, err := repo.academyRepo.UpdateCharacter(academyCharacter)
 
-	return nil
+	if err != nil {
+		return genshin_models.Character{}, err
+	}
+
+	return result.Character, nil
 }

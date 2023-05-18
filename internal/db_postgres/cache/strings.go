@@ -45,7 +45,7 @@ func (cache *Cache) GetCharacterStrings(key db_models.DBKey) *CharacterStrings {
 	return val
 }
 
-func (cache *Cache) UpdateCharacterStrings(model *db_models.Character) *CharacterStrings {
+func (cache *Cache) UpdateCharacterStrings(model db_models.Character) *CharacterStrings {
 	var strings = cache.GetCharacterStrings(model.Id)
 
 	cache.Lock()

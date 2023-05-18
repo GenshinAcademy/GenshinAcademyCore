@@ -16,8 +16,8 @@ type CharacterRepository interface {
 	GetCharacterIds(parameters find_parameters.CharacterFindParameters) []models.ModelId
 	FindCharacterById(characterId models.ModelId) (models.Character, error)
 	FindCharacters(parameters find_parameters.CharacterFindParameters) []models.Character
-	AddCharacter(character *models.Character) error
-	UpdateCharacter(character *models.Character) error
+	AddCharacter(character models.Character) (models.Character, error)
+	UpdateCharacter(character models.Character) (models.Character, error)
 }
 
 type WeaponRepository interface {

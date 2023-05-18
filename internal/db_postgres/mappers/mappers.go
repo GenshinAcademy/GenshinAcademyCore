@@ -33,10 +33,10 @@ func CreateMapper(languageName string, language *academy_models.Language, cache 
 }
 
 // MapDbCharacterFromModel converts Core character model to DB character model.
-func (mapper Mapper) MapDbCharacterFromModel(model *academy_models.Character) *db_models.Character {
+func (mapper Mapper) MapDbCharacterFromModel(model academy_models.Character) db_models.Character {
 	var strings = mapper.cache.GetCharacterStrings(db_models.DBKey(model.Id))
 
-	var character = &db_models.Character{
+	var character = db_models.Character{
 		Id:          db_models.DBKey(model.Id),
 		CharacterId: db_models.GenshinKey(model.Character.Id),
 		Name:        *mapper.MapDbStringFromString(strings.Name, model.Name),
@@ -47,29 +47,29 @@ func (mapper Mapper) MapDbCharacterFromModel(model *academy_models.Character) *d
 		Rarity:      uint8(model.Rarity),
 		Weapon:      uint8(model.Weapon),
 	}
-	mapper.mapDbCharacterArrays(character, model)
+	mapper.mapDbCharacterArrays(&character, model)
 
 	return character
 }
 
 // MapAcademyCharacterFromDbModel converts DB character model to Academy character model.
-func (mapper Mapper) MapAcademyCharacterFromDbModel(model *db_models.Character) *academy_models.Character {
-	var character = &academy_models.Character{
+func (mapper Mapper) MapAcademyCharacterFromDbModel(model db_models.Character) academy_models.Character {
+	var character = academy_models.Character{
 		AcademyModel: academy_models.AcademyModel{
 			Id: academy_models.AcademyId(model.Id),
 		},
-		Character: *mapper.MapGenshinCharacterFromDbModel(model),
+		Character: mapper.MapGenshinCharacterFromDbModel(model),
 	}
-	mapper.mapAcademyCharacterArrays(character, model)
+	mapper.mapAcademyCharacterArrays(&character, model)
 	mapper.cache.UpdateCharacterStrings(model)
 
 	return character
 }
 
-func (mapper Mapper) mapDbCharacterArrays(model *db_models.Character, srcModel *academy_models.Character) {
+func (mapper Mapper) mapDbCharacterArrays(model *db_models.Character, srcModel academy_models.Character) {
 	// Genshin related
 	for i := 0; i < len(srcModel.Icons); i += 1 {
-		model.Icons = append(model.Icons, *mapper.MapDbCharacterIcon(db_models.DBKey(srcModel.Id), &srcModel.Icons[i]))
+		model.Icons = append(model.Icons, mapper.MapDbCharacterIcon(db_models.DBKey(srcModel.Id), srcModel.Icons[i]))
 	}
 
 	//Academy related
@@ -78,20 +78,20 @@ func (mapper Mapper) mapDbCharacterArrays(model *db_models.Character, srcModel *
 	}
 }
 
-func (mapper Mapper) mapAcademyCharacterArrays(model *academy_models.Character, srcModel *db_models.Character) {
+func (mapper Mapper) mapAcademyCharacterArrays(model *academy_models.Character, srcModel db_models.Character) {
 	for i := 0; i < len(srcModel.ArtifactProfits); i += 1 {
-		model.Profits = append(model.Profits, *mapper.MapArtifactStats(&srcModel.ArtifactProfits[i]))
+		model.Profits = append(model.Profits, mapper.MapArtifactStats(srcModel.ArtifactProfits[i]))
 	}
 }
 
-func (mapper Mapper) mapGenshinCharacterArrays(model *genshin_models.Character, srcModel *db_models.Character) {
+func (mapper Mapper) mapGenshinCharacterArrays(model *genshin_models.Character, srcModel db_models.Character) {
 	for i := 0; i < len(srcModel.Icons); i += 1 {
-		model.Icons = append(model.Icons, *mapper.MapCharacterIcon(&srcModel.Icons[i]))
+		model.Icons = append(model.Icons, mapper.MapCharacterIcon(srcModel.Icons[i]))
 	}
 }
 
 // MapGenshinCharacterFromDbModel converts DB character model to Core character model
-func (mapper Mapper) MapGenshinCharacterFromDbModel(model *db_models.Character) *genshin_models.Character {
+func (mapper Mapper) MapGenshinCharacterFromDbModel(model db_models.Character) genshin_models.Character {
 	var character = genshin_models.Character{
 		BaseModel: genshin_models.BaseModel{
 			Id: genshin_models.ModelId(model.CharacterId),
@@ -107,7 +107,7 @@ func (mapper Mapper) MapGenshinCharacterFromDbModel(model *db_models.Character) 
 	mapper.mapGenshinCharacterArrays(&character, model)
 	mapper.cache.UpdateCharacterStrings(model)
 
-	return &character
+	return character
 }
 
 // MapLanguageFromDbModel converts DB language model to language model
@@ -180,8 +180,8 @@ func (mapper Mapper) MapDbStringFromLocalizedString(model *localized_string.Loca
 	}
 }
 
-func (mapper Mapper) MapArtifactStats(model *db_models.ArtifactProfit) *artifact_profit.ArtifactProfit {
-	return &artifact_profit.ArtifactProfit{
+func (mapper Mapper) MapArtifactStats(model db_models.ArtifactProfit) artifact_profit.ArtifactProfit {
+	return artifact_profit.ArtifactProfit{
 		Slot:              artifact_profit.ProfitSlotFromNumber(artifact_profit.ProfitSlotNumber(model.SlotId)),
 		Attack:            artifact_profit.StatProfit(model.Attack),
 		AttackPercentage:  artifact_profit.StatProfit(model.AttackPercentage),
@@ -222,15 +222,15 @@ func (mapper Mapper) MapDbArtifactStats(parentId db_models.DBKey, model *artifac
 	}
 }
 
-func (mapper Mapper) MapCharacterIcon(model *db_models.CharacterIcon) *genshin_objects.CharacterIcon {
-	return &genshin_objects.CharacterIcon{
+func (mapper Mapper) MapCharacterIcon(model db_models.CharacterIcon) genshin_objects.CharacterIcon {
+	return genshin_objects.CharacterIcon{
 		Type: genshin_objects.CharacterIconType(model.IconType),
 		Url:  model.Url,
 	}
 }
 
-func (mapper Mapper) MapDbCharacterIcon(parentId db_models.DBKey, model *genshin_objects.CharacterIcon) *db_models.CharacterIcon {
-	return &db_models.CharacterIcon{
+func (mapper Mapper) MapDbCharacterIcon(parentId db_models.DBKey, model genshin_objects.CharacterIcon) db_models.CharacterIcon {
+	return db_models.CharacterIcon{
 		CharacterId: parentId,
 		IconType:    uint8(model.Type),
 		Url:         model.Url,
