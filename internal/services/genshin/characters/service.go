@@ -1,7 +1,6 @@
 package characters
 
 import (
-	"errors"
 	"ga/internal/academy_core"
 	"ga/internal/academy_core/repositories"
 	"ga/internal/services/genshin/characters/models"
@@ -37,12 +36,16 @@ func (service *Service) GetAll(c *gin.Context) {
 	var language = languages.GetLanguage(languages.ConvertStringsToLanguages(strings.Split(c.GetHeader("Accept-Languages"), ",")))
 
 	var characterRepo = service.core.AsGenshinCore().GetProvider(language).NewCharacterRepo()
-	var result = characterRepo.FindCharacters(
+	var result, err = characterRepo.FindCharacters(
 		find_parameters.CharacterFindParameters{
 			FindParameters: find_parameters.FindParameters{
 				SliceOptions: find_parameters.SliceParameters{
 					Offset: uint32(c.GetUint("offset")),
 					Limit:  uint32(c.GetUint("limit"))}}})
+
+	if err != nil {
+		c.JSON(http.StatusNotFound, gin.H{"error": err})
+	}
 
 	c.JSON(http.StatusOK,
 		result)
@@ -181,9 +184,9 @@ func addStrings(input gdb_models.Character, output *gc_models.Character) {
 
 func updateLocalizationFields(id gc_models.ModelId, requestData models.CharacterLocalized, repo repositories.ICharacterRepository, lang languages.Language) (gc_models.Character, error) {
 	// TODO: Error handling
-	result, ok := repo.FindCharacterByGenshinId(id)
-	if !ok {
-		return gc_models.Character{}, errors.New("character not found")
+	result, err := repo.FindCharacterByGenshinId(id)
+	if err != nil {
+		return gc_models.Character{}, err
 	}
 
 	if value, ok := requestData.Name[lang]; ok {

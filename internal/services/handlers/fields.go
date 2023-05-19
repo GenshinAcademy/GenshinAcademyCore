@@ -1,6 +1,7 @@
 package handlers
 
 import (
+	"fmt"
 	"ga/pkg/genshin_core/models/languages"
 	"reflect"
 	"strings"
@@ -53,6 +54,7 @@ func HasAnyFields(fieldsStruct interface{}) gin.H {
 		tag := v.Type().Field(i).Tag.Get("ga")
 
 		if strings.Contains(tag, "required") {
+			fmt.Println(tag)
 			requiredFields++
 			if field.IsZero() || (field.Kind() == reflect.Ptr && field.IsNil()) {
 				emptyFields = append(emptyFields, jsonName)
@@ -62,7 +64,7 @@ func HasAnyFields(fieldsStruct interface{}) gin.H {
 		}
 	}
 
-	if len(emptyFields) == requiredFields {
+	if len(emptyFields) == requiredFields && requiredFields > 0 {
 		return buildError("at least one field is required", emptyFields)
 	}
 

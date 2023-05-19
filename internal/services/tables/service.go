@@ -10,7 +10,6 @@ import (
 	"ga/pkg/genshin_core/models/languages"
 	gFindParameters "ga/pkg/genshin_core/repositories/find_parameters"
 
-	"errors"
 	"net/http"
 	"strconv"
 	"strings"
@@ -34,11 +33,18 @@ func (service *Service) GetAll(c *gin.Context) {
 	var language = languages.GetLanguage(languages.ConvertStringsToLanguages(strings.Split(c.GetHeader("Accept-Languages"), ",")))
 
 	var tablesRepo = service.core.GetProvider(language).CreateTableRepo()
-	var result = tablesRepo.FindTables(
+	var result, err = tablesRepo.FindTables(
 		find_parameters.TableFindParameters{
 			SliceOptions: gFindParameters.SliceParameters{
 				Offset: uint32(c.GetUint("offset")),
 				Limit:  uint32(c.GetUint("limit"))}})
+
+	if err != nil {
+		c.JSON(http.StatusNotFound, gin.H{
+			"error":   "tables not found",
+			"message": err.Error(),
+		})
+	}
 
 	var tables []academyModels.Table = result
 
@@ -63,7 +69,10 @@ func (service *Service) Create(c *gin.Context) {
 	// Read request body
 	var requestData models.TablesLocalized
 	if err := c.BindJSON(&requestData); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "invalid request data"})
+		c.JSON(http.StatusBadRequest, gin.H{
+			"error":   "invalid request data",
+			"message": err.Error(),
+		})
 		return
 	}
 
@@ -87,13 +96,16 @@ func (service *Service) Create(c *gin.Context) {
 
 	// Add to database
 	var results []academyModels.Table
-	result, err := defaultRepo.AddTable(&table)
+	result, err := defaultRepo.AddTable(table)
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "failed to create table", "message": err.Error()})
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"error":   "failed to create table",
+			"message": err.Error(),
+		})
 		return
 	}
 
-	results = append(results, *result)
+	results = append(results, result)
 
 	// Update localization fields
 	if len(requestData.Title) > 0 || len(requestData.Description) > 0 {
@@ -105,13 +117,16 @@ func (service *Service) Create(c *gin.Context) {
 				if err != nil {
 					errChan <- err
 				}
-				results = append(results, *result)
+				results = append(results, result)
 				errChan <- nil
 			}(result.Id, requestData, repo, lang)
 		}
 		for range tablesRepos {
 			if err := <-errChan; err != nil {
-				c.JSON(http.StatusInternalServerError, gin.H{"error": "failed to update localization fields", "message": err.Error()})
+				c.JSON(http.StatusInternalServerError, gin.H{
+					"error":   "failed to update localization",
+					"message": err.Error(),
+				})
 				return
 			}
 		}
@@ -137,7 +152,10 @@ func (service *Service) Update(c *gin.Context) {
 	// Get tables ID
 	id, err := strconv.Atoi(c.Param("id"))
 	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "invalid id"})
+		c.JSON(http.StatusBadRequest, gin.H{
+			"error":   "invalid id",
+			"message": err.Error(),
+		})
 		return
 	}
 
@@ -145,7 +163,10 @@ func (service *Service) Update(c *gin.Context) {
 	var requestData models.TablesLocalized
 	err = c.BindJSON(&requestData)
 	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "invalid request data"})
+		c.JSON(http.StatusBadRequest, gin.H{
+			"error":   "invalid request data",
+			"message": err.Error(),
+		})
 		return
 	}
 
@@ -156,7 +177,14 @@ func (service *Service) Update(c *gin.Context) {
 
 	// Update general fields
 	defaultRepo := service.core.GetProvider(&languages.DefaultLanguage).CreateTableRepo()
-	table := defaultRepo.FindTableById(academyModels.AcademyId(id))
+	table, err := defaultRepo.FindTableById(academyModels.AcademyId(id))
+	if err != nil {
+		c.JSON(http.StatusNotFound, gin.H{
+			"error":   "tables not found",
+			"message": err.Error(),
+		})
+	}
+
 	if value, ok := requestData.Title[languages.DefaultLanguage]; ok {
 		table.Title = value
 	}
@@ -175,10 +203,13 @@ func (service *Service) Update(c *gin.Context) {
 	var results []academyModels.Table
 	result, err := defaultRepo.UpdateTable(table)
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "failed to update table", "message": err.Error()})
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"error":   "failed to update table",
+			"message": err.Error(),
+		})
 		return
 	}
-	results = append(results, *result)
+	results = append(results, result)
 
 	// Update localization fields
 	if len(requestData.Title) > 0 || len(requestData.Description) > 0 {
@@ -190,13 +221,16 @@ func (service *Service) Update(c *gin.Context) {
 				if err != nil {
 					errChan <- err
 				}
-				results = append(results, *result)
+				results = append(results, result)
 				errChan <- nil
 			}(academyModels.AcademyId(id), requestData, repo, lang)
 		}
 		for range tablesRepos {
 			if err := <-errChan; err != nil {
-				c.JSON(http.StatusInternalServerError, gin.H{"error": "failed to update localization fields", "message": err.Error()})
+				c.JSON(http.StatusInternalServerError, gin.H{
+					"error":   "failed to update localization fields",
+					"message": err.Error(),
+				})
 				return
 			}
 		}
@@ -207,10 +241,10 @@ func (service *Service) Update(c *gin.Context) {
 
 // TODO: Delete table
 
-func updateLocalizationFields(id academyModels.AcademyId, requestData models.TablesLocalized, repo repositories.ITableRepository, lang languages.Language) (*academyModels.Table, error) {
-	result := repo.FindTableById(id)
-	if result == nil {
-		return nil, errors.New("table not found")
+func updateLocalizationFields(id academyModels.AcademyId, requestData models.TablesLocalized, repo repositories.ITableRepository, lang languages.Language) (academyModels.Table, error) {
+	result, err := repo.FindTableById(id)
+	if err != nil {
+		return academyModels.Table{}, err
 	}
 
 	if value, ok := requestData.Title[lang]; ok {
@@ -227,7 +261,7 @@ func updateLocalizationFields(id academyModels.AcademyId, requestData models.Tab
 
 	newResult, err := repo.UpdateTable(result)
 	if err != nil {
-		return nil, err
+		return academyModels.Table{}, err
 	}
 
 	return newResult, nil

@@ -13,20 +13,20 @@ type Repository interface {
 
 type CharacterRepository interface {
 	Repository
-	GetCharacterIds(parameters find_parameters.CharacterFindParameters) []models.ModelId
+	GetCharacterIds(parameters find_parameters.CharacterFindParameters) ([]models.ModelId, error)
 	FindCharacterById(characterId models.ModelId) (models.Character, error)
-	FindCharacters(parameters find_parameters.CharacterFindParameters) []models.Character
+	FindCharacters(parameters find_parameters.CharacterFindParameters) ([]models.Character, error)
 	AddCharacter(character models.Character) (models.Character, error)
 	UpdateCharacter(character models.Character) (models.Character, error)
 }
 
 type WeaponRepository interface {
 	Repository
-	GetWeaponIds(parameters find_parameters.WeaponFindParameters) []models.ModelId
+	GetWeaponIds(parameters find_parameters.WeaponFindParameters) ([]models.ModelId, error)
 	FindWeaponById(weaponId models.ModelId) (models.Weapon, error)
-	FindWeapons(find_parameters.WeaponFindParameters) []models.Weapon
-	AddWeapon(weapon *models.Weapon) error
-	UpdateWeapon(weapon *models.Weapon) error
+	FindWeapons(find_parameters.WeaponFindParameters) ([]models.Weapon, error)
+	AddWeapon(weapon models.Weapon) (models.Weapon, error)
+	UpdateWeapon(weapon models.Weapon) (models.Weapon, error)
 }
 
 type CharacterIconRepository interface {

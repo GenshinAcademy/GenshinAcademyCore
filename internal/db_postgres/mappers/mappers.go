@@ -237,7 +237,7 @@ func (mapper Mapper) MapDbCharacterIcon(parentId db_models.DBKey, model genshin_
 	}
 }
 
-func (mapper Mapper) MapNewsFromDbModel(model *db_models.News) *academy_models.News {
+func (mapper Mapper) MapNewsFromDbModel(model db_models.News) academy_models.News {
 	var modelNews = academy_models.News{
 		AcademyModel: academy_models.AcademyModel{
 			Id: academy_models.AcademyId(model.Id),
@@ -250,13 +250,13 @@ func (mapper Mapper) MapNewsFromDbModel(model *db_models.News) *academy_models.N
 	}
 	mapper.cache.UpdateNewsStrings(model)
 
-	return &modelNews
+	return modelNews
 }
 
-func (mapper Mapper) MapDbNewsFromModel(model *academy_models.News) *db_models.News {
+func (mapper Mapper) MapDbNewsFromModel(model academy_models.News) db_models.News {
 	var newsStrings = mapper.cache.GetNewsStrings(db_models.DBKey(model.Id))
 
-	return &db_models.News{
+	return db_models.News{
 		Id:          db_models.DBKey(model.Id),
 		Title:       *mapper.MapDbStringFromString(newsStrings.Title, model.Title),
 		Description: *mapper.MapDbStringFromString(newsStrings.Description, model.Description),
@@ -266,7 +266,7 @@ func (mapper Mapper) MapDbNewsFromModel(model *academy_models.News) *db_models.N
 	}
 }
 
-func (mapper Mapper) MapTableFromDbModel(model *db_models.Table) *academy_models.Table {
+func (mapper Mapper) MapTableFromDbModel(model db_models.Table) academy_models.Table {
 	var modelNews = academy_models.Table{
 		AcademyModel: academy_models.AcademyModel{
 			Id: academy_models.AcademyId(model.Id),
@@ -278,13 +278,13 @@ func (mapper Mapper) MapTableFromDbModel(model *db_models.Table) *academy_models
 	}
 	mapper.cache.UpdateTableStrings(model)
 
-	return &modelNews
+	return modelNews
 }
 
-func (mapper Mapper) MapDbTableFromModel(model *academy_models.Table) *db_models.Table {
+func (mapper Mapper) MapDbTableFromModel(model academy_models.Table) db_models.Table {
 	var tableStrings = mapper.cache.GetTableStrings(db_models.DBKey(model.Id))
 
-	return &db_models.Table{
+	return db_models.Table{
 		Id:          db_models.DBKey(model.Id),
 		Title:       *mapper.MapDbStringFromString(tableStrings.Title, model.Title),
 		Description: *mapper.MapDbStringFromString(tableStrings.Description, model.Description),
@@ -308,10 +308,10 @@ func (mapper Mapper) MapDbWeaponIcon(parentId db_models.DBKey, model *genshin_ob
 	}
 }
 
-func (mapper Mapper) MapDbWeaponFromModel(model *academy_models.Weapon) *db_models.Weapon {
+func (mapper Mapper) MapDbWeaponFromModel(model academy_models.Weapon) db_models.Weapon {
 	var strings = mapper.cache.GetWeaponStrings(db_models.DBKey(model.Id))
 
-	var weapon = &db_models.Weapon{
+	var weapon = db_models.Weapon{
 		Id:                db_models.DBKey(model.Id),
 		WeaponId:          db_models.GenshinKey(model.Weapon.Id),
 		Name:              *mapper.MapDbStringFromString(strings.Name, model.Name),
@@ -327,26 +327,27 @@ func (mapper Mapper) MapDbWeaponFromModel(model *academy_models.Weapon) *db_mode
 		Type:              uint8(model.WeaponType),
 		Icons:             make([]db_models.WeaponIcon, 0),
 	}
-	mapper.mapDbWeaponArrays(weapon, model)
+	mapper.mapDbWeaponArrays(&weapon, model)
 
 	return weapon
 }
 
 // MapAcademyWeaponFromDbModel converts DB character model to Academy character model.
-func (mapper Mapper) MapAcademyWeaponFromDbModel(model *db_models.Weapon) *academy_models.Weapon {
-	var weapon = &academy_models.Weapon{
+func (mapper Mapper) MapAcademyWeaponFromDbModel(model db_models.Weapon) academy_models.Weapon {
+	var weapon = academy_models.Weapon{
 		AcademyModel: academy_models.AcademyModel{
 			Id: academy_models.AcademyId(model.Id),
 		},
-		Weapon: *mapper.MapGenshinWeaponFromDbModel(model),
+		Weapon: mapper.MapGenshinWeaponFromDbModel(model),
 	}
-	mapper.mapAcademyWeaponArrays(weapon, model)
+
+	mapper.mapAcademyWeaponArrays(&weapon, model)
 	mapper.cache.UpdateWeaponStrings(model)
 
 	return weapon
 }
 
-func (mapper Mapper) mapDbWeaponArrays(model *db_models.Weapon, srcModel *academy_models.Weapon) {
+func (mapper Mapper) mapDbWeaponArrays(model *db_models.Weapon, srcModel academy_models.Weapon) {
 	// Genshin related
 	for i := 0; i < len(srcModel.Icons); i += 1 {
 		model.Icons = append(model.Icons, *mapper.MapDbWeaponIcon(db_models.DBKey(srcModel.Id), &srcModel.Icons[i]))
@@ -355,17 +356,19 @@ func (mapper Mapper) mapDbWeaponArrays(model *db_models.Weapon, srcModel *academ
 	//Academy related
 }
 
-func (mapper Mapper) mapAcademyWeaponArrays(model *academy_models.Weapon, srcModel *db_models.Weapon) {
+// TODO: implement
+func (mapper Mapper) mapAcademyWeaponArrays(model *academy_models.Weapon, srcModel db_models.Weapon) {
+	panic("not implemented")
 }
 
-func (mapper Mapper) mapGenshinWeaponArrays(model *genshin_models.Weapon, srcModel *db_models.Weapon) {
+func (mapper Mapper) mapGenshinWeaponArrays(model *genshin_models.Weapon, srcModel db_models.Weapon) {
 	for i := 0; i < len(srcModel.Icons); i += 1 {
 		model.Icons = append(model.Icons, *mapper.MapWeaponIcon(&srcModel.Icons[i]))
 	}
 }
 
 // MapGenshinCharacterFromDbModel converts DB character model to Core character model
-func (mapper Mapper) MapGenshinWeaponFromDbModel(model *db_models.Weapon) *genshin_models.Weapon {
+func (mapper Mapper) MapGenshinWeaponFromDbModel(model db_models.Weapon) genshin_models.Weapon {
 	var weapon = genshin_models.Weapon{
 		BaseModel: genshin_models.BaseModel{
 			Id: genshin_models.ModelId(model.WeaponId),
@@ -386,5 +389,5 @@ func (mapper Mapper) MapGenshinWeaponFromDbModel(model *db_models.Weapon) *gensh
 	mapper.mapGenshinWeaponArrays(&weapon, model)
 	mapper.cache.UpdateWeaponStrings(model)
 
-	return &weapon
+	return weapon
 }

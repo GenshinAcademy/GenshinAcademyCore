@@ -10,7 +10,6 @@ import (
 	"ga/pkg/genshin_core/models/languages"
 	gFindParameters "ga/pkg/genshin_core/repositories/find_parameters"
 
-	"errors"
 	"net/http"
 	"strconv"
 	"strings"
@@ -36,12 +35,16 @@ func (service *Service) GetAll(c *gin.Context) {
 	// TODO: GetProvider should return error if provider is not found
 	var newsRepo = service.core.GetProvider(language).CreateNewsRepo()
 
-	var result = newsRepo.FindNews(
+	var result, err = newsRepo.FindNews(
 		find_parameters.NewsFindParameters{
 			SortOptions: find_parameters.NewsSortParameters{CreatedTimeSort: find_parameters.SortByDescending},
 			SliceOptions: gFindParameters.SliceParameters{
 				Offset: uint32(c.GetUint("offset")),
 				Limit:  uint32(c.GetUint("limit"))}})
+
+	if err != nil {
+		c.JSON(http.StatusNotFound, gin.H{"error": err})
+	}
 
 	var news []academyModels.News = result
 
@@ -91,13 +94,13 @@ func (service *Service) Create(c *gin.Context) {
 
 	// Add to database
 	var results []academyModels.News
-	result, err := defaultRepo.AddNews(&news)
+	result, err := defaultRepo.AddNews(news)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "failed to create news", "message": err.Error()})
 		return
 	}
 
-	results = append(results, *result)
+	results = append(results, result)
 
 	// Update localization fields
 	if len(requestData.Title) > 0 || len(requestData.Description) > 0 {
@@ -109,7 +112,7 @@ func (service *Service) Create(c *gin.Context) {
 				if err != nil {
 					errChan <- err
 				}
-				results = append(results, *res)
+				results = append(results, res)
 				errChan <- nil
 			}(result.Id, requestData, repo, lang)
 		}
@@ -160,7 +163,11 @@ func (service *Service) Update(c *gin.Context) {
 
 	// Update general fields
 	defaultRepo := service.core.GetProvider(&languages.DefaultLanguage).CreateNewsRepo()
-	news := defaultRepo.FindNewsById(academyModels.AcademyId(id))
+	news, err := defaultRepo.FindNewsById(academyModels.AcademyId(id))
+	if err != nil {
+		c.JSON(http.StatusNotFound, gin.H{"error": err})
+	}
+
 	if !requestData.CreatedAt.IsZero() {
 		news.CreatedAt = requestData.CreatedAt
 	}
@@ -185,7 +192,7 @@ func (service *Service) Update(c *gin.Context) {
 		return
 	}
 
-	results = append(results, *result)
+	results = append(results, result)
 
 	// Update localization fields
 	if len(requestData.Title) > 0 || len(requestData.Description) > 0 {
@@ -197,7 +204,7 @@ func (service *Service) Update(c *gin.Context) {
 				if err != nil {
 					errChan <- err
 				}
-				results = append(results, *res)
+				results = append(results, res)
 				errChan <- nil
 			}(academyModels.AcademyId(id), requestData, repo, lang)
 		}
@@ -215,13 +222,13 @@ func (service *Service) Update(c *gin.Context) {
 
 // TODO: Delete news
 
-func updateLocalizationFields(id academyModels.AcademyId, requestData models.NewsLocalized, repo repositories.INewsRepository, lang languages.Language) (*academyModels.News, error) {
+func updateLocalizationFields(id academyModels.AcademyId, requestData models.NewsLocalized, repo repositories.INewsRepository, lang languages.Language) (academyModels.News, error) {
 	// TODO: Error handling
 	// BUG: panic: runtime error: invalid memory address or nil pointer dereference
 	// [signal 0xc0000005 code=0x0 addr=0x18 pc=0x30d5bf]
-	result := repo.FindNewsById(id)
-	if result == nil {
-		return nil, errors.New("news not found")
+	result, err := repo.FindNewsById(id)
+	if err != nil {
+		return academyModels.News{}, err
 	}
 
 	if value, ok := requestData.Title[lang]; ok {
@@ -242,7 +249,7 @@ func updateLocalizationFields(id academyModels.AcademyId, requestData models.New
 
 	newResult, err := repo.UpdateNews(result)
 	if err != nil {
-		return nil, err
+		return academyModels.News{}, err
 	}
 
 	return newResult, nil

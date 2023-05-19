@@ -116,7 +116,7 @@ func main() {
 
 	for _, character := range characters {
 		char := convertCharacter(character)
-		characterRepoEn.AddCharacter(&char)
+		characterRepoEn.AddCharacter(char)
 		ruCharFromRepo, _ := characterRepoRu.FindCharacterById(char.Id)
 
 		charRu, err := apiRu.GetCharacter(char.Name)
@@ -126,7 +126,7 @@ func main() {
 
 		addStrings(charRu, &ruCharFromRepo)
 
-		characterRepoRu.UpdateCharacter(&ruCharFromRepo)
+		characterRepoRu.UpdateCharacter(ruCharFromRepo)
 	}
 }
 
@@ -136,7 +136,7 @@ func convertCharacter(input gdb_models.CharacterWeb) (output gc_models.Character
 
 	addStrings(input, &output)
 
-	switch input.Element {
+	switch input.ElementText {
 	case "Geo":
 		output.Element = gc_enums.Geo
 	case "Dendro":
@@ -156,13 +156,13 @@ func convertCharacter(input gdb_models.CharacterWeb) (output gc_models.Character
 	}
 
 	switch input.Rarity {
-	case "5":
+	case 5:
 		output.Rarity = gc_enums.Legendary
 	default:
 		output.Rarity = gc_enums.Epic
 	}
 
-	switch input.Weapontype {
+	switch input.WeaponText {
 	case "Sword":
 		output.Weapon = gc_enums.Sword
 	case "Bow":
@@ -183,7 +183,6 @@ func convertCharacter(input gdb_models.CharacterWeb) (output gc_models.Character
 
 func addStrings(input gdb_models.CharacterWeb, output *gc_models.Character) {
 	output.Name = input.Name
-	output.FullName = input.FullName
 	output.Description = input.Description
 	output.Title = input.Title
 }

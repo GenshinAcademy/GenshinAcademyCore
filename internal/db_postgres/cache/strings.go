@@ -74,7 +74,7 @@ func (cache *Cache) GetNewsStrings(key db_models.DBKey) *NewsStrings {
 	return val
 }
 
-func (cache *Cache) UpdateNewsStrings(model *db_models.News) *NewsStrings {
+func (cache *Cache) UpdateNewsStrings(model db_models.News) *NewsStrings {
 	var strings = cache.GetNewsStrings(model.Id)
 
 	cache.Lock()
@@ -103,7 +103,7 @@ func (cache *Cache) GetTableStrings(key db_models.DBKey) *TableStrings {
 	return val
 }
 
-func (cache *Cache) UpdateTableStrings(model *db_models.Table) *TableStrings {
+func (cache *Cache) UpdateTableStrings(model db_models.Table) *TableStrings {
 	var strings = cache.GetTableStrings(model.Id)
 
 	cache.Lock()
@@ -131,7 +131,7 @@ func (cache *Cache) GetWeaponStrings(key db_models.DBKey) *WeaponStrings {
 	return val
 }
 
-func (cache *Cache) UpdateWeaponStrings(model *db_models.Weapon) *WeaponStrings {
+func (cache *Cache) UpdateWeaponStrings(model db_models.Weapon) *WeaponStrings {
 	var strings = cache.GetWeaponStrings(model.Id)
 
 	cache.Lock()

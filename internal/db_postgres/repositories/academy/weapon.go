@@ -53,18 +53,22 @@ func (repo PostgresWeaponRepository) GetPreloads() []string {
 	return weaponPreloads
 }
 
-func (repo PostgresWeaponRepository) GetWeaponIds(parameters find_parameters.WeaponFindParameters) []genshin_models.ModelId {
+func (repo PostgresWeaponRepository) GetWeaponIds(parameters find_parameters.WeaponFindParameters) ([]genshin_models.ModelId, error) {
 	var weaponNames []db_models.Weapon
-	repo.gormConnection.Select([]string{"weapon_id"}, &weaponNames)
+	if err := repo.gormConnection.Select([]string{"weapon_id"}, &weaponNames).Error; err != nil {
+		return nil, err
+	}
+
 	var result = make([]genshin_models.ModelId, 0)
 	for _, weapon := range weaponNames {
 		result = append(result, genshin_models.ModelId(weapon.WeaponId))
 	}
-	return result
+
+	return result, nil
 }
 
-func (repo PostgresWeaponRepository) FindWeaponById(id academy_models.AcademyId) *academy_models.Weapon {
-	var weapon *db_models.Weapon
+func (repo PostgresWeaponRepository) FindWeaponById(id academy_models.AcademyId) (academy_models.Weapon, error) {
+	var weapon db_models.Weapon
 	var ids = make([]academy_models.AcademyId, 1)
 	ids[0] = id
 
@@ -73,24 +77,29 @@ func (repo PostgresWeaponRepository) FindWeaponById(id academy_models.AcademyId)
 		FilterById(repo, ids).
 		GetConnection()
 
-	connection.Find(&weapon)
+	if err := connection.Find(&weapon).Error; err != nil {
+		return academy_models.Weapon{}, err
+	}
 
-	return repo.mapper.MapAcademyWeaponFromDbModel(weapon)
+	return repo.mapper.MapAcademyWeaponFromDbModel(weapon), nil
 }
 
-func (repo PostgresWeaponRepository) FindWeaponByGenshinId(weaponId genshin_models.ModelId) (*academy_models.Weapon, bool) {
-	var selectedWeapon *db_models.Weapon
+func (repo PostgresWeaponRepository) FindWeaponByGenshinId(weaponId genshin_models.ModelId) (academy_models.Weapon, error) {
+	var selectedWeapon db_models.Weapon
 
 	var connection = repositories.CreateQueryBuilder(repo.GetConnection()).
 		PreloadAll(repo).
 		GetConnection().
 		Where("weapon_id = ?", weaponId)
-	connection.First(selectedWeapon)
 
-	return repo.mapper.MapAcademyWeaponFromDbModel(selectedWeapon), selectedWeapon.Id != db_models.DBKey(academy_models.UNDEFINED_ID)
+	if err := connection.First(&selectedWeapon).Error; err != nil {
+		return academy_models.Weapon{}, nil
+	}
+
+	return repo.mapper.MapAcademyWeaponFromDbModel(selectedWeapon), nil
 }
 
-func (repo PostgresWeaponRepository) FindWeapons(parameters find_parameters.WeaponFindParameters) []academy_models.Weapon {
+func (repo PostgresWeaponRepository) FindWeapons(parameters find_parameters.WeaponFindParameters) ([]academy_models.Weapon, error) {
 	var selectedWeapons []db_models.Weapon = make([]db_models.Weapon, 0)
 
 	var queryBuilder = repositories.CreateQueryBuilder(repo.GetConnection()).
@@ -103,28 +112,27 @@ func (repo PostgresWeaponRepository) FindWeapons(parameters find_parameters.Weap
 		queryBuilder = queryBuilder.Slice(&parameters.SliceOptions)
 	}
 
-	queryBuilder.GetConnection().Find(&selectedWeapons)
+	if err := queryBuilder.GetConnection().Find(&selectedWeapons).Error; err != nil {
+		return nil, err
+	}
 
 	var resultWeapons = make([]academy_models.Weapon, len(selectedWeapons))
 	for index, weapon := range selectedWeapons {
-		resultWeapons[index] = *repo.mapper.MapAcademyWeaponFromDbModel(&weapon)
+		resultWeapons[index] = repo.mapper.MapAcademyWeaponFromDbModel(weapon)
 	}
 
-	return resultWeapons
+	return resultWeapons, nil
 }
 
-func (repo PostgresWeaponRepository) AddWeapon(weapon *academy_models.Weapon) (*academy_models.Weapon, error) {
-	if weapon == nil {
-		return nil, errors.New("null value provided")
-	}
-
+func (repo PostgresWeaponRepository) AddWeapon(weapon academy_models.Weapon) (academy_models.Weapon, error) {
 	var dbWeapon = repo.mapper.MapDbWeaponFromModel(weapon)
 
 	var connection = repositories.CreateQueryBuilder(repo.GetConnection()).
 		PreloadAll(repo).
 		GetConnection()
+
 	if err := connection.Create(&dbWeapon).Error; err != nil {
-		return nil, err
+		return academy_models.Weapon{}, err
 	}
 	result := repo.mapper.MapAcademyWeaponFromDbModel(dbWeapon)
 
@@ -133,12 +141,9 @@ func (repo PostgresWeaponRepository) AddWeapon(weapon *academy_models.Weapon) (*
 	return result, nil
 }
 
-func (repo PostgresWeaponRepository) UpdateWeapon(weapon *academy_models.Weapon) (*academy_models.Weapon, error) {
-	if weapon == nil {
-		return nil, errors.New("null value provided")
-	}
+func (repo PostgresWeaponRepository) UpdateWeapon(weapon academy_models.Weapon) (academy_models.Weapon, error) {
 	if weapon.Id == academy_models.UNDEFINED_ID {
-		return nil, errors.New("not existing weapon provided")
+		return academy_models.Weapon{}, errors.New("not existing weapon provided")
 	}
 
 	var dbWeapon = repo.mapper.MapDbWeaponFromModel(weapon)
@@ -146,12 +151,14 @@ func (repo PostgresWeaponRepository) UpdateWeapon(weapon *academy_models.Weapon)
 	var connection = repositories.CreateUpdateQueryBuilder(repo.GetConnection()).
 		PreloadAll(repo).
 		GetConnection()
-	if err := connection.Save(dbWeapon).Error; err != nil {
-		return nil, err
+
+	if err := connection.Save(&dbWeapon).Error; err != nil {
+		return academy_models.Weapon{}, err
 	}
 
 	db_postgres.GetCache().UpdateWeaponStrings(dbWeapon)
 
 	weapon.Id = academy_models.AcademyId(dbWeapon.Id)
+
 	return weapon, nil
 }

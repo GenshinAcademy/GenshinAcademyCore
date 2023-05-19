@@ -48,8 +48,8 @@ func (repo PostgresTableRepository) GetPreloads() []string {
 	return tablePreloads
 }
 
-func (repo PostgresTableRepository) FindTableById(id academy_models.AcademyId) *academy_models.Table {
-	var table *db_models.Table
+func (repo PostgresTableRepository) FindTableById(id academy_models.AcademyId) (academy_models.Table, error) {
+	var table db_models.Table
 	var ids = make([]academy_models.AcademyId, 1)
 	ids[0] = id
 
@@ -58,12 +58,14 @@ func (repo PostgresTableRepository) FindTableById(id academy_models.AcademyId) *
 		FilterById(repo, ids).
 		GetConnection()
 
-	connection.Find(&table)
+	if err := connection.Find(&table).Error; err != nil {
+		return academy_models.Table{}, err
+	}
 
-	return repo.mapper.MapTableFromDbModel(table)
+	return repo.mapper.MapTableFromDbModel(table), nil
 }
 
-func (repo PostgresTableRepository) FindTables(parameters find_parameters.TableFindParameters) []academy_models.Table {
+func (repo PostgresTableRepository) FindTables(parameters find_parameters.TableFindParameters) ([]academy_models.Table, error) {
 	var selectedTables []db_models.Table = make([]db_models.Table, 0)
 
 	var queryBuilder = repositories.CreateQueryBuilder(repo.GetConnection()).
@@ -79,28 +81,26 @@ func (repo PostgresTableRepository) FindTables(parameters find_parameters.TableF
 		queryBuilder = queryBuilder.Slice(&parameters.SliceOptions)
 	}
 
-	queryBuilder.GetConnection().Find(&selectedTables)
+	if err := queryBuilder.GetConnection().Find(&selectedTables).Error; err != nil {
+		return nil, err
+	}
 
 	var resultTables = make([]academy_models.Table, len(selectedTables))
 	for index, table := range selectedTables {
-		resultTables[index] = *repo.mapper.MapTableFromDbModel(&table)
+		resultTables[index] = repo.mapper.MapTableFromDbModel(table)
 	}
 
-	return resultTables
+	return resultTables, nil
 }
 
-func (repo PostgresTableRepository) AddTable(table *academy_models.Table) (*academy_models.Table, error) {
-	if table == nil {
-		return nil, errors.New("null value provided")
-	}
-
+func (repo PostgresTableRepository) AddTable(table academy_models.Table) (academy_models.Table, error) {
 	var dbTable = repo.mapper.MapDbTableFromModel(table)
 
 	var connection = repositories.CreateQueryBuilder(repo.GetConnection()).
 		PreloadAll(repo).
 		GetConnection()
 	if err := connection.Create(&dbTable).Error; err != nil {
-		return nil, err
+		return academy_models.Table{}, err
 	}
 	result := repo.mapper.MapTableFromDbModel(dbTable)
 
@@ -109,12 +109,9 @@ func (repo PostgresTableRepository) AddTable(table *academy_models.Table) (*acad
 	return result, nil
 }
 
-func (repo PostgresTableRepository) UpdateTable(table *academy_models.Table) (*academy_models.Table, error) {
-	if table == nil {
-		return nil, errors.New("null value provided")
-	}
+func (repo PostgresTableRepository) UpdateTable(table academy_models.Table) (academy_models.Table, error) {
 	if table.Id == academy_models.UNDEFINED_ID {
-		return nil, errors.New("not existing table provided")
+		return academy_models.Table{}, errors.New("not existing table provided")
 	}
 
 	var dbTable = repo.mapper.MapDbTableFromModel(table)
@@ -122,8 +119,8 @@ func (repo PostgresTableRepository) UpdateTable(table *academy_models.Table) (*a
 	var connection = repositories.CreateUpdateQueryBuilder(repo.GetConnection()).
 		PreloadAll(repo).
 		GetConnection()
-	if err := connection.Save(dbTable).Error; err != nil {
-		return nil, err
+	if err := connection.Save(&dbTable).Error; err != nil {
+		return academy_models.Table{}, err
 	}
 
 	db_postgres.GetCache().UpdateTableStrings(dbTable)

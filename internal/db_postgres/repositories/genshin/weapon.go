@@ -26,7 +26,7 @@ func (repo PostgresGenshinWeaponRepository) GetLanguage() *languages.Language {
 	return &result
 }
 
-func (repo PostgresGenshinWeaponRepository) GetWeaponIds(parameters find_parameters.WeaponFindParameters) []genshin_models.ModelId {
+func (repo PostgresGenshinWeaponRepository) GetWeaponIds(parameters find_parameters.WeaponFindParameters) ([]genshin_models.ModelId, error) {
 	var academyParams = academy_find_parameters.WeaponFindParameters{
 		WeaponFindParameters: parameters,
 	}
@@ -35,52 +35,62 @@ func (repo PostgresGenshinWeaponRepository) GetWeaponIds(parameters find_paramet
 }
 
 func (repo PostgresGenshinWeaponRepository) FindWeaponById(weaponId genshin_models.ModelId) (genshin_models.Weapon, error) {
-	var weapon, found = repo.academyRepo.FindWeaponByGenshinId(weaponId)
-	if !found {
+	var weapon, err = repo.academyRepo.FindWeaponByGenshinId(weaponId)
+	if err != nil {
 		return genshin_models.Weapon{}, errors.WeaponNotFound(weaponId)
 	}
 
 	return weapon.Weapon, nil
 }
 
-func (repo PostgresGenshinWeaponRepository) FindWeapons(parameters find_parameters.WeaponFindParameters) []genshin_models.Weapon {
+func (repo PostgresGenshinWeaponRepository) FindWeapons(parameters find_parameters.WeaponFindParameters) ([]genshin_models.Weapon, error) {
 	var weapons = make([]genshin_models.Weapon, 0)
 	var academyParams = academy_find_parameters.WeaponFindParameters{
 		WeaponFindParameters: parameters,
 	}
 
-	var academyWeapons = repo.academyRepo.FindWeapons(academyParams)
+	var academyWeapons, err = repo.academyRepo.FindWeapons(academyParams)
+	if err != nil {
+		return nil, err
+	}
+
 	for i := 0; i < len(academyWeapons); i += 1 {
 		weapons = append(weapons, academyWeapons[i].Weapon)
 	}
 
-	return weapons
+	return weapons, nil
 }
 
-func (repo PostgresGenshinWeaponRepository) AddWeapon(model *genshin_models.Weapon) error {
+func (repo PostgresGenshinWeaponRepository) AddWeapon(model genshin_models.Weapon) (genshin_models.Weapon, error) {
 	if model.Id == genshin_models.DEFAULT_ID {
-		return errors.EmptyId()
+		return genshin_models.Weapon{}, errors.EmptyId()
 	}
 
 	var academyWeapon, _ = repo.academyRepo.FindWeaponByGenshinId(model.Id)
-	academyWeapon.Weapon = *model
-	repo.academyRepo.AddWeapon(academyWeapon)
+	academyWeapon.Weapon = model
+	result, err := repo.academyRepo.AddWeapon(academyWeapon)
+	if err != nil {
+		return genshin_models.Weapon{}, err
+	}
 
-	return nil
+	return result.Weapon, nil
 }
 
-func (repo PostgresGenshinWeaponRepository) UpdateWeapon(model *genshin_models.Weapon) error {
+func (repo PostgresGenshinWeaponRepository) UpdateWeapon(model genshin_models.Weapon) (genshin_models.Weapon, error) {
 	if model.Id == genshin_models.DEFAULT_ID {
-		return errors.EmptyId()
+		return genshin_models.Weapon{}, errors.EmptyId()
 	}
 
-	var academyWeapon, found = repo.academyRepo.FindWeaponByGenshinId(model.Id)
-	if !found {
-		return errors.WeaponNotFound(model.Id)
+	var academyWeapon, err = repo.academyRepo.FindWeaponByGenshinId(model.Id)
+	if err != nil {
+		return genshin_models.Weapon{}, errors.WeaponNotFound(model.Id)
 	}
 
-	academyWeapon.Weapon = *model
-	repo.academyRepo.UpdateWeapon(academyWeapon)
+	academyWeapon.Weapon = model
+	result, err := repo.academyRepo.UpdateWeapon(academyWeapon)
+	if err != nil {
+		return genshin_models.Weapon{}, err
+	}
 
-	return nil
+	return result.Weapon, nil
 }

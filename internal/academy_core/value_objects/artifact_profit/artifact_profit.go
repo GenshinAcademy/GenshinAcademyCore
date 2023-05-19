@@ -27,20 +27,20 @@ const (
 )
 
 type ArtifactProfit struct {
-	Slot              ProfitSlot `json:"slot" ga:"required"`
-	Attack            StatProfit `json:"ATK,omitempty" ga:"required"`
-	AttackPercentage  StatProfit `json:"ATK_P,omitempty" ga:"required"`
-	Health            StatProfit `json:"HP,omitempty" ga:"required"`
-	HealthPercentage  StatProfit `json:"HP_P,omitempty" ga:"required"`
-	Defense           StatProfit `json:"DEF,omitempty" ga:"required"`
-	DefensePercentage StatProfit `json:"DEF_P,omitempty" ga:"required"`
-	ElementalMastery  StatProfit `json:"EM,omitempty" ga:"required"`
-	EnergyRecharge    StatProfit `json:"ER,omitempty" ga:"required"`
-	ElementalDamage   StatProfit `json:"ELEM,omitempty" ga:"required"`
-	CritRate          StatProfit `json:"CR,omitempty" ga:"required"`
-	CritDamage        StatProfit `json:"CD,omitempty" ga:"required"`
-	PhysicalDamage    StatProfit `json:"PHYS,omitempty" ga:"required"`
-	Heal              StatProfit `json:"HEAL,omitempty" ga:"required"`
+	Slot              ProfitSlot `json:"slot" binding:"required"`
+	Attack            StatProfit `json:"ATK,omitempty"`
+	AttackPercentage  StatProfit `json:"ATK_P,omitempty"`
+	Health            StatProfit `json:"HP,omitempty"`
+	HealthPercentage  StatProfit `json:"HP_P,omitempty"`
+	Defense           StatProfit `json:"DEF,omitempty"`
+	DefensePercentage StatProfit `json:"DEF_P,omitempty"`
+	ElementalMastery  StatProfit `json:"EM,omitempty"`
+	EnergyRecharge    StatProfit `json:"ER,omitempty"`
+	ElementalDamage   StatProfit `json:"ELEM,omitempty"`
+	CritRate          StatProfit `json:"CR,omitempty"`
+	CritDamage        StatProfit `json:"CD,omitempty"`
+	PhysicalDamage    StatProfit `json:"PHYS,omitempty"`
+	Heal              StatProfit `json:"HEAL,omitempty"`
 }
 
 func CreateNew(slot ProfitSlot) ArtifactProfit {

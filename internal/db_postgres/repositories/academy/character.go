@@ -54,31 +54,35 @@ func (repo PostgresCharacterRepository) GetStringPreloads() []string {
 	return characterStringPreloads
 }
 
-func (repo PostgresCharacterRepository) FindCharacterById(characterId academy_models.AcademyId) (academy_models.Character, bool) {
+func (repo PostgresCharacterRepository) FindCharacterById(characterId academy_models.AcademyId) (academy_models.Character, error) {
 	var selectedCharacter db_models.Character
 
 	var connection = repositories.CreateQueryBuilder(repo.GetConnection()).
 		PreloadAll(repo).
 		FilterById(repo, []academy_models.AcademyId{characterId}).
 		GetConnection()
-	connection.First(selectedCharacter)
+	if err := connection.First(selectedCharacter).Error; err != nil {
+		return academy_models.Character{}, err
+	}
 
-	return repo.mapper.MapAcademyCharacterFromDbModel(selectedCharacter), selectedCharacter.Id != db_models.DBKey(academy_models.UNDEFINED_ID)
+	return repo.mapper.MapAcademyCharacterFromDbModel(selectedCharacter), nil
 }
 
-func (repo PostgresCharacterRepository) FindCharacterByGenshinId(characterId genshin_models.ModelId) (academy_models.Character, bool) {
+func (repo PostgresCharacterRepository) FindCharacterByGenshinId(characterId genshin_models.ModelId) (academy_models.Character, error) {
 	var selectedCharacter db_models.Character
 
 	var connection = repositories.CreateQueryBuilder(repo.GetConnection()).
 		PreloadAll(repo).
 		GetConnection().
 		Where("character_id = ?", characterId)
-	connection.First(&selectedCharacter)
+	if err := connection.First(&selectedCharacter).Error; err != nil {
+		return academy_models.Character{}, err
+	}
 
-	return repo.mapper.MapAcademyCharacterFromDbModel(selectedCharacter), selectedCharacter.Id != db_models.DBKey(academy_models.UNDEFINED_ID)
+	return repo.mapper.MapAcademyCharacterFromDbModel(selectedCharacter), nil
 }
 
-func (repo PostgresCharacterRepository) FindCharacters(parameters find_parameters.CharacterFindParameters) []academy_models.Character {
+func (repo PostgresCharacterRepository) FindCharacters(parameters find_parameters.CharacterFindParameters) ([]academy_models.Character, error) {
 
 	var selectedChacters = make([]db_models.Character, 0)
 	var result = make([]academy_models.Character, 0)
@@ -102,13 +106,15 @@ func (repo PostgresCharacterRepository) FindCharacters(parameters find_parameter
 		queryBuilder = repositories.CreateQueryBuilder(connection).Slice(&parameters.SliceOptions)
 	}
 
-	queryBuilder.GetConnection().Find(&selectedChacters)
+	if err := queryBuilder.GetConnection().Find(&selectedChacters).Error; err != nil {
+		return nil, err
+	}
 
 	for _, character := range selectedChacters {
 		result = append(result, repo.mapper.MapAcademyCharacterFromDbModel(character))
 	}
 
-	return result
+	return result, nil
 }
 
 func (repo PostgresCharacterRepository) AddCharacter(character academy_models.Character) (academy_models.Character, error) {
@@ -149,12 +155,16 @@ func (repo PostgresCharacterRepository) UpdateCharacter(character academy_models
 	return character, nil
 }
 
-func (repo PostgresCharacterRepository) GetCharacterIds(parameters find_parameters.CharacterFindParameters) []genshin_models.ModelId {
+func (repo PostgresCharacterRepository) GetCharacterIds(parameters find_parameters.CharacterFindParameters) ([]genshin_models.ModelId, error) {
 	var characterNames []db_models.Character
-	repo.gormConnection.Select([]string{"character_id"}, &characterNames)
+	if err := repo.gormConnection.Select([]string{"character_id"}, &characterNames).Error; err != nil {
+		return nil, err
+	}
+
 	var result = make([]genshin_models.ModelId, 0)
 	for _, character := range characterNames {
 		result = append(result, genshin_models.ModelId(character.CharacterId))
 	}
-	return result
+
+	return result, nil
 }

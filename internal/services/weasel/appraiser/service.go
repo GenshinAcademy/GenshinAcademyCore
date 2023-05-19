@@ -27,11 +27,16 @@ func CreateService(core *academy_core.AcademyCore) *Service {
 // GetAll returns all characters profit information in specified language
 // Requires Accept-Languages header in request
 func (service *Service) GetAll(c *gin.Context) {
-	// TODO: GetProvider should return error if provider is not found
 	var language = languages.GetLanguage(languages.ConvertStringsToLanguages(strings.Split(c.GetHeader("Accept-Languages"), ",")))
 
+	// TODO: GetProvider should return error if provider is not found
 	var characterRepo = service.core.GetProvider(language).NewCharacterRepo()
-	var result = characterRepo.FindCharacters(find_parameters.CharacterFindParameters{})
+	var result, err = characterRepo.FindCharacters(find_parameters.CharacterFindParameters{})
+	if err != nil {
+		c.JSON(http.StatusNotFound, gin.H{"error": err})
+		return
+	}
+
 	var characters []models.WeaselAppraiserCharacter
 	for _, char := range result {
 		if len(char.Profits) == 0 {
@@ -40,7 +45,7 @@ func (service *Service) GetAll(c *gin.Context) {
 
 		character, err := service.mapCharacter(char)
 		if err != nil {
-			c.JSON(http.StatusInternalServerError, gin.H{"error": "Internal server error, please contact administrator"})
+			c.JSON(http.StatusNotFound, gin.H{"error": err})
 			return
 		}
 
@@ -57,7 +62,7 @@ func (service *Service) UpdateStats(c *gin.Context) {
 
 	var requestData []artifact_profit.ArtifactProfit
 	if err := c.BindJSON(&requestData); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "invalid request data"})
+		c.JSON(http.StatusBadRequest, gin.H{"error": err})
 		return
 	}
 
@@ -68,9 +73,9 @@ func (service *Service) UpdateStats(c *gin.Context) {
 		}
 	}
 
-	char, ok := characterRepo.FindCharacterByGenshinId(gc_models.ModelId(id))
-	if !ok {
-		c.JSON(http.StatusNotFound, gin.H{"error": "not found"})
+	char, err := characterRepo.FindCharacterByGenshinId(gc_models.ModelId(id))
+	if err != nil {
+		c.JSON(http.StatusNotFound, gin.H{"error": err})
 	}
 
 	char.Profits = requestData
