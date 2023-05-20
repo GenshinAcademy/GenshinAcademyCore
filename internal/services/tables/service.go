@@ -11,6 +11,7 @@ import (
 	gFindParameters "ga/pkg/genshin_core/repositories/find_parameters"
 
 	"net/http"
+	"net/url"
 	"strconv"
 	"strings"
 
@@ -38,7 +39,6 @@ func (service *Service) GetAll(c *gin.Context) {
 			SliceOptions: gFindParameters.SliceParameters{
 				Offset: uint32(c.GetUint("offset")),
 				Limit:  uint32(c.GetUint("limit"))}})
-
 	if err != nil {
 		c.JSON(http.StatusNotFound, gin.H{
 			"error":   "tables not found",
@@ -46,10 +46,32 @@ func (service *Service) GetAll(c *gin.Context) {
 		})
 	}
 
-	var tables []academyModels.Table = result
+	// Add assets path to non URL values
+	const tablesPath = "tables/"
+
+	for i := range result {
+		table := &result[i]
+		if !isURL(table.Icon) {
+			iconPath := tablesPath + table.Icon
+			iconURL, err := service.core.GetAssetPath(iconPath)
+			if err != nil {
+				c.JSON(http.StatusInternalServerError, gin.H{
+					"error":   "failed to get asset path",
+					"message": err.Error(),
+				})
+				return
+			}
+			table.Icon = string(iconURL)
+		}
+	}
 
 	c.JSON(http.StatusOK,
-		tables)
+		result)
+}
+
+func isURL(input string) bool {
+	u, err := url.Parse(input)
+	return err == nil && u.Scheme != ""
 }
 
 func (service *Service) Create(c *gin.Context) {

@@ -1,6 +1,7 @@
 package news
 
 import (
+	"fmt"
 	"ga/internal/academy_core"
 	academyModels "ga/internal/academy_core/models"
 	"ga/internal/academy_core/repositories"
@@ -11,6 +12,7 @@ import (
 	gFindParameters "ga/pkg/genshin_core/repositories/find_parameters"
 
 	"net/http"
+	"net/url"
 	"strconv"
 	"strings"
 	"time"
@@ -46,10 +48,49 @@ func (service *Service) GetAll(c *gin.Context) {
 		c.JSON(http.StatusNotFound, gin.H{"error": err})
 	}
 
-	var news []academyModels.News = result
+	// Add assets path to non URL values
+	const tablesPath = "tables/"
+
+	for i := range result {
+		news := &result[i]
+		if !isURL(news.Preview) {
+			iconPath := tablesPath + news.Preview
+			iconURL, err := service.core.GetAssetPath(iconPath)
+			if err != nil {
+				c.JSON(http.StatusInternalServerError, gin.H{
+					"error":   "failed to get asset path",
+					"message": err.Error(),
+				})
+				return
+			}
+			news.Preview = string(iconURL)
+		}
+	}
+
+	for _, news := range result {
+		_, err := url.Parse(news.Preview)
+		if err != nil {
+			newsPath := "news"
+
+			iconUrl, err := service.core.GetAssetPath(fmt.Sprintf("%s/%s", newsPath, news.Preview))
+			if err != nil {
+				c.JSON(http.StatusInternalServerError, gin.H{
+					"error":   "failed to get assets path",
+					"message": err.Error(),
+				})
+			}
+
+			news.Preview = string(iconUrl)
+		}
+	}
 
 	c.JSON(http.StatusOK,
-		news)
+		result)
+}
+
+func isURL(input string) bool {
+	u, err := url.Parse(input)
+	return err == nil && u.Scheme != ""
 }
 
 func (service *Service) Create(c *gin.Context) {
