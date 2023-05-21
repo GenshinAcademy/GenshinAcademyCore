@@ -1,0 +1,16 @@
+[Unit]
+Description=Genshin Academy Server Docker PROD Service
+Requires=docker.service
+After=docker.service
+
+[Service]
+Type=oneshot
+User=academy
+RemainAfterExit=yes
+WorkingDirectory=/var/www/genshinacademy/prod/server
+ExecStart=/usr/bin/docker compose --file /var/www/genshinacademy/prod/server/docker-compose.prod.yaml --env-file /var/www/genshinacademy/prod/server/prod.env pull
+ExecStart=/usr/bin/docker compose --file /var/www/genshinacademy/prod/server/docker-compose.prod.yaml --project-name ga_server-prod --env-file /var/www/genshinacademy/prod/server/prod.env up -d
+ExecStop=/usr/bin/docker compose --file /var/www/genshinacademy/prod/server/docker-compose.prod.yaml --env-file /var/www/genshinacademy/prod/server/prod.env down
+
+[Install]
+WantedBy=multi-user.target
