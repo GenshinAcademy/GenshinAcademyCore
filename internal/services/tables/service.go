@@ -51,7 +51,7 @@ func (service *Service) GetAll(c *gin.Context) {
 
 	for i := range result {
 		table := &result[i]
-		if !isURL(table.Icon) {
+		if !isURL(table.Icon) && table.Icon != "" {
 			iconPath := tablesPath + table.Icon
 			iconURL, err := service.core.GetAssetPath(iconPath)
 			if err != nil {
