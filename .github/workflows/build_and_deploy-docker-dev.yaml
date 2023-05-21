@@ -54,7 +54,7 @@ jobs:
           host: ${{ secrets.HOST }}
           username: ${{ secrets.USERNAME }}
           key: ${{ secrets.SSH_KEY }}
-          source: docker-compose.yaml
+          source: docker-compose.dev.yaml
           target: ${{ vars.OUTPUT_DIR_DEV }}
 
       - name: Create .env file
