@@ -53,7 +53,7 @@ func (service *Service) GetAll(c *gin.Context) {
 
 	for i := range result {
 		news := &result[i]
-		if !isURL(news.Preview) {
+		if !isURL(news.Preview) && news.Preview != "" {
 			iconPath := tablesPath + news.Preview
 			iconURL, err := service.core.GetAssetPath(iconPath)
 			if err != nil {
