@@ -10,7 +10,7 @@ services:
     volumes:
       - ${ASSETS_PATH_OUT}:${ASSETS_PATH}
     networks:
-      - internal
+      - internal-prod
     env_file:
       - prod.env
 
@@ -22,7 +22,7 @@ services:
     volumes:
       - postgres_db-prod:/var/lib/postgresql/data
     networks:
-      - internal
+      - internal-prod
     environment:
       POSTGRES_USER: ${POSTGRES_USER}
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
@@ -38,5 +38,5 @@ volumes:
 
 
 networks:
-  internal:
+  internal-prod:
     driver: bridge
