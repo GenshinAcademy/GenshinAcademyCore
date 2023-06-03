@@ -29,8 +29,16 @@ func CreateService(core *academy_core.AcademyCore) *Service {
 	return result
 }
 
-// GetAll returns all characters raw
-// Requires Accept-Languages header in request
+// GetAllCharacters godoc
+// @Summary Get all characters from database
+// @Tags characters
+// @Description Retrieves all characters.
+// @Produce json
+// @Param offset query int false "Offset for pagination"
+// @Param limit query int false "Limit for pagination"
+// @Success 200 {array} gc_models.Character
+// @Failure 404 {error} error "error"
+// @Router /characters [get]
 func (service *Service) GetAll(c *gin.Context) {
 	// TODO: GetProvider should return error if provider is not found
 	var language = languages.GetLanguage(languages.ConvertStringsToLanguages(strings.Split(c.GetHeader("Accept-Languages"), ",")))
@@ -51,6 +59,20 @@ func (service *Service) GetAll(c *gin.Context) {
 		result)
 }
 
+// CreateCharacter godoc
+// @Summary Add genshin character to database
+// @Tags characters
+// @Description Creates a new character.
+// @Accept json
+// @Produce json
+// @Param Authorization header string true "Bearer token" default(Bearer YOUR_TOKEN)
+// @Param Accept-Languages header string true "Languages splitted by comma. Specify each language you are adding in json body" default(en,ru)
+// @Param character body models.CharacterLocalized true "Character data"
+// @Security ApiKeyAuth
+// @Router /characters [post]
+// @Success 200 {array} gc_models.Character
+// @Failure 400 {string} string "error"
+// @Failure 500 {object} string "error"
 func (service *Service) Create(c *gin.Context) {
 	// Get languages repositories
 	langs := languages.ConvertStringsToLanguages(strings.Split(c.GetHeader("Accept-Languages"), ","))

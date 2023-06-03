@@ -6,8 +6,8 @@ import (
 )
 
 type CharacterLocalized struct {
-	Name    map[languages.Language]string `json:"name" ga:"required,localized"`
-	Rarity  enums.Rarity                  `json:"rarity" ga:"required"`
-	Element enums.ElementText             `json:"element" ga:"required"`
-	Weapon  enums.WeaponText              `json:"weaponType" ga:"required"`
+	Name    map[languages.Language]string `json:"name" ga:"required,localized" example:"en:Liza,ru:Лиза"`
+	Rarity  enums.Rarity                  `json:"rarity" ga:"required" example:"4"`
+	Element enums.ElementText             `json:"element" ga:"required" example:"Electro"`
+	Weapon  enums.WeaponText              `json:"weaponType" ga:"required" example:"Catalyst"`
 }
