@@ -66,8 +66,6 @@ func createLanguageRepository() repositories.ILanguageRepository {
 }
 
 // createPostgresProvider creates a provider to operate with Academy database.
-//
-// @param language - Language to operate with.
 func createPostgresProvider(language *models.Language) repositories.IRepositoryProvider {
 	return academy_repositories.CreateAcademyProvider(
 		database.Connections[0].ORMConnection,
