@@ -1,6 +1,11 @@
 package main
 
 import (
+	docs "ga/docs"
+
+	swaggerfiles "github.com/swaggo/files"
+	ginSwagger "github.com/swaggo/gin-swagger"
+
 	academy "ga/internal/academy_core"
 	db "ga/internal/db_postgres/implementation/academy"
 	genshin "ga/pkg/genshin_core"
@@ -48,7 +53,6 @@ type Config struct {
 }
 
 func init() {
-
 	cfg, err := configuration.New[Config]()
 	if err != nil {
 		panic(err)
@@ -89,7 +93,9 @@ func init() {
 	assetsService = assets.CreateService(gacore, env.AssetsPath)
 }
 
-// Web server here
+// @BasePath /api
+// @title Genshin Academy Service API
+// @description Genshin Academy Service API
 func main() {
 	defer db.CleanupConnections()
 	defer logger.Sync()
@@ -106,6 +112,8 @@ func main() {
 		MaxAge:          12 * time.Hour,
 	}))
 
+	docs.SwaggerInfo.BasePath = "/api"
+	r.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerfiles.Handler))
 	mainRoute := r.Group("/api")
 
 	characters := mainRoute.Group("/characters")
