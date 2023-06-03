@@ -16,12 +16,12 @@ const (
 type ElementType string
 
 const (
-	ElementTypeUndefinedElement ElementText = "ELEMENT_NONE"
-	ElementTypePyro             ElementText = "ELEMENT_PYRO"
-	ElementTypeHydro            ElementText = "ELEMENT_HYDRO"
-	ElementTypeGeo              ElementText = "ELEMENT_GEO"
-	ElementTypeAnemo            ElementText = "ELEMENT_ANEMO"
-	ElementTypeElectro          ElementText = "ELEMENT_ELECTRO"
-	ElementTypeCryo             ElementText = "ELEMENT_CRYO"
-	ElementTypeDendro           ElementText = "ELEMENT_DENDRO"
+	ElementTypeUndefinedElement ElementType = "ELEMENT_NONE"
+	ElementTypePyro             ElementType = "ELEMENT_PYRO"
+	ElementTypeHydro            ElementType = "ELEMENT_HYDRO"
+	ElementTypeGeo              ElementType = "ELEMENT_GEO"
+	ElementTypeAnemo            ElementType = "ELEMENT_ANEMO"
+	ElementTypeElectro          ElementType = "ELEMENT_ELECTRO"
+	ElementTypeCryo             ElementType = "ELEMENT_CRYO"
+	ElementTypeDendro           ElementType = "ELEMENT_DENDRO"
 )
