@@ -5,6 +5,7 @@ import (
 	"ga/internal/academy_core"
 	"net/http"
 	"os"
+	"path/filepath"
 	"strings"
 
 	"github.com/gin-gonic/gin"
@@ -25,13 +26,20 @@ func CreateService(core *academy_core.AcademyCore, assetsPath string) *Service {
 type AssetsType string
 
 const (
-	characters      AssetsType = "characters"
-	charactersIcons AssetsType = characters + "/icons"
-	tables          AssetsType = "tables"
-	news            AssetsType = "news"
+	Characters      AssetsType = "characters"
+	CharactersIcons AssetsType = Characters + "/icons"
+	Tables          AssetsType = "tables"
+	News            AssetsType = "news"
+	OpenGraph       AssetsType = "opengraph"
 )
 
-var possibleTypes []AssetsType = []AssetsType{characters, charactersIcons, tables, news}
+var validAssetTypes = []AssetsType{
+	Characters,
+	CharactersIcons,
+	Tables,
+	News,
+	OpenGraph,
+}
 
 func (service *Service) Upload(c *gin.Context) {
 	form, err := c.MultipartForm()
@@ -47,10 +55,10 @@ func (service *Service) Upload(c *gin.Context) {
 	}
 
 	path := strings.Trim(c.Param("path"), "/")
-	if !isValidAssetType(AssetsType(path)) {
+	if !isValidAssetType(path) {
 		c.JSON(http.StatusBadRequest, gin.H{
 			"error":    "wrong file type",
-			"possible": possibleTypes,
+			"possible": validAssetTypes,
 		})
 		return
 	}
@@ -61,7 +69,7 @@ func (service *Service) Upload(c *gin.Context) {
 	)
 
 	for _, file := range files {
-		savePath := fmt.Sprintf("%s/%s/%s", service.assetsPath, path, file.Filename)
+		savePath := filepath.Join(service.assetsPath, path, file.Filename)
 		if err := c.SaveUploadedFile(file, savePath); err != nil {
 			errors = append(errors, fmt.Sprintf("failed to upload %s: %s", file.Filename, err.Error()))
 		} else {
@@ -121,11 +129,11 @@ func assetsResult(c *gin.Context, successful []string, errors []string) {
 	}
 }
 
-func isValidAssetType(assetType AssetsType) bool {
-	switch assetType {
-	case characters, charactersIcons, tables, news:
-		return true
-	default:
-		return false
+func isValidAssetType(assetType string) bool {
+	for _, validType := range validAssetTypes {
+		if assetType == string(validType) {
+			return true
+		}
 	}
+	return false
 }
