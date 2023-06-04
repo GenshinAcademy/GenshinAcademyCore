@@ -99,12 +99,12 @@ func (service *Service) Upload(c *gin.Context) {
 }
 
 // DeleteAssets godoc
-// @Summary Delete files
+// @Summary Delete assets
 // @Tags assets
-// @Description Deletes files at the specified paths.
+// @Description Deletes assets at the specified paths.
 // @Accept multipart/form-data
 // @Produce json
-// @Param paths formData []string true "Paths of the files to delete" example(characters/icons/lisa.webp)
+// @Param paths formData []string true "Assets paths to delete" collectionFormat(multi) example(characters/icons/lisa.webp)
 // @Security ApiKeyAuth
 // @Router /assets [delete]
 // @Success 200 {object} gin.H{}
