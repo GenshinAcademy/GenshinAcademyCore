@@ -72,7 +72,7 @@ func (service *Service) GetAll(c *gin.Context) {
 // @Produce json
 // @Param Accept-Languages header string true "Languages splitted by comma. Specify each language you are adding in json body" default(en,ru)
 // @Param id path string true "Character ID"
-// @Param stats body artifact_profit.ArtifactProfit true "Character stats"
+// @Param stats body []artifact_profit.ArtifactProfit true "Character stats"
 // @Security ApiKeyAuth
 // @Router /characters/stats/{id} [patch]
 // @Success 200 {array} ga_models.Character

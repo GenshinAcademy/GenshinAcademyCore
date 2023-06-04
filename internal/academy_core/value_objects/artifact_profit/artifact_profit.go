@@ -27,20 +27,20 @@ const (
 )
 
 type ArtifactProfit struct {
-	Slot              ProfitSlot `json:"slot" binding:"required"`
-	Attack            StatProfit `json:"ATK,omitempty"`
-	AttackPercentage  StatProfit `json:"ATK_P,omitempty"`
-	Health            StatProfit `json:"HP,omitempty"`
-	HealthPercentage  StatProfit `json:"HP_P,omitempty"`
-	Defense           StatProfit `json:"DEF,omitempty"`
-	DefensePercentage StatProfit `json:"DEF_P,omitempty"`
-	ElementalMastery  StatProfit `json:"EM,omitempty"`
-	EnergyRecharge    StatProfit `json:"ER,omitempty"`
-	ElementalDamage   StatProfit `json:"ELEM,omitempty"`
-	CritRate          StatProfit `json:"CR,omitempty"`
-	CritDamage        StatProfit `json:"CD,omitempty"`
-	PhysicalDamage    StatProfit `json:"PHYS,omitempty"`
-	Heal              StatProfit `json:"HEAL,omitempty"`
+	Slot              ProfitSlot `json:"slot" binding:"required" extensions:"x-order=0"`
+	Attack            StatProfit `json:"ATK,omitempty" extensions:"x-order=1"`
+	AttackPercentage  StatProfit `json:"ATK_P,omitempty" extensions:"x-order=2"`
+	Health            StatProfit `json:"HP,omitempty" extensions:"x-order=3"`
+	HealthPercentage  StatProfit `json:"HP_P,omitempty" extensions:"x-order=4"`
+	Defense           StatProfit `json:"DEF,omitempty" extensions:"x-order=5"`
+	DefensePercentage StatProfit `json:"DEF_P,omitempty" extensions:"x-order=6"`
+	ElementalMastery  StatProfit `json:"EM,omitempty" extensions:"x-order=7"`
+	EnergyRecharge    StatProfit `json:"ER,omitempty" extensions:"x-order=8"`
+	ElementalDamage   StatProfit `json:"ELEM,omitempty" extensions:"x-order=9"`
+	CritRate          StatProfit `json:"CR,omitempty" extensions:"x-order=10"`
+	CritDamage        StatProfit `json:"CD,omitempty" extensions:"x-order=11"`
+	PhysicalDamage    StatProfit `json:"PHYS,omitempty" extensions:"x-order=12"`
+	Heal              StatProfit `json:"HEAL,omitempty" extensions:"x-order=113"`
 } //@name ArtifactProfit
 
 func CreateNew(slot ProfitSlot) ArtifactProfit {

@@ -31,9 +31,9 @@ func CreateService(core *academy_core.AcademyCore) *Service {
 }
 
 // GetAllNews godoc
-// @Summary Get all news from database sorted by date
+// @Summary Get all news
 // @Tags news
-// @Description Retrieves all news.
+// @Description Retrieves all news from database sorted by date.
 // @Produce json
 // @Param Accept-Languages header string true "Result language" default(en)
 // @Param offset query int false "Offset for pagination"
@@ -99,9 +99,9 @@ func (service *Service) GetAll(c *gin.Context) {
 }
 
 // CreateNews godoc
-// @Summary Add news to database
+// @Summary Create news
 // @Tags news
-// @Description Creates news.
+// @Description Creates news in database.
 // @Accept json
 // @Produce json
 // @Param Accept-Languages header string true "Languages splitted by comma. Specify each language you are adding in json body" default(en,ru)
@@ -187,9 +187,9 @@ func (service *Service) Create(c *gin.Context) {
 }
 
 // UpdateNews godoc
-// @Summary Update news in the database
+// @Summary Update news
 // @Tags news
-// @Description Updates news.
+// @Description Updates selected news in database.
 // @Accept json
 // @Produce json
 // @Param Accept-Languages header string true "Languages splitted by comma. Specify each language you are adding in json body" default(en,ru)
