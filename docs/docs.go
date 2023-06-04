@@ -40,7 +40,7 @@ const docTemplate = `{
                         "items": {
                             "type": "string"
                         },
-                        "collectionFormat": "csv",
+                        "collectionFormat": "multi",
                         "example": "characters/icons/lisa.webp",
                         "description": "Paths of the files to delete",
                         "name": "paths",

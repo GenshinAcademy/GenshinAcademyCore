@@ -31,7 +31,7 @@
                         "items": {
                             "type": "string"
                         },
-                        "collectionFormat": "csv",
+                        "collectionFormat": "multi",
                         "example": "characters/icons/lisa.webp",
                         "description": "Paths of the files to delete",
                         "name": "paths",
@@ -738,6 +738,13 @@
                     "x-order": "4",
                     "example": "Witch of Purple Rose"
                 },
+                "profits": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/ArtifactProfit"
+                    },
+                    "x-order": "5"
+                },
                 "element": {
                     "description": "Character type:\n* 0 - Undefined\n* 1 - Pyro\n* 2 - Hydro\n* 3 - Geo\n* 4 - Anemo\n* 5 - Electro\n* 6 - Cryo\n* 7 - Dendro",
                     "allOf": [
@@ -747,13 +754,6 @@
                     ],
                     "x-order": "5",
                     "example": 5
-                },
-                "profits": {
-                    "type": "array",
-                    "items": {
-                        "$ref": "#/definitions/ArtifactProfit"
-                    },
-                    "x-order": "5"
                 },
                 "rarity": {
                     "description": "Rarity types:\n* 3 - Epic 4 star rarity\n* 4 - Legendary 5 star rarity",

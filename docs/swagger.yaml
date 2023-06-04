@@ -499,7 +499,7 @@ paths:
       - multipart/form-data
       description: Deletes files at the specified paths.
       parameters:
-      - collectionFormat: csv
+      - collectionFormat: multi
         description: Paths of the files to delete
         example: characters/icons/lisa.webp
         in: formData
