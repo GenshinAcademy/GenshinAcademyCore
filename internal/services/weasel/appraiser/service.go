@@ -26,14 +26,14 @@ func CreateService(core *academy_core.AcademyCore) *Service {
 }
 
 // GetCharactersStats godoc
-// @Summary Get all characters stats for weasel appraiser from database
-// @Tags weasel_appraiser
-// @Description Retrieves all characters stats.
-// @Produce json
-// @Param Accept-Languages header string true "Result language" default(en)
-// @Success 200 {array} models.WeaselAppraiserCharacter
-// @Failure 404 {error} error "error"
-// @Router /characters/stats [get]
+//	@Summary		Get all characters stats for weasel appraiser from database
+//	@Tags			weasel_appraiser
+//	@Description	Retrieves all characters stats.
+//	@Produce		json
+//	@Param			Accept-Languages	header	string	true	"Result language"	default(en)
+//	@Success		200					{array}	models.WeaselAppraiserCharacter
+//	@Failure		404					{error}	error	"error"
+//	@Router			/characters/stats [get]
 func (service *Service) GetAll(c *gin.Context) {
 	var language = languages.GetLanguage(languages.ConvertStringsToLanguages(strings.Split(c.GetHeader("Accept-Languages"), ",")))
 
@@ -65,20 +65,20 @@ func (service *Service) GetAll(c *gin.Context) {
 }
 
 // UpdateCharactersStats godoc
-// @Summary Update character's stats
-// @Tags weasel_appraiser
-// @Description Updates character's stats.
-// @Accept json
-// @Produce json
-// @Param Accept-Languages header string true "Languages splitted by comma. Specify each language you are adding in json body" default(en,ru)
-// @Param id path string true "Character ID"
-// @Param stats body []artifact_profit.ArtifactProfit true "Character stats"
-// @Security ApiKeyAuth
-// @Router /characters/stats/{id} [patch]
-// @Success 200 {array} ga_models.Character
-// @Failure 400 {string} string "error"
-// @Failure 404 {object} string "error"
-// @Failure 500 {object} string "error"
+//	@Summary		Update character's stats
+//	@Tags			weasel_appraiser
+//	@Description	Updates character's stats.
+//	@Accept			json
+//	@Produce		json
+//	@Param			Accept-Languages	header	string								true	"Languages splitted by comma. Specify each language you are adding in json body"	default(en,ru)
+//	@Param			id					path	string								true	"Character ID"
+//	@Param			stats				body	[]artifact_profit.ArtifactProfit	true	"Character stats"
+//	@Security		ApiKeyAuth
+//	@Router			/characters/stats/{id} [patch]
+//	@Success		200	{array}		ga_models.Character
+//	@Failure		400	{string}	string	"error"
+//	@Failure		404	{object}	string	"error"
+//	@Failure		500	{object}	string	"error"
 func (service *Service) UpdateStats(c *gin.Context) {
 	id := c.Param("id")
 	var characterRepo = service.core.GetProvider(&languages.DefaultLanguage).NewCharacterRepo()

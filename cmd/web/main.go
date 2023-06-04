@@ -93,13 +93,13 @@ func init() {
 	assetsService = assets.CreateService(gacore, env.AssetsPath)
 }
 
-// @BasePath /api
-// @title Genshin Academy Service API
-// @description Genshin Academy API documentation
-// @securitydefinitions.apikey ApiKeyAuth
-// @in header
-// @name Authorization
-// @description Token for endpoints
+//	@BasePath					/api
+//	@title						Genshin Academy Service API
+//	@description				Genshin Academy API documentation
+//	@securitydefinitions.apikey	ApiKeyAuth
+//	@in							header
+//	@name						Authorization
+//	@description				Token for endpoints
 func main() {
 	defer db.CleanupConnections()
 	defer logger.Sync()

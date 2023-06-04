@@ -42,23 +42,23 @@ var validAssetTypes = []AssetsType{
 }
 
 // UploadAssets godoc
-// @Summary Upload assets
-// @Tags assets
-// @Description Uploads assets to the specified path.
-// @Description Possible values:
-// @Description * characters
-// @Description * characters/icons
-// @Description * tables
-// @Description * news
-// @Description * opengraph
-// @Accept multipart/form-data
-// @Produce json
-// @Param path path string true "Path to upload files. Possible values: characters, characters/icons, tables, news, opengraph"
-// @Param files formData file true "Files to upload"
-// @Security ApiKeyAuth
-// @Router /assets/{path} [post]
-// @Success 200 {object} gin.H{}
-// @Failure 400 {object} gin.H{}
+//	@Summary		Upload assets
+//	@Tags			assets
+//	@Description	Uploads assets to the specified path.
+//	@Description	Possible values:
+//	@Description	* characters
+//	@Description	* characters/icons
+//	@Description	* tables
+//	@Description	* news
+//	@Description	* opengraph
+//	@Accept			multipart/form-data
+//	@Produce		json
+//	@Param			path	path		string	true	"Path to upload files. Possible values: characters, characters/icons, tables, news, opengraph"
+//	@Param			files	formData	file	true	"Files to upload"
+//	@Security		ApiKeyAuth
+//	@Router			/assets/{path} [post]
+//	@Success		200	{object}	gin.H{}
+//	@Failure		400	{object}	gin.H{}
 func (service *Service) Upload(c *gin.Context) {
 	form, err := c.MultipartForm()
 	if err != nil {
@@ -99,16 +99,16 @@ func (service *Service) Upload(c *gin.Context) {
 }
 
 // DeleteAssets godoc
-// @Summary Delete assets
-// @Tags assets
-// @Description Deletes assets at the specified paths.
-// @Accept multipart/form-data
-// @Produce json
-// @Param paths formData []string true "Assets paths to delete" collectionFormat(multi) example(characters/icons/lisa.webp)
-// @Security ApiKeyAuth
-// @Router /assets [delete]
-// @Success 200 {object} gin.H{}
-// @Failure 400 {object} gin.H{}
+//	@Summary		Delete assets
+//	@Tags			assets
+//	@Description	Deletes assets at the specified paths.
+//	@Accept			multipart/form-data
+//	@Produce		json
+//	@Param			paths	formData	[]string	true	"Assets paths to delete"	collectionFormat(multi)	example(characters/icons/lisa.webp)
+//	@Security		ApiKeyAuth
+//	@Router			/assets [delete]
+//	@Success		200	{object}	gin.H{}
+//	@Failure		400	{object}	gin.H{}
 func (service *Service) Delete(c *gin.Context) {
 	form, err := c.MultipartForm()
 	if err != nil {

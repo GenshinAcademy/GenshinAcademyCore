@@ -2,7 +2,7 @@ package artifact_profit
 
 import "fmt"
 
-type ProfitSlot string // @name ProfitSlot
+type ProfitSlot string //	@name	ProfitSlot
 type ProfitSlotNumber uint8
 type StatProfit uint16
 

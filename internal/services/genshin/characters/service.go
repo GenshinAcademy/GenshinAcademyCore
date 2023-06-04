@@ -30,16 +30,16 @@ func CreateService(core *academy_core.AcademyCore) *Service {
 }
 
 // GetAllCharacters godoc
-// @Summary Get all characters
-// @Tags characters
-// @Description Retrieves all characters from database.
-// @Produce json
-// @Param Accept-Languages header string true "Result language" default(en)
-// @Param offset query int false "Offset for pagination"
-// @Param limit query int false "Limit for pagination"
-// @Success 200 {array} gc_models.Character
-// @Failure 404 {error} error "error"
-// @Router /characters [get]
+//	@Summary		Get all characters
+//	@Tags			characters
+//	@Description	Retrieves all characters from database.
+//	@Produce		json
+//	@Param			Accept-Languages	header	string	true	"Result language"	default(en)
+//	@Param			offset				query	int		false	"Offset for pagination"
+//	@Param			limit				query	int		false	"Limit for pagination"
+//	@Success		200					{array}	gc_models.Character
+//	@Failure		404					{error}	error	"error"
+//	@Router			/characters [get]
 func (service *Service) GetAll(c *gin.Context) {
 	// TODO: GetProvider should return error if provider is not found
 	var language = languages.GetLanguage(languages.ConvertStringsToLanguages(strings.Split(c.GetHeader("Accept-Languages"), ",")))
@@ -61,18 +61,18 @@ func (service *Service) GetAll(c *gin.Context) {
 }
 
 // CreateCharacter godoc
-// @Summary Create genshin character
-// @Tags characters
-// @Description Creates a new character in database.
-// @Accept json
-// @Produce json
-// @Param Accept-Languages header string true "Languages splitted by comma. Specify each language you are adding in json body" default(en,ru)
-// @Param character body models.CharacterLocalized true "Character data"
-// @Security ApiKeyAuth
-// @Router /characters [post]
-// @Success 200 {array} gc_models.Character
-// @Failure 400 {string} string "error"
-// @Failure 500 {object} string "error"
+//	@Summary		Create genshin character
+//	@Tags			characters
+//	@Description	Creates a new character in database.
+//	@Accept			json
+//	@Produce		json
+//	@Param			Accept-Languages	header	string						true	"Languages splitted by comma. Specify each language you are adding in json body"	default(en,ru)
+//	@Param			character			body	models.CharacterLocalized	true	"Character data"
+//	@Security		ApiKeyAuth
+//	@Router			/characters [post]
+//	@Success		200	{array}		gc_models.Character
+//	@Failure		400	{string}	string	"error"
+//	@Failure		500	{object}	string	"error"
 func (service *Service) Create(c *gin.Context) {
 	// Get languages repositories
 	langs := languages.ConvertStringsToLanguages(strings.Split(c.GetHeader("Accept-Languages"), ","))
