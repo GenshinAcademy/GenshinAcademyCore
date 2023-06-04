@@ -71,12 +71,6 @@ definitions:
         example: 5
         x-order: "7"
     type: object
-  AcademyId:
-    enum:
-    - 0
-    type: integer
-    x-enum-varnames:
-    - UNDEFINED_ID
   ArtifactProfit:
     properties:
       ATK:
@@ -120,7 +114,7 @@ definitions:
         x-order: "12"
       slot:
         allOf:
-        - $ref: '#/definitions/ProfitSlot'
+        - $ref: '#/definitions/ga_internal_academy_core_value_objects_artifact_profit.ProfitSlot'
         x-order: "0"
     required:
     - slot
@@ -295,7 +289,7 @@ definitions:
         x-order: "2"
       id:
         allOf:
-        - $ref: '#/definitions/AcademyId'
+        - $ref: '#/definitions/ga_internal_academy_core_models.AcademyId'
         x-order: "0"
       preview:
         example: https://example.com
@@ -345,22 +339,6 @@ definitions:
         type: object
         x-order: "0"
     type: object
-  ProfitSlot:
-    enum:
-    - substats
-    - flower
-    - plume
-    - sands
-    - goblet
-    - circlet
-    type: string
-    x-enum-varnames:
-    - SubStats
-    - Flower
-    - Plume
-    - Sands
-    - Goblet
-    - Circlet
   Rarity:
     enum:
     - 5
@@ -384,7 +362,7 @@ definitions:
         x-order: "4"
       id:
         allOf:
-        - $ref: '#/definitions/AcademyId'
+        - $ref: '#/definitions/ga_internal_academy_core_models.AcademyId'
         x-order: "0"
       redirectUrl:
         example: https://example.com
@@ -485,6 +463,28 @@ definitions:
         type: array
         x-order: "4"
     type: object
+  ga_internal_academy_core_models.AcademyId:
+    enum:
+    - 0
+    type: integer
+    x-enum-varnames:
+    - UNDEFINED_ID
+  ga_internal_academy_core_value_objects_artifact_profit.ProfitSlot:
+    enum:
+    - substats
+    - flower
+    - plume
+    - sands
+    - goblet
+    - circlet
+    type: string
+    x-enum-varnames:
+    - SubStats
+    - Flower
+    - Plume
+    - Sands
+    - Goblet
+    - Circlet
   gin.H:
     additionalProperties: {}
     type: object
@@ -497,10 +497,10 @@ paths:
     delete:
       consumes:
       - multipart/form-data
-      description: Deletes files at the specified paths.
+      description: Deletes assets at the specified paths.
       parameters:
       - collectionFormat: multi
-        description: Paths of the files to delete
+        description: Assets paths to delete
         example: characters/icons/lisa.webp
         in: formData
         items:
@@ -521,7 +521,7 @@ paths:
             $ref: '#/definitions/gin.H'
       security:
       - ApiKeyAuth: []
-      summary: Delete files
+      summary: Delete assets
       tags:
       - assets
   /assets/{path}:
@@ -619,8 +619,8 @@ paths:
       produces:
       - application/json
       responses:
-        "200":
-          description: OK
+        "201":
+          description: Created
           schema:
             items:
               $ref: '#/definitions/GenshinCharacter'
@@ -693,8 +693,8 @@ paths:
       produces:
       - application/json
       responses:
-        "200":
-          description: OK
+        "202":
+          description: Accepted
           schema:
             items:
               $ref: '#/definitions/AcademyCharacter'
@@ -771,8 +771,8 @@ paths:
       produces:
       - application/json
       responses:
-        "200":
-          description: OK
+        "201":
+          description: Created
           schema:
             items:
               $ref: '#/definitions/News'
@@ -817,8 +817,8 @@ paths:
       produces:
       - application/json
       responses:
-        "200":
-          description: OK
+        "202":
+          description: Accepted
           schema:
             items:
               $ref: '#/definitions/News'
@@ -895,8 +895,8 @@ paths:
       produces:
       - application/json
       responses:
-        "200":
-          description: OK
+        "201":
+          description: Created
           schema:
             items:
               $ref: '#/definitions/Table'
@@ -941,8 +941,8 @@ paths:
       produces:
       - application/json
       responses:
-        "200":
-          description: OK
+        "202":
+          description: Accepted
           schema:
             items:
               $ref: '#/definitions/Table'

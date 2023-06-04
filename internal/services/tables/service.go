@@ -29,6 +29,7 @@ func CreateService(core *academy_core.AcademyCore) *Service {
 }
 
 // GetAllTables godoc
+//
 //	@Summary		Get all tables from database
 //	@Tags			tables
 //	@Description	Retrieves all tables.
@@ -85,6 +86,7 @@ func isURL(input string) bool {
 }
 
 // CreateTable godoc
+//
 //	@Summary		Create table
 //	@Tags			tables
 //	@Description	Creates a new table in database.
@@ -94,7 +96,7 @@ func isURL(input string) bool {
 //	@Param			table				body	models.TablesLocalized	true	"Table data"
 //	@Security		ApiKeyAuth
 //	@Router			/tables [post]
-//	@Success		200	{array}		academyModels.Table
+//	@Success		201	{array}		academyModels.Table
 //	@Failure		400	{string}	string	"error"
 //	@Failure		500	{object}	string	"error"
 func (service *Service) Create(c *gin.Context) {
@@ -177,10 +179,11 @@ func (service *Service) Create(c *gin.Context) {
 		}
 	}
 
-	c.JSON(http.StatusOK, results)
+	c.JSON(http.StatusCreated, results)
 }
 
 // UpdateTable godoc
+//
 //	@Summary		Update table
 //	@Tags			tables
 //	@Description	Updates selected table in database.
@@ -191,7 +194,7 @@ func (service *Service) Create(c *gin.Context) {
 //	@Param			table				body	models.TablesLocalized	true	"Table data"
 //	@Security		ApiKeyAuth
 //	@Router			/tables/{id} [patch]
-//	@Success		200	{array}		academyModels.Table
+//	@Success		202	{array}		academyModels.Table
 //	@Failure		400	{string}	string	"error"
 //	@Failure		404	{object}	string	"error"
 //	@Failure		500	{object}	string	"error"
@@ -296,7 +299,7 @@ func (service *Service) Update(c *gin.Context) {
 		}
 	}
 
-	c.JSON(http.StatusOK, results)
+	c.JSON(http.StatusAccepted, results)
 }
 
 // TODO: Delete table

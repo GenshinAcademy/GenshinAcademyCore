@@ -26,6 +26,7 @@ func CreateService(core *academy_core.AcademyCore) *Service {
 }
 
 // GetCharactersStats godoc
+//
 //	@Summary		Get all characters stats for weasel appraiser from database
 //	@Tags			weasel_appraiser
 //	@Description	Retrieves all characters stats.
@@ -65,6 +66,7 @@ func (service *Service) GetAll(c *gin.Context) {
 }
 
 // UpdateCharactersStats godoc
+//
 //	@Summary		Update character's stats
 //	@Tags			weasel_appraiser
 //	@Description	Updates character's stats.
@@ -75,7 +77,7 @@ func (service *Service) GetAll(c *gin.Context) {
 //	@Param			stats				body	[]artifact_profit.ArtifactProfit	true	"Character stats"
 //	@Security		ApiKeyAuth
 //	@Router			/characters/stats/{id} [patch]
-//	@Success		200	{array}		ga_models.Character
+//	@Success		202	{array}		ga_models.Character
 //	@Failure		400	{string}	string	"error"
 //	@Failure		404	{object}	string	"error"
 //	@Failure		500	{object}	string	"error"
@@ -109,6 +111,6 @@ func (service *Service) UpdateStats(c *gin.Context) {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "unable to update character", "message": err.Error()})
 	}
 
-	c.JSON(http.StatusOK,
+	c.JSON(http.StatusAccepted,
 		result)
 }
