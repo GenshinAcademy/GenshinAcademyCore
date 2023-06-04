@@ -96,6 +96,10 @@ func init() {
 // @BasePath /api
 // @title Genshin Academy Service API
 // @description Genshin Academy Service API
+// @securitydefinitions.apikey ApiKeyAuth
+// @in header
+// @name Authorization
+// @description Token for endpoints
 func main() {
 	defer db.CleanupConnections()
 	defer logger.Sync()
