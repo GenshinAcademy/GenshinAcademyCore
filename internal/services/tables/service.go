@@ -29,16 +29,16 @@ func CreateService(core *academy_core.AcademyCore) *Service {
 }
 
 // GetAllTables godoc
-// @Summary Get all tables from database
-// @Tags tables
-// @Description Retrieves all tables.
-// @Produce json
-// @Param Accept-Languages header string true "Result language" default(en)
-// @Param offset query int false "Offset for pagination"
-// @Param limit query int false "Limit for pagination"
-// @Success 200 {array} academyModels.Table
-// @Failure 404 {error} error "error"
-// @Router /tables [get]
+//	@Summary		Get all tables from database
+//	@Tags			tables
+//	@Description	Retrieves all tables.
+//	@Produce		json
+//	@Param			Accept-Languages	header	string	true	"Result language"	default(en)
+//	@Param			offset				query	int		false	"Offset for pagination"
+//	@Param			limit				query	int		false	"Limit for pagination"
+//	@Success		200					{array}	academyModels.Table
+//	@Failure		404					{error}	error	"error"
+//	@Router			/tables [get]
 func (service *Service) GetAll(c *gin.Context) {
 	// TODO: GetProvider should return error if provider is not found
 	var language = languages.GetLanguage(languages.ConvertStringsToLanguages(strings.Split(c.GetHeader("Accept-Languages"), ",")))
@@ -85,18 +85,18 @@ func isURL(input string) bool {
 }
 
 // CreateTable godoc
-// @Summary Create table
-// @Tags tables
-// @Description Creates a new table in database.
-// @Accept json
-// @Produce json
-// @Param Accept-Languages header string true "Languages splitted by comma. Specify each language you are adding in json body" default(en,ru)
-// @Param table body models.TablesLocalized true "Table data"
-// @Security ApiKeyAuth
-// @Router /tables [post]
-// @Success 200 {array} academyModels.Table
-// @Failure 400 {string} string "error"
-// @Failure 500 {object} string "error"
+//	@Summary		Create table
+//	@Tags			tables
+//	@Description	Creates a new table in database.
+//	@Accept			json
+//	@Produce		json
+//	@Param			Accept-Languages	header	string					true	"Languages splitted by comma. Specify each language you are adding in json body"	default(en,ru)
+//	@Param			table				body	models.TablesLocalized	true	"Table data"
+//	@Security		ApiKeyAuth
+//	@Router			/tables [post]
+//	@Success		200	{array}		academyModels.Table
+//	@Failure		400	{string}	string	"error"
+//	@Failure		500	{object}	string	"error"
 func (service *Service) Create(c *gin.Context) {
 	// Get languages repositories
 	langs := languages.ConvertStringsToLanguages(strings.Split(c.GetHeader("Accept-Languages"), ","))
@@ -181,20 +181,20 @@ func (service *Service) Create(c *gin.Context) {
 }
 
 // UpdateTable godoc
-// @Summary Update table
-// @Tags tables
-// @Description Updates selected table in database.
-// @Accept json
-// @Produce json
-// @Param Accept-Languages header string true "Languages splitted by comma. Specify each language you are adding in json body" default(en,ru)
-// @Param id path int true "Table ID"
-// @Param table body models.TablesLocalized true "Table data"
-// @Security ApiKeyAuth
-// @Router /tables/{id} [patch]
-// @Success 200 {array} academyModels.Table
-// @Failure 400 {string} string "error"
-// @Failure 404 {object} string "error"
-// @Failure 500 {object} string "error"
+//	@Summary		Update table
+//	@Tags			tables
+//	@Description	Updates selected table in database.
+//	@Accept			json
+//	@Produce		json
+//	@Param			Accept-Languages	header	string					true	"Languages splitted by comma. Specify each language you are adding in json body"	default(en,ru)
+//	@Param			id					path	int						true	"Table ID"
+//	@Param			table				body	models.TablesLocalized	true	"Table data"
+//	@Security		ApiKeyAuth
+//	@Router			/tables/{id} [patch]
+//	@Success		200	{array}		academyModels.Table
+//	@Failure		400	{string}	string	"error"
+//	@Failure		404	{object}	string	"error"
+//	@Failure		500	{object}	string	"error"
 func (service *Service) Update(c *gin.Context) {
 	// Get languages repositories
 	langs := languages.ConvertStringsToLanguages(strings.Split(c.GetHeader("Accept-Languages"), ","))

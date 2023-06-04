@@ -31,16 +31,16 @@ func CreateService(core *academy_core.AcademyCore) *Service {
 }
 
 // GetAllNews godoc
-// @Summary Get all news
-// @Tags news
-// @Description Retrieves all news from database sorted by date.
-// @Produce json
-// @Param Accept-Languages header string true "Result language" default(en)
-// @Param offset query int false "Offset for pagination"
-// @Param limit query int false "Limit for pagination"
-// @Success 200 {array} academyModels.News
-// @Failure 404 {error} error "error"
-// @Router /news [get]
+//	@Summary		Get all news
+//	@Tags			news
+//	@Description	Retrieves all news from database sorted by date.
+//	@Produce		json
+//	@Param			Accept-Languages	header	string	true	"Result language"	default(en)
+//	@Param			offset				query	int		false	"Offset for pagination"
+//	@Param			limit				query	int		false	"Limit for pagination"
+//	@Success		200					{array}	academyModels.News
+//	@Failure		404					{error}	error	"error"
+//	@Router			/news [get]
 func (service *Service) GetAll(c *gin.Context) {
 	var language = languages.GetLanguage(languages.ConvertStringsToLanguages(strings.Split(c.GetHeader("Accept-Languages"), ",")))
 
@@ -99,18 +99,18 @@ func (service *Service) GetAll(c *gin.Context) {
 }
 
 // CreateNews godoc
-// @Summary Create news
-// @Tags news
-// @Description Creates news in database.
-// @Accept json
-// @Produce json
-// @Param Accept-Languages header string true "Languages splitted by comma. Specify each language you are adding in json body" default(en,ru)
-// @Param news body models.NewsLocalized true "News data"
-// @Security ApiKeyAuth
-// @Router /news [post]
-// @Success 200 {array} academyModels.News
-// @Failure 400 {string} string "error"
-// @Failure 500 {object} string "error"
+//	@Summary		Create news
+//	@Tags			news
+//	@Description	Creates news in database.
+//	@Accept			json
+//	@Produce		json
+//	@Param			Accept-Languages	header	string					true	"Languages splitted by comma. Specify each language you are adding in json body"	default(en,ru)
+//	@Param			news				body	models.NewsLocalized	true	"News data"
+//	@Security		ApiKeyAuth
+//	@Router			/news [post]
+//	@Success		200	{array}		academyModels.News
+//	@Failure		400	{string}	string	"error"
+//	@Failure		500	{object}	string	"error"
 func (service *Service) Create(c *gin.Context) {
 	// Get languages repositories
 	langs := languages.ConvertStringsToLanguages(strings.Split(c.GetHeader("Accept-Languages"), ","))
@@ -187,20 +187,20 @@ func (service *Service) Create(c *gin.Context) {
 }
 
 // UpdateNews godoc
-// @Summary Update news
-// @Tags news
-// @Description Updates selected news in database.
-// @Accept json
-// @Produce json
-// @Param Accept-Languages header string true "Languages splitted by comma. Specify each language you are adding in json body" default(en,ru)
-// @Param id path int true "News ID"
-// @Param news body models.NewsLocalized true "News data"
-// @Security ApiKeyAuth
-// @Router /news/{id} [patch]
-// @Success 200 {array} academyModels.News
-// @Failure 400 {string} string "error"
-// @Failure 404 {string} string "error"
-// @Failure 500 {object} string "error"
+//	@Summary		Update news
+//	@Tags			news
+//	@Description	Updates selected news in database.
+//	@Accept			json
+//	@Produce		json
+//	@Param			Accept-Languages	header	string					true	"Languages splitted by comma. Specify each language you are adding in json body"	default(en,ru)
+//	@Param			id					path	int						true	"News ID"
+//	@Param			news				body	models.NewsLocalized	true	"News data"
+//	@Security		ApiKeyAuth
+//	@Router			/news/{id} [patch]
+//	@Success		200	{array}		academyModels.News
+//	@Failure		400	{string}	string	"error"
+//	@Failure		404	{string}	string	"error"
+//	@Failure		500	{object}	string	"error"
 func (service *Service) Update(c *gin.Context) {
 	// Get languages repositories
 	langs := languages.ConvertStringsToLanguages(strings.Split(c.GetHeader("Accept-Languages"), ","))

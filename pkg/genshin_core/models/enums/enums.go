@@ -13,7 +13,7 @@ type Element uint8    //@name Element
 // * 4 - Legendary 5 star rarity
 type Rarity uint8 //@name Rarity
 
-type Region uint8 // @name Region
+type Region uint8 //	@name	Region
 
 const (
 	Male Gender = iota

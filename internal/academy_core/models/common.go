@@ -1,6 +1,6 @@
 package models
 
-type AcademyId uint32 // @name AcademyId
+type AcademyId uint32 //	@name	AcademyId
 
 const UNDEFINED_ID AcademyId = 0
 
