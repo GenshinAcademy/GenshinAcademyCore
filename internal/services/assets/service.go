@@ -42,6 +42,7 @@ var validAssetTypes = []AssetsType{
 }
 
 // UploadAssets godoc
+//
 //	@Summary		Upload assets
 //	@Tags			assets
 //	@Description	Uploads assets to the specified path.
@@ -99,6 +100,7 @@ func (service *Service) Upload(c *gin.Context) {
 }
 
 // DeleteAssets godoc
+//
 //	@Summary		Delete assets
 //	@Tags			assets
 //	@Description	Deletes assets at the specified paths.

@@ -31,6 +31,7 @@ func CreateService(core *academy_core.AcademyCore) *Service {
 }
 
 // GetAllNews godoc
+//
 //	@Summary		Get all news
 //	@Tags			news
 //	@Description	Retrieves all news from database sorted by date.
@@ -99,6 +100,7 @@ func (service *Service) GetAll(c *gin.Context) {
 }
 
 // CreateNews godoc
+//
 //	@Summary		Create news
 //	@Tags			news
 //	@Description	Creates news in database.
@@ -108,7 +110,7 @@ func (service *Service) GetAll(c *gin.Context) {
 //	@Param			news				body	models.NewsLocalized	true	"News data"
 //	@Security		ApiKeyAuth
 //	@Router			/news [post]
-//	@Success		200	{array}		academyModels.News
+//	@Success		201	{array}		academyModels.News
 //	@Failure		400	{string}	string	"error"
 //	@Failure		500	{object}	string	"error"
 func (service *Service) Create(c *gin.Context) {
@@ -183,10 +185,11 @@ func (service *Service) Create(c *gin.Context) {
 		}
 	}
 
-	c.JSON(http.StatusOK, results)
+	c.JSON(http.StatusCreated, results)
 }
 
 // UpdateNews godoc
+//
 //	@Summary		Update news
 //	@Tags			news
 //	@Description	Updates selected news in database.
@@ -197,7 +200,7 @@ func (service *Service) Create(c *gin.Context) {
 //	@Param			news				body	models.NewsLocalized	true	"News data"
 //	@Security		ApiKeyAuth
 //	@Router			/news/{id} [patch]
-//	@Success		200	{array}		academyModels.News
+//	@Success		202	{array}		academyModels.News
 //	@Failure		400	{string}	string	"error"
 //	@Failure		404	{string}	string	"error"
 //	@Failure		500	{object}	string	"error"
@@ -291,7 +294,7 @@ func (service *Service) Update(c *gin.Context) {
 		}
 	}
 
-	c.JSON(http.StatusOK, results)
+	c.JSON(http.StatusAccepted, results)
 }
 
 // TODO: Delete news

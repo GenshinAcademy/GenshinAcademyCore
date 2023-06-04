@@ -23,7 +23,7 @@ const docTemplate = `{
                         "ApiKeyAuth": []
                     }
                 ],
-                "description": "Deletes files at the specified paths.",
+                "description": "Deletes assets at the specified paths.",
                 "consumes": [
                     "multipart/form-data"
                 ],
@@ -33,7 +33,7 @@ const docTemplate = `{
                 "tags": [
                     "assets"
                 ],
-                "summary": "Delete files",
+                "summary": "Delete assets",
                 "parameters": [
                     {
                         "type": "array",
@@ -42,7 +42,7 @@ const docTemplate = `{
                         },
                         "collectionFormat": "multi",
                         "example": "characters/icons/lisa.webp",
-                        "description": "Paths of the files to delete",
+                        "description": "Assets paths to delete",
                         "name": "paths",
                         "in": "formData",
                         "required": true
@@ -201,8 +201,8 @@ const docTemplate = `{
                     }
                 ],
                 "responses": {
-                    "200": {
-                        "description": "OK",
+                    "201": {
+                        "description": "Created",
                         "schema": {
                             "type": "array",
                             "items": {
@@ -312,8 +312,8 @@ const docTemplate = `{
                     }
                 ],
                 "responses": {
-                    "200": {
-                        "description": "OK",
+                    "202": {
+                        "description": "Accepted",
                         "schema": {
                             "type": "array",
                             "items": {
@@ -429,8 +429,8 @@ const docTemplate = `{
                     }
                 ],
                 "responses": {
-                    "200": {
-                        "description": "OK",
+                    "201": {
+                        "description": "Created",
                         "schema": {
                             "type": "array",
                             "items": {
@@ -498,8 +498,8 @@ const docTemplate = `{
                     }
                 ],
                 "responses": {
-                    "200": {
-                        "description": "OK",
+                    "202": {
+                        "description": "Accepted",
                         "schema": {
                             "type": "array",
                             "items": {
@@ -615,8 +615,8 @@ const docTemplate = `{
                     }
                 ],
                 "responses": {
-                    "200": {
-                        "description": "OK",
+                    "201": {
+                        "description": "Created",
                         "schema": {
                             "type": "array",
                             "items": {
@@ -684,8 +684,8 @@ const docTemplate = `{
                     }
                 ],
                 "responses": {
-                    "200": {
-                        "description": "OK",
+                    "202": {
+                        "description": "Accepted",
                         "schema": {
                             "type": "array",
                             "items": {
@@ -792,15 +792,6 @@ const docTemplate = `{
                 }
             }
         },
-        "AcademyId": {
-            "type": "integer",
-            "enum": [
-                0
-            ],
-            "x-enum-varnames": [
-                "UNDEFINED_ID"
-            ]
-        },
         "ArtifactProfit": {
             "type": "object",
             "required": [
@@ -810,7 +801,7 @@ const docTemplate = `{
                 "slot": {
                     "allOf": [
                         {
-                            "$ref": "#/definitions/ProfitSlot"
+                            "$ref": "#/definitions/ga_internal_academy_core_value_objects_artifact_profit.ProfitSlot"
                         }
                     ],
                     "x-order": "0"
@@ -1072,7 +1063,7 @@ const docTemplate = `{
                 "id": {
                     "allOf": [
                         {
-                            "$ref": "#/definitions/AcademyId"
+                            "$ref": "#/definitions/ga_internal_academy_core_models.AcademyId"
                         }
                     ],
                     "x-order": "0"
@@ -1153,25 +1144,6 @@ const docTemplate = `{
                 }
             }
         },
-        "ProfitSlot": {
-            "type": "string",
-            "enum": [
-                "substats",
-                "flower",
-                "plume",
-                "sands",
-                "goblet",
-                "circlet"
-            ],
-            "x-enum-varnames": [
-                "SubStats",
-                "Flower",
-                "Plume",
-                "Sands",
-                "Goblet",
-                "Circlet"
-            ]
-        },
         "Rarity": {
             "type": "integer",
             "enum": [
@@ -1191,7 +1163,7 @@ const docTemplate = `{
                 "id": {
                     "allOf": [
                         {
-                            "$ref": "#/definitions/AcademyId"
+                            "$ref": "#/definitions/ga_internal_academy_core_models.AcademyId"
                         }
                     ],
                     "x-order": "0"
@@ -1338,6 +1310,34 @@ const docTemplate = `{
                     "x-order": "4"
                 }
             }
+        },
+        "ga_internal_academy_core_models.AcademyId": {
+            "type": "integer",
+            "enum": [
+                0
+            ],
+            "x-enum-varnames": [
+                "UNDEFINED_ID"
+            ]
+        },
+        "ga_internal_academy_core_value_objects_artifact_profit.ProfitSlot": {
+            "type": "string",
+            "enum": [
+                "substats",
+                "flower",
+                "plume",
+                "sands",
+                "goblet",
+                "circlet"
+            ],
+            "x-enum-varnames": [
+                "SubStats",
+                "Flower",
+                "Plume",
+                "Sands",
+                "Goblet",
+                "Circlet"
+            ]
         },
         "gin.H": {
             "type": "object",

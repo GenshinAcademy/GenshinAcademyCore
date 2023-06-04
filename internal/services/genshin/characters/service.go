@@ -30,6 +30,7 @@ func CreateService(core *academy_core.AcademyCore) *Service {
 }
 
 // GetAllCharacters godoc
+//
 //	@Summary		Get all characters
 //	@Tags			characters
 //	@Description	Retrieves all characters from database.
@@ -61,6 +62,7 @@ func (service *Service) GetAll(c *gin.Context) {
 }
 
 // CreateCharacter godoc
+//
 //	@Summary		Create genshin character
 //	@Tags			characters
 //	@Description	Creates a new character in database.
@@ -70,7 +72,7 @@ func (service *Service) GetAll(c *gin.Context) {
 //	@Param			character			body	models.CharacterLocalized	true	"Character data"
 //	@Security		ApiKeyAuth
 //	@Router			/characters [post]
-//	@Success		200	{array}		gc_models.Character
+//	@Success		201	{array}		gc_models.Character
 //	@Failure		400	{string}	string	"error"
 //	@Failure		500	{object}	string	"error"
 func (service *Service) Create(c *gin.Context) {
@@ -145,7 +147,7 @@ func (service *Service) Create(c *gin.Context) {
 		}
 	}
 
-	c.JSON(http.StatusOK, results)
+	c.JSON(http.StatusCreated, results)
 }
 
 func convertCharacter(input gdb_models.Character) (output gc_models.Character) {
