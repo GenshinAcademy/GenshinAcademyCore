@@ -1,6 +1,7 @@
 package enums
 
-type ElementText string
+type ElementText string //@name ElementText
+type ElementType string //@name ElementType
 
 const (
 	UndefinedElement ElementText = "None"
@@ -12,8 +13,6 @@ const (
 	Cryo             ElementText = "Cryo"
 	Dendro           ElementText = "Dendro"
 )
-
-type ElementType string
 
 const (
 	ElementTypeUndefinedElement ElementType = "ELEMENT_NONE"

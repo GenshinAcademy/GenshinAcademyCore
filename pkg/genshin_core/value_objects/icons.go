@@ -1,7 +1,7 @@
 package value_objects
 
-type CharacterIconType byte
-type WeaponIconType byte
+type CharacterIconType byte //@name CharacterIconType
+type WeaponIconType byte    //@name WeaponIconType
 
 const (
 	Front CharacterIconType = iota
@@ -15,12 +15,12 @@ const (
 
 // CharacterIcon represents icon for Character
 type CharacterIcon struct {
-	Type CharacterIconType
-	Url  string
-}
+	Type CharacterIconType `example:"0"`
+	Url  string            `example:"/characters/icons/lisa.webp"`
+} //@name CharacterIcon
 
 // WeaponIcon represents icon for weapon
 type WeaponIcon struct {
 	Type WeaponIconType
 	Url  string
-}
+} //@name WeaponIcon

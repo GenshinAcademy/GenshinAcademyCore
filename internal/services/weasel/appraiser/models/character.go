@@ -13,4 +13,4 @@ type WeaselAppraiserCharacter struct {
 	Element     enums.Element                    `json:"element"`
 	IconUrl     url.Url                          `json:"icon_url"`
 	StatsProfit []artifact_profit.ArtifactProfit `json:"stats_profit"`
-}
+} //@name WeaselAppraiserCharacter

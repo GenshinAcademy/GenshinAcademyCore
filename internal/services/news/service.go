@@ -30,7 +30,17 @@ func CreateService(core *academy_core.AcademyCore) *Service {
 	return result
 }
 
-// GetAll returns all news in specified language
+// GetAllNews godoc
+// @Summary Get all news from database sorted by date
+// @Tags news
+// @Description Retrieves all news.
+// @Produce json
+// @Param Accept-Languages header string true "Result language" default(en)
+// @Param offset query int false "Offset for pagination"
+// @Param limit query int false "Limit for pagination"
+// @Success 200 {array} academyModels.News
+// @Failure 404 {error} error "error"
+// @Router /news [get]
 func (service *Service) GetAll(c *gin.Context) {
 	var language = languages.GetLanguage(languages.ConvertStringsToLanguages(strings.Split(c.GetHeader("Accept-Languages"), ",")))
 
@@ -49,12 +59,12 @@ func (service *Service) GetAll(c *gin.Context) {
 	}
 
 	// Add assets path to non URL values
-	const tablesPath = "tables/"
+	const newsPath = "news/"
 
 	for i := range result {
 		news := &result[i]
 		if !isURL(news.Preview) && news.Preview != "" {
-			iconPath := tablesPath + news.Preview
+			iconPath := newsPath + news.Preview
 			iconURL, err := service.core.GetAssetPath(iconPath)
 			if err != nil {
 				c.JSON(http.StatusInternalServerError, gin.H{
@@ -88,11 +98,19 @@ func (service *Service) GetAll(c *gin.Context) {
 		result)
 }
 
-func isURL(input string) bool {
-	u, err := url.Parse(input)
-	return err == nil && u.Scheme != ""
-}
-
+// CreateNews godoc
+// @Summary Add news to database
+// @Tags news
+// @Description Creates news.
+// @Accept json
+// @Produce json
+// @Param Accept-Languages header string true "Languages splitted by comma. Specify each language you are adding in json body" default(en,ru)
+// @Param news body models.NewsLocalized true "News data"
+// @Security ApiKeyAuth
+// @Router /news [post]
+// @Success 200 {array} academyModels.News
+// @Failure 400 {string} string "error"
+// @Failure 500 {object} string "error"
 func (service *Service) Create(c *gin.Context) {
 	// Get languages repositories
 	langs := languages.ConvertStringsToLanguages(strings.Split(c.GetHeader("Accept-Languages"), ","))
@@ -168,6 +186,21 @@ func (service *Service) Create(c *gin.Context) {
 	c.JSON(http.StatusOK, results)
 }
 
+// UpdateNews godoc
+// @Summary Update news in the database
+// @Tags news
+// @Description Updates news.
+// @Accept json
+// @Produce json
+// @Param Accept-Languages header string true "Languages splitted by comma. Specify each language you are adding in json body" default(en,ru)
+// @Param id path int true "News ID"
+// @Param news body models.NewsLocalized true "News data"
+// @Security ApiKeyAuth
+// @Router /news/{id} [patch]
+// @Success 200 {array} academyModels.News
+// @Failure 400 {string} string "error"
+// @Failure 404 {string} string "error"
+// @Failure 500 {object} string "error"
 func (service *Service) Update(c *gin.Context) {
 	// Get languages repositories
 	langs := languages.ConvertStringsToLanguages(strings.Split(c.GetHeader("Accept-Languages"), ","))
@@ -209,9 +242,9 @@ func (service *Service) Update(c *gin.Context) {
 		c.JSON(http.StatusNotFound, gin.H{"error": err})
 	}
 
-	if !requestData.CreatedAt.IsZero() {
-		news.CreatedAt = requestData.CreatedAt
-	}
+	// if !requestData.CreatedAt.IsZero() {
+	// 	news.CreatedAt = requestData.CreatedAt
+	// }
 	if value, ok := requestData.Title[languages.DefaultLanguage]; ok {
 		news.Title = value
 	}
@@ -294,4 +327,9 @@ func updateLocalizationFields(id academyModels.AcademyId, requestData models.New
 	}
 
 	return newResult, nil
+}
+
+func isURL(input string) bool {
+	u, err := url.Parse(input)
+	return err == nil && u.Scheme != ""
 }

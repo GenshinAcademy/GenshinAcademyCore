@@ -34,6 +34,7 @@ func CreateService(core *academy_core.AcademyCore) *Service {
 // @Tags characters
 // @Description Retrieves all characters.
 // @Produce json
+// @Param Accept-Languages header string true "Result language" default(en)
 // @Param offset query int false "Offset for pagination"
 // @Param limit query int false "Limit for pagination"
 // @Success 200 {array} gc_models.Character
@@ -65,7 +66,6 @@ func (service *Service) GetAll(c *gin.Context) {
 // @Description Creates a new character.
 // @Accept json
 // @Produce json
-// @Param Authorization header string true "Bearer token" default(Bearer YOUR_TOKEN)
 // @Param Accept-Languages header string true "Languages splitted by comma. Specify each language you are adding in json body" default(en,ru)
 // @Param character body models.CharacterLocalized true "Character data"
 // @Security ApiKeyAuth

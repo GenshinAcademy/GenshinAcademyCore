@@ -1,6 +1,6 @@
 package enums
 
-type Gender string
+type Gender string //@name Gender
 
 // TODO: Implement
 const (

@@ -1,6 +1,6 @@
 package enums
 
-type BodyType string
+type BodyType string //@name BodyType
 
 // TODO: Implement
 const (
