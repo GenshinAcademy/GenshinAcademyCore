@@ -30,9 +30,9 @@ func CreateService(core *academy_core.AcademyCore) *Service {
 }
 
 // GetAllCharacters godoc
-// @Summary Get all characters from database
+// @Summary Get all characters
 // @Tags characters
-// @Description Retrieves all characters.
+// @Description Retrieves all characters from database.
 // @Produce json
 // @Param Accept-Languages header string true "Result language" default(en)
 // @Param offset query int false "Offset for pagination"
@@ -61,9 +61,9 @@ func (service *Service) GetAll(c *gin.Context) {
 }
 
 // CreateCharacter godoc
-// @Summary Add genshin character to database
+// @Summary Create genshin character
 // @Tags characters
-// @Description Creates a new character.
+// @Description Creates a new character in database.
 // @Accept json
 // @Produce json
 // @Param Accept-Languages header string true "Languages splitted by comma. Specify each language you are adding in json body" default(en,ru)

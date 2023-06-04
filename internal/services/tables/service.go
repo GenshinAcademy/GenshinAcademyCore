@@ -85,9 +85,9 @@ func isURL(input string) bool {
 }
 
 // CreateTable godoc
-// @Summary Create a new table
+// @Summary Create table
 // @Tags tables
-// @Description Creates a new table.
+// @Description Creates a new table in database.
 // @Accept json
 // @Produce json
 // @Param Accept-Languages header string true "Languages splitted by comma. Specify each language you are adding in json body" default(en,ru)
@@ -181,9 +181,9 @@ func (service *Service) Create(c *gin.Context) {
 }
 
 // UpdateTable godoc
-// @Summary Update a table
+// @Summary Update table
 // @Tags tables
-// @Description Updates a table.
+// @Description Updates selected table in database.
 // @Accept json
 // @Produce json
 // @Param Accept-Languages header string true "Languages splitted by comma. Specify each language you are adding in json body" default(en,ru)

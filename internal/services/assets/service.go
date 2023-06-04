@@ -41,6 +41,24 @@ var validAssetTypes = []AssetsType{
 	OpenGraph,
 }
 
+// UploadAssets godoc
+// @Summary Upload assets
+// @Tags assets
+// @Description Uploads assets to the specified path.
+// @Description Possible values:
+// @Description * characters
+// @Description * characters/icons
+// @Description * tables
+// @Description * news
+// @Description * opengraph
+// @Accept multipart/form-data
+// @Produce json
+// @Param path path string true "Path to upload files. Possible values: characters, characters/icons, tables, news, opengraph"
+// @Param files formData file true "Files to upload"
+// @Security ApiKeyAuth
+// @Router /assets/{path} [post]
+// @Success 200 {object} gin.H{}
+// @Failure 400 {object} gin.H{}
 func (service *Service) Upload(c *gin.Context) {
 	form, err := c.MultipartForm()
 	if err != nil {
@@ -80,6 +98,17 @@ func (service *Service) Upload(c *gin.Context) {
 	assetsResult(c, successful, errors)
 }
 
+// DeleteAssets godoc
+// @Summary Delete files
+// @Tags assets
+// @Description Deletes files at the specified paths.
+// @Accept multipart/form-data
+// @Produce json
+// @Param paths formData []string true "Paths of the files to delete" example(characters/icons/lisa.webp)
+// @Security ApiKeyAuth
+// @Router /assets [delete]
+// @Success 200 {object} gin.H{}
+// @Failure 400 {object} gin.H{}
 func (service *Service) Delete(c *gin.Context) {
 	form, err := c.MultipartForm()
 	if err != nil {
@@ -87,7 +116,7 @@ func (service *Service) Delete(c *gin.Context) {
 		return
 	}
 
-	paths := form.Value["path"]
+	paths := form.Value["paths"]
 	if len(paths) == 0 {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "paths not specified"})
 		return
@@ -99,7 +128,7 @@ func (service *Service) Delete(c *gin.Context) {
 	)
 
 	for _, path := range paths {
-		if err := os.Remove(fmt.Sprintf("%s/%s", service.assetsPath, path)); err != nil {
+		if err := os.Remove(filepath.Join(service.assetsPath, path)); err != nil {
 			errors = append(errors, fmt.Sprintf("failed to delete %s: %s", path, err.Error()))
 		} else {
 			successful = append(successful, path)

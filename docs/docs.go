@@ -16,16 +16,114 @@ const docTemplate = `{
     "host": "{{.Host}}",
     "basePath": "{{.BasePath}}",
     "paths": {
+        "/assets": {
+            "delete": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "Deletes files at the specified paths.",
+                "consumes": [
+                    "multipart/form-data"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "assets"
+                ],
+                "summary": "Delete files",
+                "parameters": [
+                    {
+                        "type": "array",
+                        "items": {
+                            "type": "string"
+                        },
+                        "collectionFormat": "csv",
+                        "example": "characters/icons/lisa.webp",
+                        "description": "Paths of the files to delete",
+                        "name": "paths",
+                        "in": "formData",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/gin.H"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/gin.H"
+                        }
+                    }
+                }
+            }
+        },
+        "/assets/{path}": {
+            "post": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "Uploads assets to the specified path.\nPossible values:\n* characters\n* characters/icons\n* tables\n* news\n* opengraph",
+                "consumes": [
+                    "multipart/form-data"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "assets"
+                ],
+                "summary": "Upload assets",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Path to upload files. Possible values: characters, characters/icons, tables, news, opengraph",
+                        "name": "path",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "file",
+                        "description": "Files to upload",
+                        "name": "files",
+                        "in": "formData",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/gin.H"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/gin.H"
+                        }
+                    }
+                }
+            }
+        },
         "/characters": {
             "get": {
-                "description": "Retrieves all characters.",
+                "description": "Retrieves all characters from database.",
                 "produces": [
                     "application/json"
                 ],
                 "tags": [
                     "characters"
                 ],
-                "summary": "Get all characters from database",
+                "summary": "Get all characters",
                 "parameters": [
                     {
                         "type": "string",
@@ -72,7 +170,7 @@ const docTemplate = `{
                         "ApiKeyAuth": []
                     }
                 ],
-                "description": "Creates a new character.",
+                "description": "Creates a new character in database.",
                 "consumes": [
                     "application/json"
                 ],
@@ -82,7 +180,7 @@ const docTemplate = `{
                 "tags": [
                     "characters"
                 ],
-                "summary": "Add genshin character to database",
+                "summary": "Create genshin character",
                 "parameters": [
                     {
                         "type": "string",
@@ -206,7 +304,10 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/ArtifactProfit"
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/ArtifactProfit"
+                            }
                         }
                     }
                 ],
@@ -243,14 +344,14 @@ const docTemplate = `{
         },
         "/news": {
             "get": {
-                "description": "Retrieves all news.",
+                "description": "Retrieves all news from database sorted by date.",
                 "produces": [
                     "application/json"
                 ],
                 "tags": [
                     "news"
                 ],
-                "summary": "Get all news from database sorted by date",
+                "summary": "Get all news",
                 "parameters": [
                     {
                         "type": "string",
@@ -297,7 +398,7 @@ const docTemplate = `{
                         "ApiKeyAuth": []
                     }
                 ],
-                "description": "Creates news.",
+                "description": "Creates news in database.",
                 "consumes": [
                     "application/json"
                 ],
@@ -307,7 +408,7 @@ const docTemplate = `{
                 "tags": [
                     "news"
                 ],
-                "summary": "Add news to database",
+                "summary": "Create news",
                 "parameters": [
                     {
                         "type": "string",
@@ -359,7 +460,7 @@ const docTemplate = `{
                         "ApiKeyAuth": []
                     }
                 ],
-                "description": "Updates news.",
+                "description": "Updates selected news in database.",
                 "consumes": [
                     "application/json"
                 ],
@@ -369,7 +470,7 @@ const docTemplate = `{
                 "tags": [
                     "news"
                 ],
-                "summary": "Update news in the database",
+                "summary": "Update news",
                 "parameters": [
                     {
                         "type": "string",
@@ -483,7 +584,7 @@ const docTemplate = `{
                         "ApiKeyAuth": []
                     }
                 ],
-                "description": "Creates a new table.",
+                "description": "Creates a new table in database.",
                 "consumes": [
                     "application/json"
                 ],
@@ -493,7 +594,7 @@ const docTemplate = `{
                 "tags": [
                     "tables"
                 ],
-                "summary": "Create a new table",
+                "summary": "Create table",
                 "parameters": [
                     {
                         "type": "string",
@@ -545,7 +646,7 @@ const docTemplate = `{
                         "ApiKeyAuth": []
                     }
                 ],
-                "description": "Updates a table.",
+                "description": "Updates selected table in database.",
                 "consumes": [
                     "application/json"
                 ],
@@ -555,7 +656,7 @@ const docTemplate = `{
                 "tags": [
                     "tables"
                 ],
-                "summary": "Update a table",
+                "summary": "Update table",
                 "parameters": [
                     {
                         "type": "string",
@@ -646,6 +747,13 @@ const docTemplate = `{
                     "x-order": "4",
                     "example": "Witch of Purple Rose"
                 },
+                "profits": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/ArtifactProfit"
+                    },
+                    "x-order": "5"
+                },
                 "element": {
                     "description": "Character type:\n* 0 - Undefined\n* 1 - Pyro\n* 2 - Hydro\n* 3 - Geo\n* 4 - Anemo\n* 5 - Electro\n* 6 - Cryo\n* 7 - Dendro",
                     "allOf": [
@@ -655,13 +763,6 @@ const docTemplate = `{
                     ],
                     "x-order": "5",
                     "example": 5
-                },
-                "profits": {
-                    "type": "array",
-                    "items": {
-                        "$ref": "#/definitions/ArtifactProfit"
-                    },
-                    "x-order": "5"
                 },
                 "rarity": {
                     "description": "Rarity types:\n* 3 - Epic 4 star rarity\n* 4 - Legendary 5 star rarity",
@@ -706,47 +807,65 @@ const docTemplate = `{
                 "slot"
             ],
             "properties": {
+                "slot": {
+                    "allOf": [
+                        {
+                            "$ref": "#/definitions/ProfitSlot"
+                        }
+                    ],
+                    "x-order": "0"
+                },
                 "ATK": {
-                    "type": "integer"
-                },
-                "ATK_P": {
-                    "type": "integer"
-                },
-                "CD": {
-                    "type": "integer"
+                    "type": "integer",
+                    "x-order": "1"
                 },
                 "CR": {
-                    "type": "integer"
+                    "type": "integer",
+                    "x-order": "10"
                 },
-                "DEF": {
-                    "type": "integer"
-                },
-                "DEF_P": {
-                    "type": "integer"
-                },
-                "ELEM": {
-                    "type": "integer"
-                },
-                "EM": {
-                    "type": "integer"
-                },
-                "ER": {
-                    "type": "integer"
+                "CD": {
+                    "type": "integer",
+                    "x-order": "11"
                 },
                 "HEAL": {
-                    "type": "integer"
-                },
-                "HP": {
-                    "type": "integer"
-                },
-                "HP_P": {
-                    "type": "integer"
+                    "type": "integer",
+                    "x-order": "113"
                 },
                 "PHYS": {
-                    "type": "integer"
+                    "type": "integer",
+                    "x-order": "12"
                 },
-                "slot": {
-                    "$ref": "#/definitions/ProfitSlot"
+                "ATK_P": {
+                    "type": "integer",
+                    "x-order": "2"
+                },
+                "HP": {
+                    "type": "integer",
+                    "x-order": "3"
+                },
+                "HP_P": {
+                    "type": "integer",
+                    "x-order": "4"
+                },
+                "DEF": {
+                    "type": "integer",
+                    "x-order": "5"
+                },
+                "DEF_P": {
+                    "type": "integer",
+                    "x-order": "6"
+                },
+                "EM": {
+                    "type": "integer",
+                    "x-order": "7"
+                },
+                "ER": {
+                    "type": "integer",
+                    "x-order": "8"
+                },
+                "ELEM": {
+                    "type": "integer",
+                    "x-order": "9"
                 }
             }
         },
@@ -1184,24 +1303,45 @@ const docTemplate = `{
             "type": "object",
             "properties": {
                 "character_id": {
-                    "$ref": "#/definitions/ModelId"
-                },
-                "element": {
-                    "$ref": "#/definitions/Element"
-                },
-                "icon_url": {
-                    "type": "string"
+                    "allOf": [
+                        {
+                            "$ref": "#/definitions/ModelId"
+                        }
+                    ],
+                    "x-order": "0",
+                    "example": "lisa"
                 },
                 "name": {
-                    "type": "string"
+                    "type": "string",
+                    "x-order": "1",
+                    "example": "Lisa"
+                },
+                "element": {
+                    "allOf": [
+                        {
+                            "$ref": "#/definitions/Element"
+                        }
+                    ],
+                    "x-order": "2",
+                    "example": 5
+                },
+                "icon_url": {
+                    "type": "string",
+                    "x-order": "3",
+                    "example": "https://example.com"
                 },
                 "stats_profit": {
                     "type": "array",
                     "items": {
                         "$ref": "#/definitions/ArtifactProfit"
-                    }
+                    },
+                    "x-order": "4"
                 }
             }
+        },
+        "gin.H": {
+            "type": "object",
+            "additionalProperties": {}
         }
     },
     "securityDefinitions": {
@@ -1221,7 +1361,7 @@ var SwaggerInfo = &swag.Spec{
 	BasePath:         "/api",
 	Schemes:          []string{},
 	Title:            "Genshin Academy Service API",
-	Description:      "Genshin Academy Service API",
+	Description:      "Genshin Academy API documentation",
 	InfoInstanceName: "swagger",
 	SwaggerTemplate:  docTemplate,
 	LeftDelim:        "{{",

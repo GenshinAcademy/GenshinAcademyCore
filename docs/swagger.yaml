@@ -81,32 +81,47 @@ definitions:
     properties:
       ATK:
         type: integer
+        x-order: "1"
       ATK_P:
         type: integer
+        x-order: "2"
       CD:
         type: integer
+        x-order: "11"
       CR:
         type: integer
+        x-order: "10"
       DEF:
         type: integer
+        x-order: "5"
       DEF_P:
         type: integer
+        x-order: "6"
       ELEM:
         type: integer
+        x-order: "9"
       EM:
         type: integer
+        x-order: "7"
       ER:
         type: integer
+        x-order: "8"
       HEAL:
         type: integer
+        x-order: "113"
       HP:
         type: integer
+        x-order: "3"
       HP_P:
         type: integer
+        x-order: "4"
       PHYS:
         type: integer
+        x-order: "12"
       slot:
-        $ref: '#/definitions/ProfitSlot'
+        allOf:
+        - $ref: '#/definitions/ProfitSlot'
+        x-order: "0"
     required:
     - slot
     type: object
@@ -447,26 +462,111 @@ definitions:
   WeaselAppraiserCharacter:
     properties:
       character_id:
-        $ref: '#/definitions/ModelId'
+        allOf:
+        - $ref: '#/definitions/ModelId'
+        example: lisa
+        x-order: "0"
       element:
-        $ref: '#/definitions/Element'
+        allOf:
+        - $ref: '#/definitions/Element'
+        example: 5
+        x-order: "2"
       icon_url:
+        example: https://example.com
         type: string
+        x-order: "3"
       name:
+        example: Lisa
         type: string
+        x-order: "1"
       stats_profit:
         items:
           $ref: '#/definitions/ArtifactProfit'
         type: array
+        x-order: "4"
+    type: object
+  gin.H:
+    additionalProperties: {}
     type: object
 info:
   contact: {}
-  description: Genshin Academy Service API
+  description: Genshin Academy API documentation
   title: Genshin Academy Service API
 paths:
+  /assets:
+    delete:
+      consumes:
+      - multipart/form-data
+      description: Deletes files at the specified paths.
+      parameters:
+      - collectionFormat: csv
+        description: Paths of the files to delete
+        example: characters/icons/lisa.webp
+        in: formData
+        items:
+          type: string
+        name: paths
+        required: true
+        type: array
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/gin.H'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/gin.H'
+      security:
+      - ApiKeyAuth: []
+      summary: Delete files
+      tags:
+      - assets
+  /assets/{path}:
+    post:
+      consumes:
+      - multipart/form-data
+      description: |-
+        Uploads assets to the specified path.
+        Possible values:
+        * characters
+        * characters/icons
+        * tables
+        * news
+        * opengraph
+      parameters:
+      - description: 'Path to upload files. Possible values: characters, characters/icons,
+          tables, news, opengraph'
+        in: path
+        name: path
+        required: true
+        type: string
+      - description: Files to upload
+        in: formData
+        name: files
+        required: true
+        type: file
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/gin.H'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/gin.H'
+      security:
+      - ApiKeyAuth: []
+      summary: Upload assets
+      tags:
+      - assets
   /characters:
     get:
-      description: Retrieves all characters.
+      description: Retrieves all characters from database.
       parameters:
       - default: en
         description: Result language
@@ -495,13 +595,13 @@ paths:
           description: error
           schema:
             type: error
-      summary: Get all characters from database
+      summary: Get all characters
       tags:
       - characters
     post:
       consumes:
       - application/json
-      description: Creates a new character.
+      description: Creates a new character in database.
       parameters:
       - default: en,ru
         description: Languages splitted by comma. Specify each language you are adding
@@ -535,7 +635,7 @@ paths:
             type: string
       security:
       - ApiKeyAuth: []
-      summary: Add genshin character to database
+      summary: Create genshin character
       tags:
       - characters
   /characters/stats:
@@ -587,7 +687,9 @@ paths:
         name: stats
         required: true
         schema:
-          $ref: '#/definitions/ArtifactProfit'
+          items:
+            $ref: '#/definitions/ArtifactProfit'
+          type: array
       produces:
       - application/json
       responses:
@@ -616,7 +718,7 @@ paths:
       - weasel_appraiser
   /news:
     get:
-      description: Retrieves all news.
+      description: Retrieves all news from database sorted by date.
       parameters:
       - default: en
         description: Result language
@@ -645,13 +747,13 @@ paths:
           description: error
           schema:
             type: error
-      summary: Get all news from database sorted by date
+      summary: Get all news
       tags:
       - news
     post:
       consumes:
       - application/json
-      description: Creates news.
+      description: Creates news in database.
       parameters:
       - default: en,ru
         description: Languages splitted by comma. Specify each language you are adding
@@ -685,14 +787,14 @@ paths:
             type: string
       security:
       - ApiKeyAuth: []
-      summary: Add news to database
+      summary: Create news
       tags:
       - news
   /news/{id}:
     patch:
       consumes:
       - application/json
-      description: Updates news.
+      description: Updates selected news in database.
       parameters:
       - default: en,ru
         description: Languages splitted by comma. Specify each language you are adding
@@ -735,7 +837,7 @@ paths:
             type: string
       security:
       - ApiKeyAuth: []
-      summary: Update news in the database
+      summary: Update news
       tags:
       - news
   /tables:
@@ -775,7 +877,7 @@ paths:
     post:
       consumes:
       - application/json
-      description: Creates a new table.
+      description: Creates a new table in database.
       parameters:
       - default: en,ru
         description: Languages splitted by comma. Specify each language you are adding
@@ -809,14 +911,14 @@ paths:
             type: string
       security:
       - ApiKeyAuth: []
-      summary: Create a new table
+      summary: Create table
       tags:
       - tables
   /tables/{id}:
     patch:
       consumes:
       - application/json
-      description: Updates a table.
+      description: Updates selected table in database.
       parameters:
       - default: en,ru
         description: Languages splitted by comma. Specify each language you are adding
@@ -859,7 +961,7 @@ paths:
             type: string
       security:
       - ApiKeyAuth: []
-      summary: Update a table
+      summary: Update table
       tags:
       - tables
 securityDefinitions:

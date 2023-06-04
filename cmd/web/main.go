@@ -95,7 +95,7 @@ func init() {
 
 // @BasePath /api
 // @title Genshin Academy Service API
-// @description Genshin Academy Service API
+// @description Genshin Academy API documentation
 // @securitydefinitions.apikey ApiKeyAuth
 // @in header
 // @name Authorization
