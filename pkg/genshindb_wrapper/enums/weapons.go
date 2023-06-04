@@ -1,6 +1,7 @@
 package enums
 
-type WeaponText string
+type WeaponText string //@name WeaponText
+type WeaponType string //@name WeaponType
 
 const (
 	UndefinedWeapon WeaponText = "None"
@@ -10,8 +11,6 @@ const (
 	Bow             WeaponText = "Bow"
 	Catalyst        WeaponText = "Catalyst"
 )
-
-type WeaponType string
 
 // TODO: implement
 const (

@@ -2,7 +2,7 @@ package artifact_profit
 
 import "fmt"
 
-type ProfitSlot string
+type ProfitSlot string // @name ProfitSlot
 type ProfitSlotNumber uint8
 type StatProfit uint16
 
@@ -41,7 +41,7 @@ type ArtifactProfit struct {
 	CritDamage        StatProfit `json:"CD,omitempty"`
 	PhysicalDamage    StatProfit `json:"PHYS,omitempty"`
 	Heal              StatProfit `json:"HEAL,omitempty"`
-}
+} //@name ArtifactProfit
 
 func CreateNew(slot ProfitSlot) ArtifactProfit {
 	return ArtifactProfit{

@@ -1,0 +1,871 @@
+basePath: /api
+definitions:
+  AcademyCharacter:
+    properties:
+      description:
+        example: The languid but knowledgeable Librarian of the Knights of Favonius,
+          deemed by Sumeru Akademiya to be their most distinguished graduate in the
+          past two centuries.
+        type: string
+        x-order: "3"
+      element:
+        allOf:
+        - $ref: '#/definitions/Element'
+        description: |-
+          Character type:
+          * 0 - Undefined
+          * 1 - Pyro
+          * 2 - Hydro
+          * 3 - Geo
+          * 4 - Anemo
+          * 5 - Electro
+          * 6 - Cryo
+          * 7 - Dendro
+        example: 5
+        x-order: "5"
+      fullName:
+        example: Lisa
+        type: string
+        x-order: "2"
+      icons:
+        items:
+          $ref: '#/definitions/CharacterIcon'
+        type: array
+      id:
+        allOf:
+        - $ref: '#/definitions/ModelId'
+        x-order: "0"
+      name:
+        example: Lisa
+        type: string
+        x-order: "1"
+      profits:
+        items:
+          $ref: '#/definitions/ArtifactProfit'
+        type: array
+        x-order: "5"
+      rarity:
+        allOf:
+        - $ref: '#/definitions/Rarity'
+        description: |-
+          Rarity types:
+          * 3 - Epic 4 star rarity
+          * 4 - Legendary 5 star rarity
+        example: 3
+        x-order: "6"
+      title:
+        example: Witch of Purple Rose
+        type: string
+        x-order: "4"
+      weapon:
+        allOf:
+        - $ref: '#/definitions/WeaponType'
+        description: |-
+          Character weapon type:
+          * 0 - Undefined
+          * 1 - Sword
+          * 2 - Claymore
+          * 3 - Polearm
+          * 4 - Bow
+          * 5 - Catalyst
+        example: 5
+        x-order: "7"
+    type: object
+  AcademyId:
+    enum:
+    - 0
+    type: integer
+    x-enum-varnames:
+    - UNDEFINED_ID
+  ArtifactProfit:
+    properties:
+      ATK:
+        type: integer
+      ATK_P:
+        type: integer
+      CD:
+        type: integer
+      CR:
+        type: integer
+      DEF:
+        type: integer
+      DEF_P:
+        type: integer
+      ELEM:
+        type: integer
+      EM:
+        type: integer
+      ER:
+        type: integer
+      HEAL:
+        type: integer
+      HP:
+        type: integer
+      HP_P:
+        type: integer
+      PHYS:
+        type: integer
+      slot:
+        $ref: '#/definitions/ProfitSlot'
+    required:
+    - slot
+    type: object
+  CharacterIcon:
+    properties:
+      type:
+        allOf:
+        - $ref: '#/definitions/CharacterIconType'
+        example: 0
+      url:
+        example: /characters/icons/lisa.webp
+        type: string
+    type: object
+  CharacterIconType:
+    enum:
+    - 0
+    - 1
+    - 2
+    type: integer
+    x-enum-varnames:
+    - Front
+    - Side
+    - Gacha
+  CharacterLocalized:
+    properties:
+      element:
+        allOf:
+        - $ref: '#/definitions/ElementText'
+        example: Electro
+        x-order: "2"
+      name:
+        additionalProperties:
+          type: string
+        example:
+          en: Lisa
+          ru: Лиза
+        type: object
+        x-order: "0"
+      rarity:
+        allOf:
+        - $ref: '#/definitions/Rarity'
+        example: 4
+        x-order: "1"
+      weaponType:
+        allOf:
+        - $ref: '#/definitions/WeaponText'
+        example: Catalyst
+        x-order: "3"
+    type: object
+  Element:
+    enum:
+    - 0
+    - 1
+    - 2
+    - 3
+    - 4
+    - 5
+    - 6
+    - 7
+    type: integer
+    x-enum-varnames:
+    - UndefinedElement
+    - Pyro
+    - Hydro
+    - Geo
+    - Anemo
+    - Electro
+    - Cryo
+    - Dendro
+  ElementText:
+    enum:
+    - None
+    - Pyro
+    - Hydro
+    - Geo
+    - Anemo
+    - Electro
+    - Cryo
+    - Dendro
+    type: string
+    x-enum-varnames:
+    - UndefinedElement
+    - Pyro
+    - Hydro
+    - Geo
+    - Anemo
+    - Electro
+    - Cryo
+    - Dendro
+  GenshinCharacter:
+    properties:
+      description:
+        example: The languid but knowledgeable Librarian of the Knights of Favonius,
+          deemed by Sumeru Akademiya to be their most distinguished graduate in the
+          past two centuries.
+        type: string
+        x-order: "3"
+      element:
+        allOf:
+        - $ref: '#/definitions/Element'
+        description: |-
+          Character type:
+          * 0 - Undefined
+          * 1 - Pyro
+          * 2 - Hydro
+          * 3 - Geo
+          * 4 - Anemo
+          * 5 - Electro
+          * 6 - Cryo
+          * 7 - Dendro
+        example: 5
+        x-order: "5"
+      fullName:
+        example: Lisa
+        type: string
+        x-order: "2"
+      icons:
+        items:
+          $ref: '#/definitions/CharacterIcon'
+        type: array
+      id:
+        allOf:
+        - $ref: '#/definitions/ModelId'
+        x-order: "0"
+      name:
+        example: Lisa
+        type: string
+        x-order: "1"
+      rarity:
+        allOf:
+        - $ref: '#/definitions/Rarity'
+        description: |-
+          Rarity types:
+          * 3 - Epic 4 star rarity
+          * 4 - Legendary 5 star rarity
+        example: 3
+        x-order: "6"
+      title:
+        example: Witch of Purple Rose
+        type: string
+        x-order: "4"
+      weapon:
+        allOf:
+        - $ref: '#/definitions/WeaponType'
+        description: |-
+          Character weapon type:
+          * 0 - Undefined
+          * 1 - Sword
+          * 2 - Claymore
+          * 3 - Polearm
+          * 4 - Bow
+          * 5 - Catalyst
+        example: 5
+        x-order: "7"
+    type: object
+  ModelId:
+    enum:
+    - ""
+    type: string
+    x-enum-varnames:
+    - DEFAULT_ID
+  News:
+    properties:
+      createdAt:
+        example: "2023-05-21T18:24:28.960356Z"
+        type: string
+        x-order: "5"
+      description:
+        example: Who needs news when there are such cuties above???
+        type: string
+        x-order: "2"
+      id:
+        allOf:
+        - $ref: '#/definitions/AcademyId'
+        x-order: "0"
+      preview:
+        example: https://example.com
+        type: string
+        x-order: "3"
+      redirectUrl:
+        example: https://example.com
+        type: string
+        x-order: "4"
+      title:
+        example: Pre-Release
+        type: string
+        x-order: "1"
+    type: object
+  NewsLocalized:
+    properties:
+      description:
+        additionalProperties:
+          type: string
+        example:
+          en: Who needs news when there are such cuties above???
+          ru: Кому нужны новости когда есть такие милашки???
+        type: object
+        x-order: "1"
+      preview:
+        additionalProperties:
+          type: string
+        example:
+          en: news-en.webp
+          ru: news-ru.webp
+        type: object
+        x-order: "2"
+      redirect:
+        additionalProperties:
+          type: string
+        example:
+          en: https://example.com
+          ru: https://example.com
+        type: object
+        x-order: "3"
+      title:
+        additionalProperties:
+          type: string
+        example:
+          en: Pre-Release
+          ru: Не прошло и 6 лет...
+        type: object
+        x-order: "0"
+    type: object
+  ProfitSlot:
+    enum:
+    - substats
+    - flower
+    - plume
+    - sands
+    - goblet
+    - circlet
+    type: string
+    x-enum-varnames:
+    - SubStats
+    - Flower
+    - Plume
+    - Sands
+    - Goblet
+    - Circlet
+  Rarity:
+    enum:
+    - 5
+    - 4
+    - 3
+    type: integer
+    x-enum-varnames:
+    - Legendary
+    - Epic
+    - Rare
+  Table:
+    properties:
+      description:
+        example: Elemental resistances and gauges of their elemental shields or structures
+          along with notes on their specific mechanics that change those values.
+        type: string
+        x-order: "3"
+      icon:
+        example: https://example.com
+        type: string
+        x-order: "4"
+      id:
+        allOf:
+        - $ref: '#/definitions/AcademyId'
+        x-order: "0"
+      redirectUrl:
+        example: https://example.com
+        type: string
+        x-order: "5"
+      title:
+        example: Monsters' resistances and shields
+        type: string
+        x-order: "2"
+    type: object
+  TablesLocalized:
+    properties:
+      description:
+        additionalProperties:
+          type: string
+        example:
+          en: Elemental resistances and gauges of their elemental shields or structures
+            along with notes on their specific mechanics that change those values.
+          ru: Лиза
+        type: object
+        x-order: "2"
+      icon:
+        example: shield.webp
+        type: string
+        x-order: "3"
+      redirect:
+        additionalProperties:
+          type: string
+        example:
+          en: https://example.com
+          ru: https://example.com
+        type: object
+        x-order: "4"
+      title:
+        additionalProperties:
+          type: string
+        example:
+          en: Monsters' resistances and shields
+          ru: Сопротивления и щиты монстров
+        type: object
+        x-order: "1"
+    type: object
+  WeaponText:
+    enum:
+    - None
+    - Sword
+    - Claymore
+    - Polearm
+    - Bow
+    - Catalyst
+    type: string
+    x-enum-varnames:
+    - UndefinedWeapon
+    - Sword
+    - Claymore
+    - Polearm
+    - Bow
+    - Catalyst
+  WeaponType:
+    enum:
+    - 0
+    - 1
+    - 2
+    - 3
+    - 4
+    - 5
+    type: integer
+    x-enum-varnames:
+    - UndefinedWeapon
+    - Sword
+    - Claymore
+    - Polearm
+    - Bow
+    - Catalyst
+  WeaselAppraiserCharacter:
+    properties:
+      character_id:
+        $ref: '#/definitions/ModelId'
+      element:
+        $ref: '#/definitions/Element'
+      icon_url:
+        type: string
+      name:
+        type: string
+      stats_profit:
+        items:
+          $ref: '#/definitions/ArtifactProfit'
+        type: array
+    type: object
+info:
+  contact: {}
+  description: Genshin Academy Service API
+  title: Genshin Academy Service API
+paths:
+  /characters:
+    get:
+      description: Retrieves all characters.
+      parameters:
+      - default: en
+        description: Result language
+        in: header
+        name: Accept-Languages
+        required: true
+        type: string
+      - description: Offset for pagination
+        in: query
+        name: offset
+        type: integer
+      - description: Limit for pagination
+        in: query
+        name: limit
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/GenshinCharacter'
+            type: array
+        "404":
+          description: error
+          schema:
+            type: error
+      summary: Get all characters from database
+      tags:
+      - characters
+    post:
+      consumes:
+      - application/json
+      description: Creates a new character.
+      parameters:
+      - default: en,ru
+        description: Languages splitted by comma. Specify each language you are adding
+          in json body
+        in: header
+        name: Accept-Languages
+        required: true
+        type: string
+      - description: Character data
+        in: body
+        name: character
+        required: true
+        schema:
+          $ref: '#/definitions/CharacterLocalized'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/GenshinCharacter'
+            type: array
+        "400":
+          description: error
+          schema:
+            type: string
+        "500":
+          description: error
+          schema:
+            type: string
+      security:
+      - ApiKeyAuth: []
+      summary: Add genshin character to database
+      tags:
+      - characters
+  /characters/stats:
+    get:
+      description: Retrieves all characters stats.
+      parameters:
+      - default: en
+        description: Result language
+        in: header
+        name: Accept-Languages
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/WeaselAppraiserCharacter'
+            type: array
+        "404":
+          description: error
+          schema:
+            type: error
+      summary: Get all characters stats for weasel appraiser from database
+      tags:
+      - weasel_appraiser
+  /characters/stats/{id}:
+    patch:
+      consumes:
+      - application/json
+      description: Updates character's stats.
+      parameters:
+      - default: en,ru
+        description: Languages splitted by comma. Specify each language you are adding
+          in json body
+        in: header
+        name: Accept-Languages
+        required: true
+        type: string
+      - description: Character ID
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: Character stats
+        in: body
+        name: stats
+        required: true
+        schema:
+          $ref: '#/definitions/ArtifactProfit'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/AcademyCharacter'
+            type: array
+        "400":
+          description: error
+          schema:
+            type: string
+        "404":
+          description: error
+          schema:
+            type: string
+        "500":
+          description: error
+          schema:
+            type: string
+      security:
+      - ApiKeyAuth: []
+      summary: Update character's stats
+      tags:
+      - weasel_appraiser
+  /news:
+    get:
+      description: Retrieves all news.
+      parameters:
+      - default: en
+        description: Result language
+        in: header
+        name: Accept-Languages
+        required: true
+        type: string
+      - description: Offset for pagination
+        in: query
+        name: offset
+        type: integer
+      - description: Limit for pagination
+        in: query
+        name: limit
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/News'
+            type: array
+        "404":
+          description: error
+          schema:
+            type: error
+      summary: Get all news from database sorted by date
+      tags:
+      - news
+    post:
+      consumes:
+      - application/json
+      description: Creates news.
+      parameters:
+      - default: en,ru
+        description: Languages splitted by comma. Specify each language you are adding
+          in json body
+        in: header
+        name: Accept-Languages
+        required: true
+        type: string
+      - description: News data
+        in: body
+        name: news
+        required: true
+        schema:
+          $ref: '#/definitions/NewsLocalized'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/News'
+            type: array
+        "400":
+          description: error
+          schema:
+            type: string
+        "500":
+          description: error
+          schema:
+            type: string
+      security:
+      - ApiKeyAuth: []
+      summary: Add news to database
+      tags:
+      - news
+  /news/{id}:
+    patch:
+      consumes:
+      - application/json
+      description: Updates news.
+      parameters:
+      - default: en,ru
+        description: Languages splitted by comma. Specify each language you are adding
+          in json body
+        in: header
+        name: Accept-Languages
+        required: true
+        type: string
+      - description: News ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      - description: News data
+        in: body
+        name: news
+        required: true
+        schema:
+          $ref: '#/definitions/NewsLocalized'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/News'
+            type: array
+        "400":
+          description: error
+          schema:
+            type: string
+        "404":
+          description: error
+          schema:
+            type: string
+        "500":
+          description: error
+          schema:
+            type: string
+      security:
+      - ApiKeyAuth: []
+      summary: Update news in the database
+      tags:
+      - news
+  /tables:
+    get:
+      description: Retrieves all tables.
+      parameters:
+      - default: en
+        description: Result language
+        in: header
+        name: Accept-Languages
+        required: true
+        type: string
+      - description: Offset for pagination
+        in: query
+        name: offset
+        type: integer
+      - description: Limit for pagination
+        in: query
+        name: limit
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/Table'
+            type: array
+        "404":
+          description: error
+          schema:
+            type: error
+      summary: Get all tables from database
+      tags:
+      - tables
+    post:
+      consumes:
+      - application/json
+      description: Creates a new table.
+      parameters:
+      - default: en,ru
+        description: Languages splitted by comma. Specify each language you are adding
+          in json body
+        in: header
+        name: Accept-Languages
+        required: true
+        type: string
+      - description: Table data
+        in: body
+        name: table
+        required: true
+        schema:
+          $ref: '#/definitions/TablesLocalized'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/Table'
+            type: array
+        "400":
+          description: error
+          schema:
+            type: string
+        "500":
+          description: error
+          schema:
+            type: string
+      security:
+      - ApiKeyAuth: []
+      summary: Create a new table
+      tags:
+      - tables
+  /tables/{id}:
+    patch:
+      consumes:
+      - application/json
+      description: Updates a table.
+      parameters:
+      - default: en,ru
+        description: Languages splitted by comma. Specify each language you are adding
+          in json body
+        in: header
+        name: Accept-Languages
+        required: true
+        type: string
+      - description: Table ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      - description: Table data
+        in: body
+        name: table
+        required: true
+        schema:
+          $ref: '#/definitions/TablesLocalized'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/Table'
+            type: array
+        "400":
+          description: error
+          schema:
+            type: string
+        "404":
+          description: error
+          schema:
+            type: string
+        "500":
+          description: error
+          schema:
+            type: string
+      security:
+      - ApiKeyAuth: []
+      summary: Update a table
+      tags:
+      - tables
+securityDefinitions:
+  ApiKeyAuth:
+    description: Token for endpoints
+    in: header
+    name: Authorization
+    type: apiKey
+swagger: "2.0"

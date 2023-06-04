@@ -1,6 +1,6 @@
 package enums
 
-type Language string
+type Language string //@name Language
 
 const (
 	Russian            Language = "Russian"
