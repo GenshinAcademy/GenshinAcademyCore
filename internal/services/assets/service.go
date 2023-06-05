@@ -19,7 +19,7 @@ type Service struct {
 func CreateService(core *academy_core.AcademyCore, assetsPath string) *Service {
 	var result *Service = new(Service)
 	result.core = core
-	result.assetsPath = assetsPath
+	result.assetsPath = "." + assetsPath
 	return result
 }
 
