@@ -21,4 +21,12 @@ sites:
     auto_index: false
     proxy:
       - location: api
+        pass: http://localhost:8301
+  - server_name: genshin.academy-project.info
+    ssl_certificate: /etc/ssl/cert.pem
+    ssl_certificate_key: /etc/ssl/key.pem
+    root_path: /var/www/genshinacademy/prod/site
+    auto_index: false
+    proxy:
+      - location: api
         pass: http://localhost:8300
