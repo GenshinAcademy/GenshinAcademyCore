@@ -8,5 +8,5 @@ import (
 type Character struct {
 	AcademyModel
 	models.Character
-	Profits []artifact_profit.ArtifactProfit `extensions:"x-order=5"`
+	Profits []artifact_profit.ArtifactProfit `extensions:"x-order=9"`
 } //@name AcademyCharacter

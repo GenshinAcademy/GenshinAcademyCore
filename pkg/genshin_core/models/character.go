@@ -37,7 +37,7 @@ type Character struct {
 	// * 5 - Catalyst
 	Weapon enums.WeaponType `example:"5" extensions:"x-order=7"`
 
-	Icons []value_objects.CharacterIcon
+	Icons []value_objects.CharacterIcon `extensions:"x-order=8"`
 	//Body          BodyType
 	//Constellation string
 	//BirthdayMMDD  string

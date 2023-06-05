@@ -747,13 +747,6 @@ const docTemplate = `{
                     "x-order": "4",
                     "example": "Witch of Purple Rose"
                 },
-                "profits": {
-                    "type": "array",
-                    "items": {
-                        "$ref": "#/definitions/ArtifactProfit"
-                    },
-                    "x-order": "5"
-                },
                 "element": {
                     "description": "Character type:\n* 0 - Undefined\n* 1 - Pyro\n* 2 - Hydro\n* 3 - Geo\n* 4 - Anemo\n* 5 - Electro\n* 6 - Cryo\n* 7 - Dendro",
                     "allOf": [
@@ -788,7 +781,15 @@ const docTemplate = `{
                     "type": "array",
                     "items": {
                         "$ref": "#/definitions/CharacterIcon"
-                    }
+                    },
+                    "x-order": "8"
+                },
+                "profits": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/ArtifactProfit"
+                    },
+                    "x-order": "9"
                 }
             }
         },
@@ -818,13 +819,13 @@ const docTemplate = `{
                     "type": "integer",
                     "x-order": "11"
                 },
-                "HEAL": {
-                    "type": "integer",
-                    "x-order": "113"
-                },
                 "PHYS": {
                     "type": "integer",
                     "x-order": "12"
+                },
+                "HEAL": {
+                    "type": "integer",
+                    "x-order": "13"
                 },
                 "ATK_P": {
                     "type": "integer",
@@ -1044,7 +1045,8 @@ const docTemplate = `{
                     "type": "array",
                     "items": {
                         "$ref": "#/definitions/CharacterIcon"
-                    }
+                    },
+                    "x-order": "8"
                 }
             }
         },

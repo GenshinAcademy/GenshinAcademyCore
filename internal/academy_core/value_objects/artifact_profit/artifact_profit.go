@@ -40,7 +40,7 @@ type ArtifactProfit struct {
 	CritRate          StatProfit `json:"CR,omitempty" extensions:"x-order=10"`
 	CritDamage        StatProfit `json:"CD,omitempty" extensions:"x-order=11"`
 	PhysicalDamage    StatProfit `json:"PHYS,omitempty" extensions:"x-order=12"`
-	Heal              StatProfit `json:"HEAL,omitempty" extensions:"x-order=113"`
+	Heal              StatProfit `json:"HEAL,omitempty" extensions:"x-order=13"`
 } //@name ArtifactProfit
 
 func CreateNew(slot ProfitSlot) ArtifactProfit {

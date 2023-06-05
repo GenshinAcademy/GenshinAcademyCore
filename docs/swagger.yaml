@@ -31,6 +31,7 @@ definitions:
         items:
           $ref: '#/definitions/CharacterIcon'
         type: array
+        x-order: "8"
       id:
         allOf:
         - $ref: '#/definitions/ModelId'
@@ -43,7 +44,7 @@ definitions:
         items:
           $ref: '#/definitions/ArtifactProfit'
         type: array
-        x-order: "5"
+        x-order: "9"
       rarity:
         allOf:
         - $ref: '#/definitions/Rarity'
@@ -102,7 +103,7 @@ definitions:
         x-order: "8"
       HEAL:
         type: integer
-        x-order: "113"
+        x-order: "13"
       HP:
         type: integer
         x-order: "3"
@@ -236,6 +237,7 @@ definitions:
         items:
           $ref: '#/definitions/CharacterIcon'
         type: array
+        x-order: "8"
       id:
         allOf:
         - $ref: '#/definitions/ModelId'
