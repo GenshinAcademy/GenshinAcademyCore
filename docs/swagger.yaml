@@ -1,495 +1,297 @@
 basePath: /api
 definitions:
-  AcademyCharacter:
+  Character:
     properties:
       description:
-        example: The languid but knowledgeable Librarian of the Knights of Favonius,
-          deemed by Sumeru Akademiya to be their most distinguished graduate in the
-          past two centuries.
+        example: English description
         type: string
         x-order: "3"
       element:
         allOf:
-        - $ref: '#/definitions/Element'
-        description: |-
-          Character type:
-          * 0 - Undefined
-          * 1 - Pyro
-          * 2 - Hydro
-          * 3 - Geo
-          * 4 - Anemo
-          * 5 - Electro
-          * 6 - Cryo
-          * 7 - Dendro
-        example: 5
+        - $ref: '#/definitions/types.Element'
+        example: Pyro
         x-order: "5"
-      fullName:
-        example: Lisa
-        type: string
-        x-order: "2"
-      icons:
-        items:
-          $ref: '#/definitions/CharacterIcon'
-        type: array
-        x-order: "8"
-      id:
+      icons_url:
         allOf:
-        - $ref: '#/definitions/ModelId'
-        x-order: "0"
-      name:
-        example: Lisa
-        type: string
-        x-order: "1"
-      profits:
-        items:
-          $ref: '#/definitions/ArtifactProfit'
-        type: array
-        x-order: "9"
-      rarity:
-        allOf:
-        - $ref: '#/definitions/Rarity'
-        description: |-
-          Rarity types:
-          * 3 - Epic 4 star rarity
-          * 4 - Legendary 5 star rarity
-        example: 3
-        x-order: "6"
-      title:
-        example: Witch of Purple Rose
-        type: string
-        x-order: "4"
-      weapon:
-        allOf:
-        - $ref: '#/definitions/WeaponType'
-        description: |-
-          Character weapon type:
-          * 0 - Undefined
-          * 1 - Sword
-          * 2 - Claymore
-          * 3 - Polearm
-          * 4 - Bow
-          * 5 - Catalyst
-        example: 5
-        x-order: "7"
-    type: object
-  ArtifactProfit:
-    properties:
-      ATK:
-        type: integer
-        x-order: "1"
-      ATK_P:
-        type: integer
-        x-order: "2"
-      CD:
-        type: integer
-        x-order: "11"
-      CR:
-        type: integer
-        x-order: "10"
-      DEF:
-        type: integer
-        x-order: "5"
-      DEF_P:
-        type: integer
-        x-order: "6"
-      ELEM:
-        type: integer
-        x-order: "9"
-      EM:
-        type: integer
-        x-order: "7"
-      ER:
-        type: integer
-        x-order: "8"
-      HEAL:
-        type: integer
-        x-order: "13"
-      HP:
-        type: integer
-        x-order: "3"
-      HP_P:
-        type: integer
-        x-order: "4"
-      PHYS:
-        type: integer
-        x-order: "12"
-      slot:
-        allOf:
-        - $ref: '#/definitions/ga_internal_academy_core_value_objects_artifact_profit.ProfitSlot'
-        x-order: "0"
-    required:
-    - slot
-    type: object
-  CharacterIcon:
-    properties:
-      type:
-        allOf:
-        - $ref: '#/definitions/CharacterIconType'
-        example: 0
-      url:
-        example: /characters/icons/lisa.webp
-        type: string
-    type: object
-  CharacterIconType:
-    enum:
-    - 0
-    - 1
-    - 2
-    type: integer
-    x-enum-varnames:
-    - Front
-    - Side
-    - Gacha
-  CharacterLocalized:
-    properties:
-      element:
-        allOf:
-        - $ref: '#/definitions/ElementText'
-        example: Electro
-        x-order: "2"
-      name:
-        additionalProperties:
-          type: string
+        - $ref: '#/definitions/types.IconsUrl'
         example:
-          en: Lisa
-          ru: Лиза
-        type: object
-        x-order: "0"
+          "0": https://example.com/hu_tao.webp
+        x-order: "7"
+      id:
+        example: hu_tao
+        type: string
+        x-order: "1"
+      name:
+        example: Hu Tao
+        type: string
+        x-order: "2"
       rarity:
         allOf:
-        - $ref: '#/definitions/Rarity'
-        example: 4
-        x-order: "1"
-      weaponType:
+        - $ref: '#/definitions/types.Rarity'
+        example: "5"
+        x-order: "4"
+      weapon_type:
         allOf:
-        - $ref: '#/definitions/WeaponText'
-        example: Catalyst
-        x-order: "3"
+        - $ref: '#/definitions/types.WeaponType'
+        example: Polearm
+        x-order: "6"
     type: object
-  Element:
-    enum:
-    - 0
-    - 1
-    - 2
-    - 3
-    - 4
-    - 5
-    - 6
-    - 7
-    type: integer
-    x-enum-varnames:
-    - UndefinedElement
-    - Pyro
-    - Hydro
-    - Geo
-    - Anemo
-    - Electro
-    - Cryo
-    - Dendro
-  ElementText:
-    enum:
-    - None
-    - Pyro
-    - Hydro
-    - Geo
-    - Anemo
-    - Electro
-    - Cryo
-    - Dendro
-    type: string
-    x-enum-varnames:
-    - UndefinedElement
-    - Pyro
-    - Hydro
-    - Geo
-    - Anemo
-    - Electro
-    - Cryo
-    - Dendro
-  GenshinCharacter:
+  CreateCharacterRequest:
     properties:
       description:
-        example: The languid but knowledgeable Librarian of the Knights of Favonius,
-          deemed by Sumeru Akademiya to be their most distinguished graduate in the
-          past two centuries.
-        type: string
-        x-order: "3"
+        allOf:
+        - $ref: '#/definitions/types.LocalizedString'
+        example:
+          en: English description
+          ru: Русское описание
+        x-order: "2"
       element:
         allOf:
-        - $ref: '#/definitions/Element'
-        description: |-
-          Character type:
-          * 0 - Undefined
-          * 1 - Pyro
-          * 2 - Hydro
-          * 3 - Geo
-          * 4 - Anemo
-          * 5 - Electro
-          * 6 - Cryo
-          * 7 - Dendro
-        example: 5
-        x-order: "5"
-      fullName:
-        example: Lisa
-        type: string
-        x-order: "2"
-      icons:
-        items:
-          $ref: '#/definitions/CharacterIcon'
-        type: array
-        x-order: "8"
-      id:
-        allOf:
-        - $ref: '#/definitions/ModelId'
-        x-order: "0"
+        - $ref: '#/definitions/types.Element'
+        example: Pyro
+        x-order: "4"
       name:
-        example: Lisa
-        type: string
+        allOf:
+        - $ref: '#/definitions/types.LocalizedString'
+        example:
+          en: Hu Tao
+          ru: Ху Тао
         x-order: "1"
       rarity:
         allOf:
-        - $ref: '#/definitions/Rarity'
-        description: |-
-          Rarity types:
-          * 3 - Epic 4 star rarity
-          * 4 - Legendary 5 star rarity
-        example: 3
-        x-order: "6"
-      title:
-        example: Witch of Purple Rose
-        type: string
-        x-order: "4"
-      weapon:
-        allOf:
-        - $ref: '#/definitions/WeaponType'
-        description: |-
-          Character weapon type:
-          * 0 - Undefined
-          * 1 - Sword
-          * 2 - Claymore
-          * 3 - Polearm
-          * 4 - Bow
-          * 5 - Catalyst
-        example: 5
-        x-order: "7"
-    type: object
-  ModelId:
-    enum:
-    - ""
-    type: string
-    x-enum-varnames:
-    - DEFAULT_ID
-  News:
-    properties:
-      createdAt:
-        example: "2023-05-21T18:24:28.960356Z"
-        type: string
-        x-order: "5"
-      description:
-        example: Who needs news when there are such cuties above???
-        type: string
-        x-order: "2"
-      id:
-        allOf:
-        - $ref: '#/definitions/ga_internal_academy_core_models.AcademyId'
-        x-order: "0"
-      preview:
-        example: https://example.com
-        type: string
+        - $ref: '#/definitions/types.Rarity'
+        example: "5"
         x-order: "3"
-      redirectUrl:
-        example: https://example.com
-        type: string
-        x-order: "4"
-      title:
-        example: Pre-Release
-        type: string
-        x-order: "1"
+      weapon_type:
+        allOf:
+        - $ref: '#/definitions/types.WeaponType'
+        example: Polearm
+        x-order: "5"
     type: object
-  NewsLocalized:
+  CreateNewsRequest:
     properties:
       description:
-        additionalProperties:
-          type: string
+        allOf:
+        - $ref: '#/definitions/types.LocalizedString'
         example:
-          en: Who needs news when there are such cuties above???
-          ru: Кому нужны новости когда есть такие милашки???
-        type: object
-        x-order: "1"
+          en: News description
+          ru: Описание новости
+        x-order: "2"
       preview:
-        additionalProperties:
-          type: string
+        allOf:
+        - $ref: '#/definitions/types.LocalizedString'
         example:
           en: news-en.webp
           ru: news-ru.webp
-        type: object
-        x-order: "2"
-      redirect:
-        additionalProperties:
-          type: string
-        example:
-          en: https://example.com
-          ru: https://example.com
-        type: object
         x-order: "3"
-      title:
-        additionalProperties:
-          type: string
-        example:
-          en: Pre-Release
-          ru: Не прошло и 6 лет...
-        type: object
-        x-order: "0"
-    type: object
-  Rarity:
-    enum:
-    - 5
-    - 4
-    - 3
-    type: integer
-    x-enum-varnames:
-    - Legendary
-    - Epic
-    - Rare
-  Table:
-    properties:
-      description:
-        example: Elemental resistances and gauges of their elemental shields or structures
-          along with notes on their specific mechanics that change those values.
-        type: string
-        x-order: "3"
-      icon:
-        example: https://example.com
-        type: string
-        x-order: "4"
-      id:
+      redirect_url:
         allOf:
-        - $ref: '#/definitions/ga_internal_academy_core_models.AcademyId'
-        x-order: "0"
-      redirectUrl:
-        example: https://example.com
-        type: string
-        x-order: "5"
+        - $ref: '#/definitions/types.LocalizedString'
+        example:
+          en: https://example.com/news/redirect_en
+          ru: https://example.com/news/redirect_ru
+        x-order: "4"
       title:
-        example: Monsters' resistances and shields
-        type: string
-        x-order: "2"
+        allOf:
+        - $ref: '#/definitions/types.LocalizedString'
+        example:
+          en: News title
+          ru: Заголовок новости
+        x-order: "1"
     type: object
-  TablesLocalized:
+  CreateTableRequest:
     properties:
       description:
-        additionalProperties:
-          type: string
+        allOf:
+        - $ref: '#/definitions/types.LocalizedString'
         example:
           en: Elemental resistances and gauges of their elemental shields or structures
             along with notes on their specific mechanics that change those values.
           ru: Лиза
-        type: object
         x-order: "2"
       icon:
-        example: shield.webp
+        example: https://example.com/tables/shield.webp
         type: string
         x-order: "3"
-      redirect:
-        additionalProperties:
-          type: string
+      redirect_url:
+        allOf:
+        - $ref: '#/definitions/types.LocalizedString'
         example:
-          en: https://example.com
-          ru: https://example.com
-        type: object
+          en: https://example.com/tables/redirect_en
+          ru: https://example.com/tables/redirect_ru
         x-order: "4"
       title:
-        additionalProperties:
-          type: string
+        allOf:
+        - $ref: '#/definitions/types.LocalizedString'
         example:
           en: Monsters' resistances and shields
           ru: Сопротивления и щиты монстров
-        type: object
         x-order: "1"
     type: object
-  WeaponText:
-    enum:
-    - None
-    - Sword
-    - Claymore
-    - Polearm
-    - Bow
-    - Catalyst
-    type: string
-    x-enum-varnames:
-    - UndefinedWeapon
-    - Sword
-    - Claymore
-    - Polearm
-    - Bow
-    - Catalyst
-  WeaponType:
-    enum:
-    - 0
-    - 1
-    - 2
-    - 3
-    - 4
-    - 5
-    type: integer
-    x-enum-varnames:
-    - UndefinedWeapon
-    - Sword
-    - Claymore
-    - Polearm
-    - Bow
-    - Catalyst
-  WeaselAppraiserCharacter:
+  News:
     properties:
-      character_id:
-        allOf:
-        - $ref: '#/definitions/ModelId'
-        example: lisa
-        x-order: "0"
-      element:
-        allOf:
-        - $ref: '#/definitions/Element'
-        example: 5
-        x-order: "2"
-      icon_url:
-        example: https://example.com
+      created_at:
+        example: 2020-01-01T00:00:0
+        type: string
+        x-order: "6"
+      description:
+        example: News description
         type: string
         x-order: "3"
-      name:
-        example: Lisa
-        type: string
+      id:
+        example: 1
+        type: integer
         x-order: "1"
-      stats_profit:
-        items:
-          $ref: '#/definitions/ArtifactProfit'
-        type: array
+      preview_url:
+        example: https://example.com/news/preview.webp
+        type: string
         x-order: "4"
+      redirect_url:
+        example: https://example.com/news/redirect
+        type: string
+        x-order: "5"
+      title:
+        example: News title
+        type: string
+        x-order: "2"
     type: object
-  ga_internal_academy_core_models.AcademyId:
+  Table:
+    properties:
+      description:
+        example: en:Table description,ru:Описание таблицы
+        type: string
+        x-order: "3"
+      icon_url:
+        example: https://example.com/tables/icon.png
+        type: string
+        x-order: "4"
+      id:
+        example: 1
+        type: integer
+        x-order: "1"
+      redirect_url:
+        example: https://example.com/tables/redirect
+        type: string
+        x-order: "5"
+      title:
+        example: en:Table title,ru:Заголовок таблицы
+        type: string
+        x-order: "2"
+    type: object
+  UpdateNewsRequest:
+    properties:
+      description:
+        allOf:
+        - $ref: '#/definitions/types.LocalizedString'
+        example:
+          en: News description
+          ru: Описание новости
+        x-order: "2"
+      preview:
+        allOf:
+        - $ref: '#/definitions/types.LocalizedString'
+        example:
+          en: news-en.webp
+          ru: news-ru.webp
+        x-order: "3"
+      redirect_url:
+        allOf:
+        - $ref: '#/definitions/types.LocalizedString'
+        example:
+          en: https://example.com/news/redirect_en
+          ru: https://example.com/news/redirect_ru
+        x-order: "4"
+      title:
+        allOf:
+        - $ref: '#/definitions/types.LocalizedString'
+        example:
+          en: News title
+          ru: Заголовок новости
+        x-order: "1"
+    type: object
+  UpdateTableRequest:
+    properties:
+      description:
+        allOf:
+        - $ref: '#/definitions/types.LocalizedString'
+        example:
+          en: Elemental resistances and gauges of their elemental shields or structures
+            along with notes on their specific mechanics that change those values.
+          ru: Лиза
+        x-order: "2"
+      icon:
+        example: https://example.com/tables/shield.webp
+        type: string
+        x-order: "3"
+      redirect_url:
+        allOf:
+        - $ref: '#/definitions/types.LocalizedString'
+        example:
+          en: https://example.com/tables/redirect_en
+          ru: https://example.com/tables/redirect_ru
+        x-order: "4"
+      title:
+        allOf:
+        - $ref: '#/definitions/types.LocalizedString'
+        example:
+          en: Monsters' resistances and shields
+          ru: Сопротивления и щиты монстров
+        x-order: "1"
+    type: object
+  types.Element:
     enum:
-    - 0
-    type: integer
-    x-enum-varnames:
-    - UNDEFINED_ID
-  ga_internal_academy_core_value_objects_artifact_profit.ProfitSlot:
-    enum:
-    - substats
-    - flower
-    - plume
-    - sands
-    - goblet
-    - circlet
+    - None
+    - Pyro
+    - Hydro
+    - Geo
+    - Anemo
+    - Electro
+    - Cryo
+    - Dendro
     type: string
     x-enum-varnames:
-    - SubStats
-    - Flower
-    - Plume
-    - Sands
-    - Goblet
-    - Circlet
-  gin.H:
-    additionalProperties: {}
+    - UndefinedElement
+    - Pyro
+    - Hydro
+    - Geo
+    - Anemo
+    - Electro
+    - Cryo
+    - Dendro
+  types.IconsUrl:
+    additionalProperties:
+      type: string
     type: object
+  types.LocalizedString:
+    additionalProperties:
+      type: string
+    type: object
+  types.Rarity:
+    enum:
+    - "3"
+    - "4"
+    - "5"
+    type: string
+    x-enum-varnames:
+    - Rare
+    - Epic
+    - Legendary
+  types.WeaponType:
+    enum:
+    - Undefined
+    - Sword
+    - Claymore
+    - Polearm
+    - Bow
+    - Catalyst
+    type: string
+    x-enum-varnames:
+    - UndefinedWeapon
+    - Sword
+    - Claymore
+    - Polearm
+    - Bow
+    - Catalyst
 info:
   contact: {}
   description: Genshin Academy API documentation
@@ -503,7 +305,7 @@ paths:
       parameters:
       - collectionFormat: multi
         description: Assets paths to delete
-        example: characters/icons/lisa.webp
+        example: characters/icons/lisa.webp,characters/icons/hu_tao.webp
         in: formData
         items:
           type: string
@@ -515,12 +317,8 @@ paths:
       responses:
         "200":
           description: OK
-          schema:
-            $ref: '#/definitions/gin.H'
         "400":
           description: Bad Request
-          schema:
-            $ref: '#/definitions/gin.H'
       security:
       - ApiKeyAuth: []
       summary: Delete assets
@@ -530,37 +328,32 @@ paths:
     post:
       consumes:
       - multipart/form-data
-      description: |-
-        Uploads assets to the specified path.
-        Possible values:
-        * characters
-        * characters/icons
-        * tables
-        * news
-        * opengraph
+      description: Uploads assets to the specified path.
       parameters:
-      - description: 'Path to upload files. Possible values: characters, characters/icons,
-          tables, news, opengraph'
-        in: path
+      - description: Path to upload files
+        enum:
+        - characters
+        - characters/icons
+        - tables
+        - news
+        - opengraph
+        in: formData
         name: path
         required: true
         type: string
-      - description: Files to upload
+      - collectionFormat: csv
+        description: Files to upload
         in: formData
+        items:
+          type: file
         name: files
         required: true
-        type: file
-      produces:
-      - application/json
+        type: array
       responses:
         "200":
           description: OK
-          schema:
-            $ref: '#/definitions/gin.H'
         "400":
           description: Bad Request
-          schema:
-            $ref: '#/definitions/gin.H'
       security:
       - ApiKeyAuth: []
       summary: Upload assets
@@ -568,14 +361,9 @@ paths:
       - assets
   /characters:
     get:
-      description: Retrieves all characters from database.
+      description: Get a list of characters with optional offset and limit for specific
+        language.
       parameters:
-      - default: en
-        description: Result language
-        in: header
-        name: Accept-Languages
-        required: true
-        type: string
       - description: Offset for pagination
         in: query
         name: offset
@@ -584,6 +372,11 @@ paths:
         in: query
         name: limit
         type: integer
+      - default: en,ru
+        description: Preferred languages for response content
+        in: header
+        name: Accept-Languages
+        type: string
       produces:
       - application/json
       responses:
@@ -591,142 +384,45 @@ paths:
           description: OK
           schema:
             items:
-              $ref: '#/definitions/GenshinCharacter'
+              $ref: '#/definitions/Character'
             type: array
-        "404":
-          description: error
-          schema:
-            type: error
+        "500":
+          description: Internal Server Error
       summary: Get all characters
       tags:
       - characters
     post:
       consumes:
       - application/json
-      description: Creates a new character in database.
+      description: Create a new character with the provided data.
       parameters:
-      - default: en,ru
-        description: Languages splitted by comma. Specify each language you are adding
-          in json body
-        in: header
-        name: Accept-Languages
-        required: true
-        type: string
       - description: Character data
         in: body
         name: character
         required: true
         schema:
-          $ref: '#/definitions/CharacterLocalized'
-      produces:
-      - application/json
+          $ref: '#/definitions/CreateCharacterRequest'
       responses:
         "201":
           description: Created
-          schema:
-            items:
-              $ref: '#/definitions/GenshinCharacter'
-            type: array
         "400":
-          description: error
-          schema:
-            type: string
+          description: Bad Request
         "500":
-          description: error
-          schema:
-            type: string
+          description: Internal Server Error
       security:
       - ApiKeyAuth: []
-      summary: Create genshin character
+      summary: Create a new character
       tags:
       - characters
-  /characters/stats:
-    get:
-      description: Retrieves all characters stats.
-      parameters:
-      - default: en
-        description: Result language
-        in: header
-        name: Accept-Languages
-        required: true
-        type: string
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-          schema:
-            items:
-              $ref: '#/definitions/WeaselAppraiserCharacter'
-            type: array
-        "404":
-          description: error
-          schema:
-            type: error
-      summary: Get all characters stats for weasel appraiser from database
-      tags:
-      - weasel_appraiser
-  /characters/stats/{id}:
-    patch:
-      consumes:
-      - application/json
-      description: Updates character's stats.
-      parameters:
-      - default: en,ru
-        description: Languages splitted by comma. Specify each language you are adding
-          in json body
-        in: header
-        name: Accept-Languages
-        required: true
-        type: string
-      - description: Character ID
-        in: path
-        name: id
-        required: true
-        type: string
-      - description: Character stats
-        in: body
-        name: stats
-        required: true
-        schema:
-          items:
-            $ref: '#/definitions/ArtifactProfit'
-          type: array
-      produces:
-      - application/json
-      responses:
-        "202":
-          description: Accepted
-          schema:
-            items:
-              $ref: '#/definitions/AcademyCharacter'
-            type: array
-        "400":
-          description: error
-          schema:
-            type: string
-        "404":
-          description: error
-          schema:
-            type: string
-        "500":
-          description: error
-          schema:
-            type: string
-      security:
-      - ApiKeyAuth: []
-      summary: Update character's stats
-      tags:
-      - weasel_appraiser
   /news:
     get:
-      description: Retrieves all news from database sorted by date.
+      description: Get a list of news with optional offset and limit for specific
+        language.
       parameters:
-      - default: en
-        description: Result language
+      - default: en,ru
+        description: Preferred languages for response content
         in: header
         name: Accept-Languages
-        required: true
         type: string
       - description: Offset for pagination
         in: query
@@ -736,6 +432,14 @@ paths:
         in: query
         name: limit
         type: integer
+      - default: desc
+        description: Sort by field
+        enum:
+        - asc
+        - desc
+        in: query
+        name: sort
+        type: string
       produces:
       - application/json
       responses:
@@ -745,98 +449,53 @@ paths:
             items:
               $ref: '#/definitions/News'
             type: array
-        "404":
-          description: error
-          schema:
-            type: error
+        "500":
+          description: Internal Server Error
       summary: Get all news
       tags:
       - news
     post:
       consumes:
       - application/json
-      description: Creates news in database.
+      description: Create news with the provided data.
       parameters:
-      - default: en,ru
-        description: Languages splitted by comma. Specify each language you are adding
-          in json body
-        in: header
-        name: Accept-Languages
-        required: true
-        type: string
       - description: News data
         in: body
         name: news
         required: true
         schema:
-          $ref: '#/definitions/NewsLocalized'
-      produces:
-      - application/json
+          $ref: '#/definitions/CreateNewsRequest'
       responses:
         "201":
           description: Created
-          schema:
-            items:
-              $ref: '#/definitions/News'
-            type: array
         "400":
-          description: error
-          schema:
-            type: string
+          description: Bad Request
         "500":
-          description: error
-          schema:
-            type: string
+          description: Internal Server Error
       security:
       - ApiKeyAuth: []
       summary: Create news
       tags:
       - news
   /news/{id}:
-    patch:
+    put:
       consumes:
       - application/json
-      description: Updates selected news in database.
+      description: Update news with the provided id and data.
       parameters:
-      - default: en,ru
-        description: Languages splitted by comma. Specify each language you are adding
-          in json body
-        in: header
-        name: Accept-Languages
-        required: true
-        type: string
-      - description: News ID
-        in: path
-        name: id
-        required: true
-        type: integer
-      - description: News data
+      - description: News data. All fields are optional but at least 1 is required.
         in: body
         name: news
         required: true
         schema:
-          $ref: '#/definitions/NewsLocalized'
-      produces:
-      - application/json
+          $ref: '#/definitions/UpdateNewsRequest'
       responses:
         "202":
           description: Accepted
-          schema:
-            items:
-              $ref: '#/definitions/News'
-            type: array
         "400":
-          description: error
-          schema:
-            type: string
-        "404":
-          description: error
-          schema:
-            type: string
+          description: Bad Request
         "500":
-          description: error
-          schema:
-            type: string
+          description: Internal Server Error
       security:
       - ApiKeyAuth: []
       summary: Update news
@@ -844,13 +503,12 @@ paths:
       - news
   /tables:
     get:
-      description: Retrieves all tables.
+      description: Get all tables.
       parameters:
-      - default: en
-        description: Result language
+      - default: en,ru
+        description: Preferred languages for response content
         in: header
         name: Accept-Languages
-        required: true
         type: string
       - description: Offset for pagination
         in: query
@@ -860,8 +518,14 @@ paths:
         in: query
         name: limit
         type: integer
-      produces:
-      - application/json
+      - default: desc
+        description: Sort by field
+        enum:
+        - asc
+        - desc
+        in: query
+        name: sort
+        type: string
       responses:
         "200":
           description: OK
@@ -869,98 +533,51 @@ paths:
             items:
               $ref: '#/definitions/Table'
             type: array
-        "404":
-          description: error
-          schema:
-            type: error
-      summary: Get all tables from database
+        "500":
+          description: Internal Server Error
+      summary: Get all tables
       tags:
       - tables
     post:
       consumes:
       - application/json
-      description: Creates a new table in database.
+      description: Create table.
       parameters:
-      - default: en,ru
-        description: Languages splitted by comma. Specify each language you are adding
-          in json body
-        in: header
-        name: Accept-Languages
-        required: true
-        type: string
-      - description: Table data
+      - description: Table data.
         in: body
         name: table
         required: true
         schema:
-          $ref: '#/definitions/TablesLocalized'
-      produces:
-      - application/json
+          $ref: '#/definitions/CreateTableRequest'
       responses:
         "201":
           description: Created
-          schema:
-            items:
-              $ref: '#/definitions/Table'
-            type: array
         "400":
-          description: error
-          schema:
-            type: string
+          description: Bad Request
         "500":
-          description: error
-          schema:
-            type: string
+          description: Internal Server Error
       security:
       - ApiKeyAuth: []
       summary: Create table
       tags:
       - tables
   /tables/{id}:
-    patch:
+    put:
       consumes:
       - application/json
-      description: Updates selected table in database.
+      description: Update table.
       parameters:
-      - default: en,ru
-        description: Languages splitted by comma. Specify each language you are adding
-          in json body
-        in: header
-        name: Accept-Languages
-        required: true
-        type: string
-      - description: Table ID
-        in: path
-        name: id
-        required: true
-        type: integer
-      - description: Table data
+      - description: Table data. All fields are optional but at least 1 is required.
         in: body
         name: table
         required: true
         schema:
-          $ref: '#/definitions/TablesLocalized'
-      produces:
-      - application/json
+          $ref: '#/definitions/UpdateTableRequest'
       responses:
-        "202":
-          description: Accepted
-          schema:
-            items:
-              $ref: '#/definitions/Table'
-            type: array
         "400":
-          description: error
-          schema:
-            type: string
-        "404":
-          description: error
-          schema:
-            type: string
+          description: Bad Request
         "500":
-          description: error
-          schema:
-            type: string
+          description: Internal Server Error
       security:
       - ApiKeyAuth: []
       summary: Update table

@@ -2,25 +2,19 @@ package main
 
 import (
 	"encoding/json"
-	"ga/internal/academy_core"
-	academy_models "ga/internal/academy_core/models"
-	"ga/internal/configuration"
-	academy_postgres "ga/internal/db_postgres/implementation/academy"
-	core "ga/pkg/genshin_core"
-	gc_models "ga/pkg/genshin_core/models"
-	gc_enums "ga/pkg/genshin_core/models/enums"
-	"ga/pkg/genshin_core/models/languages"
-	"ga/pkg/genshin_core/repositories"
-	"ga/pkg/genshin_core/value_objects"
-	gdb_enums "ga/pkg/genshindb_wrapper/enums"
-	gdb_models "ga/pkg/genshindb_wrapper/models"
+	"ga/internal/config"
+	"ga/internal/db"
+	"ga/internal/models"
+	assets_service "ga/internal/service/assets"
+	character_service "ga/internal/service/characters"
+	"ga/internal/types"
+	"ga/pkg/genshin_db"
+	log "github.com/sirupsen/logrus"
 	"os"
 	"path/filepath"
 	"strings"
 	"sync"
 	"time"
-
-	"go.uber.org/zap"
 )
 
 const (
@@ -28,41 +22,30 @@ const (
 )
 
 var (
-	logger *zap.Logger
-	env    Config
-	gacore *academy_core.AcademyCore
+	cfg      *config.Config
+	provider *db.Provider
 )
 
-type Config struct {
-	DBHost         string `mapstructure:"POSTGRES_HOST"`
-	DBUserName     string `mapstructure:"POSTGRES_USER"`
-	DBUserPassword string `mapstructure:"POSTGRES_PASSWORD"`
-	DBName         string `mapstructure:"POSTGRES_DB"`
-	DBPort         uint16 `mapstructure:"POSTGRES_PORT"`
-	LogLevel       int8   `mapstructure:"LOG_LEVEL"`
-	AssetsPath     string `mapstructure:"ASSETS_PATH"`
-}
-
 // getCharacter retrieves the character object from a specified JSON file in a given language, by matching the character's name.
-func getCharacter(name string, language string) (gdb_models.Character, error) {
-	var filePath = filepath.Join(".", dataPath, language, name)
+func getCharacter(name string, language genshin_db.Language) (genshin_db.Character, error) {
+	var filePath = filepath.Join(".", dataPath, string(language), name)
 	fileData, err := os.ReadFile(filePath)
 	if err != nil {
-		return gdb_models.Character{}, err
+		return genshin_db.Character{}, err
 	}
 
-	var character gdb_models.Character
+	var character genshin_db.Character
 
 	if err := json.Unmarshal(fileData, &character); err != nil {
-		return gdb_models.Character{}, err
+		return genshin_db.Character{}, err
 	}
 
 	return character, nil
 }
 
-// getCharacters retrieves []gdb_models.Character slice from all JSONs file in a given language.
-func getCharacters(language string) ([]gdb_models.Character, error) {
-	var path = filepath.Join(".", dataPath, language)
+// getCharacters retrieves []genshin_db.Character slice from all JSON files in a given language.
+func getCharacters(language genshin_db.Language) ([]genshin_db.Character, error) {
+	var path = filepath.Join(".", dataPath, string(language))
 	charactersFiles, err := os.ReadDir(path)
 
 	if err != nil {
@@ -70,7 +53,7 @@ func getCharacters(language string) ([]gdb_models.Character, error) {
 	}
 
 	var (
-		characters   = make([]gdb_models.Character, len(charactersFiles))
+		characters   = make([]genshin_db.Character, len(charactersFiles))
 		characterErr = make(chan error, len(charactersFiles))
 		wg           sync.WaitGroup
 	)
@@ -90,7 +73,6 @@ func getCharacters(language string) ([]gdb_models.Character, error) {
 
 	wg.Wait()
 
-	// Check for errors in the channel after all goroutines have completed
 	select {
 	case err := <-characterErr:
 		return nil, err
@@ -99,187 +81,154 @@ func getCharacters(language string) ([]gdb_models.Character, error) {
 	}
 }
 
+var languages map[types.Language]genshin_db.Language
+
 func init() {
-	cfg, err := configuration.New[Config]()
+	var err error
+	cfg, err = config.New()
 	if err != nil {
 		panic(err)
 	}
 
-	env = cfg.ENV
-	logger = configuration.GetLogger(env.LogLevel)
-
-	var dbConfig academy_postgres.PostgresDatabaseConfiguration = academy_postgres.PostgresDatabaseConfiguration{
-		Host:         env.DBHost,
-		UserName:     env.DBUserName,
-		UserPassword: env.DBUserPassword,
-		DatabaseName: env.DBName,
-		Port:         env.DBPort,
+	var dbConfig = &db.PostgresConfig{
+		Host:         cfg.DBHost,
+		Port:         cfg.DBPort,
+		Username:     cfg.DBUserName,
+		Password:     cfg.DBUserPassword,
+		DatabaseName: cfg.DBName,
 	}
 
-	academy_postgres.InitializePostgresDatabase(dbConfig)
-
-	//Initializing gacore config and configure it for postgres db
-	var config academy_core.AcademyCoreConfiguration = academy_core.AcademyCoreConfiguration{
-		GenshinCoreConfiguration: core.GenshinCoreConfiguration{
-			DefaultLanguage: languages.DefaultLanguage,
-		},
+	p, err := db.NewPostgresProvider(dbConfig)
+	if err != nil {
+		log.Fatal(err)
 	}
+	provider = p
 
-	academy_postgres.ConfigurePostgresDB(&config) // Configure postgres database
-
-	gacore = academy_core.CreateAcademyCore(config) //Create ga core
+	languages = make(map[types.Language]genshin_db.Language)
+	languages[types.English] = genshin_db.English
+	languages[types.Russian] = genshin_db.Russian
 }
 
 func main() {
-	defer logger.Sync()
-	defer academy_postgres.CleanupConnections() // Make sure to close the connection
+	log.WithFields(log.Fields{
+		"language": languages[types.DefaultLanguage],
+	}).Info("Getting default language characters from theBowja's data")
 
-	var langRepo = gacore.GetLanguageRepository() // Get language repository
-
-	// Get character repositories for all languages
-	characterRepos := make(map[languages.Language]repositories.CharacterRepository, len(languages.Languages))
-
-	for languageCode := range languages.Languages {
-		var language = gacore.GetLanguageRepository().FindLanguage(&languageCode)
-
-		if language.Id == 0 {
-			language = &academy_models.Language{
-				LanguageName: string(languageCode),
-			}
-			langRepo.AddLanguage(language)
-			logger.Info("Language created successfully!",
-				zap.String("language", language.LanguageName))
-		} else {
-			logger.Info("Language found successfully!",
-				zap.String("language", language.LanguageName))
-		}
-
-		characterRepos[languageCode] = gacore.AsGenshinCore().GetProvider(&languageCode).NewCharacterRepo()
-	}
-
-	logger.Info("Getting default language characters from theBowja's data",
-		zap.String("language", string(languages.DefaultLanguage)))
-
-	gdbCharacters, err := getCharacters(languages.Languages[languages.DefaultLanguage])
-
+	gdbCharacters, err := getCharacters(languages[types.DefaultLanguage])
 	if err != nil {
 		panic(err)
 	}
 
-	defaultCharacterRepo := characterRepos[languages.DefaultLanguage]
+	characterService := character_service.New(assets_service.New(cfg.AssetsPath, cfg.AssetsHost), provider.GetCharacterRepository())
 
-	timerStart := time.Now() // Gorutine test
+	timerStart := time.Now()
 
 	for _, gdbCharacter := range gdbCharacters {
-		logger.Info("Coverting character from theBowja's data to Genshin Academy format",
-			zap.String("character", gdbCharacter.Name))
+		log.WithFields(log.Fields{
+			"character": gdbCharacter.Name,
+		}).Info("Converting character from theBowja's data to Genshin Academy format")
 
 		character := convertCharacter(gdbCharacter)
 
-		logger.Info("Adding character to database",
-			zap.String("character", character.Name))
-
-		_, err = defaultCharacterRepo.AddCharacter(character)
-		if err != nil {
-			panic(err)
+		multilingualCharacter := &models.CharacterMultilingual{
+			Id:          character.Id,
+			Name:        make(types.LocalizedString),
+			Description: make(types.LocalizedString),
+			Rarity:      character.Rarity,
+			Element:     character.Element,
+			WeaponType:  character.WeaponType,
+			IconsUrl:    character.IconsUrl,
 		}
 
-		var wg sync.WaitGroup // Create a WaitGroup to wait for all language updates to finish
+		multilingualCharacter.Name[types.DefaultLanguage] = character.Name
+		multilingualCharacter.Description[types.DefaultLanguage] = character.Description
+		mlMutex := &sync.RWMutex{}
 
-		for languageCode := range languages.Languages {
-			if languageCode == languages.DefaultLanguage {
+		var wg sync.WaitGroup
+
+		for languageCode, language := range languages {
+			if languageCode == types.DefaultLanguage {
 				continue
 			}
 
-			wg.Add(1) // Increment WaitGroup counter
+			wg.Add(1)
+			go func(language genshin_db.Language, languageCode types.Language) {
+				defer wg.Done()
 
-			go func(language languages.Language, id gc_models.ModelId) { // Launch a goroutine
-				defer wg.Done() // Decrement WaitGroup counter when finished
+				log.WithFields(log.Fields{
+					"character": character.Id,
+					"language":  language,
+				}).Info("Adding localization info to database")
 
-				logger.Info("Adding localization info to database",
-					zap.String("character", string(id)),
-					zap.String("language", string(language)))
-
-				// Find character in database for localization updates
-				localCharFromRepo, _ := characterRepos[language].FindCharacterById(id)
-
-				// Find character in data files by theBowja
-				localChar, err := getCharacter(strings.ToLower(strings.ReplaceAll(character.Name, " ", ""))+".json", languages.Languages[language])
-
+				localChar, err := getCharacter(strings.ToLower(strings.ReplaceAll(character.Name, " ", ""))+".json", language)
 				if err != nil {
 					panic(err)
 				}
-
-				addStrings(localChar, &localCharFromRepo)
-
-				// Commit updates
-				_, err = characterRepos[language].UpdateCharacter(localCharFromRepo)
-				if err != nil {
-					panic(err)
-				}
-			}(languageCode, character.Id)
+				mlMutex.Lock()
+				multilingualCharacter.Name[languageCode] = localChar.Name
+				multilingualCharacter.Description[languageCode] = localChar.Description
+				mlMutex.Unlock()
+			}(language, languageCode)
 		}
 
-		wg.Wait() // Wait for all language updates to finish before continuing to next character
+		wg.Wait()
+		err = characterService.CreateCharacter(multilingualCharacter)
+		if err != nil {
+			panic(err)
+		}
 	}
 
 	timerEnd := time.Now() // Gorutine test
-	logger.Info("Program has finished", zap.Float64("time", timerEnd.Sub(timerStart).Seconds()))
+	log.WithFields(log.Fields{
+		"time": timerEnd.Sub(timerStart).Seconds(),
+	}).Info("Program has finished")
 }
 
 // convertCharacter converts character from genshin-db by theBowja to genshin-core model
-func convertCharacter(input gdb_models.Character) (output gc_models.Character) {
-	output.Id = gc_models.ModelId(strings.ToLower(strings.ReplaceAll(input.Name, " ", "_")))
+func convertCharacter(input genshin_db.Character) (output models.Character) {
+	output.Name = input.Name
+	output.Description = input.Description
 
-	addStrings(input, &output)
-
-	switch input.ElementText {
-	case gdb_enums.Geo:
-		output.Element = gc_enums.Geo
-	case gdb_enums.Dendro:
-		output.Element = gc_enums.Dendro
-	case gdb_enums.Cryo:
-		output.Element = gc_enums.Cryo
-	case gdb_enums.Pyro:
-		output.Element = gc_enums.Pyro
-	case gdb_enums.Hydro:
-		output.Element = gc_enums.Hydro
-	case gdb_enums.Electro:
-		output.Element = gc_enums.Electro
-	case gdb_enums.Anemo:
-		output.Element = gc_enums.Anemo
+	switch input.Element {
+	case genshin_db.Geo:
+		output.Element = types.Geo
+	case genshin_db.Dendro:
+		output.Element = types.Dendro
+	case genshin_db.Cryo:
+		output.Element = types.Cryo
+	case genshin_db.Pyro:
+		output.Element = types.Pyro
+	case genshin_db.Hydro:
+		output.Element = types.Hydro
+	case genshin_db.Electro:
+		output.Element = types.Electro
+	case genshin_db.Anemo:
+		output.Element = types.Anemo
 	default:
-		output.Element = gc_enums.UndefinedElement
+		output.Element = types.UndefinedElement
 	}
 
 	switch input.Rarity {
-	case 5:
-		output.Rarity = gc_enums.Legendary
+	case genshin_db.Legendary:
+		output.Rarity = types.Legendary
 	default:
-		output.Rarity = gc_enums.Epic
+		output.Rarity = types.Epic
 	}
 
-	switch input.WeaponText {
-	case gdb_enums.Sword:
-		output.Weapon = gc_enums.Sword
-	case gdb_enums.Bow:
-		output.Weapon = gc_enums.Bow
-	case gdb_enums.Claymore:
-		output.Weapon = gc_enums.Claymore
-	case gdb_enums.Catalyst:
-		output.Weapon = gc_enums.Catalyst
-	case gdb_enums.Polearm:
-		output.Weapon = gc_enums.Polearm
+	switch input.WeaponType {
+	case genshin_db.Sword:
+		output.WeaponType = types.Sword
+	case genshin_db.Bow:
+		output.WeaponType = types.Bow
+	case genshin_db.Claymore:
+		output.WeaponType = types.Claymore
+	case genshin_db.Catalyst:
+		output.WeaponType = types.Catalyst
+	case genshin_db.Polearm:
+		output.WeaponType = types.Polearm
 	default:
-		output.Weapon = gc_enums.UndefinedWeapon
+		output.WeaponType = types.UndefinedWeapon
 	}
 
-	output.Icons = []value_objects.CharacterIcon{{Type: 0, Url: "/characters/icons/" + string(output.Id)}}
 	return output
-}
-
-func addStrings(input gdb_models.Character, output *gc_models.Character) {
-	output.Name = input.Name
-	output.Description = input.Description
-	output.Title = input.Title
 }

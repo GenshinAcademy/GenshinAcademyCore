@@ -1,96 +1,81 @@
 package main
 
 import (
-	docs "ga/docs"
-
-	swaggerfiles "github.com/swaggo/files"
-	ginSwagger "github.com/swaggo/gin-swagger"
-
-	academy "ga/internal/academy_core"
-	db "ga/internal/db_postgres/implementation/academy"
-	genshin "ga/pkg/genshin_core"
-
-	"ga/internal/configuration"
-	"ga/pkg/genshin_core/models/languages"
-
-	"ga/internal/services/assets"
-	"ga/internal/services/genshin/characters"
-	"ga/internal/services/middlewares"
-	"ga/internal/services/news"
-	"ga/internal/services/tables"
-	"ga/internal/services/weasel/appraiser"
-
-	"net/http"
-	"time"
-
-	"github.com/gin-contrib/cors"
-	"github.com/gin-gonic/gin"
-	"go.uber.org/zap"
+	"context"
+	"ga/internal/config"
+	assets_controller "ga/internal/controller/assets"
+	characters_controller "ga/internal/controller/genshin/characters"
+	news_controller "ga/internal/controller/news"
+	tables_controller "ga/internal/controller/tables"
+	appraiser_controller "ga/internal/controller/weasel/appraiser"
+	"ga/internal/db"
+	"ga/internal/router"
+	assets_service "ga/internal/service/assets"
+	character_service "ga/internal/service/characters"
+	news_service "ga/internal/service/news"
+	table_service "ga/internal/service/tables"
+	appraiser_service "ga/internal/service/weasel/appraiser"
+	log "github.com/sirupsen/logrus"
+	"os"
 )
 
 var (
-	logger                 *zap.Logger
-	weaselAppraiserService *appraiser.Service
-	genshinService         *characters.Service
-	newsService            *news.Service
-	tablesService          *tables.Service
-	assetsService          *assets.Service
-	env                    Config
+	cfg *config.Config
+	r   *router.Router
 )
 
-type Config struct {
-	DBHost         string `mapstructure:"POSTGRES_HOST"`
-	DBUserName     string `mapstructure:"POSTGRES_USER"`
-	DBUserPassword string `mapstructure:"POSTGRES_PASSWORD"`
-	DBName         string `mapstructure:"POSTGRES_DB"`
-	DBPort         uint16 `mapstructure:"POSTGRES_PORT"`
-	ServerPort     string `mapstructure:"SERVER_PORT"`
-	LogLevel       int8   `mapstructure:"LOG_LEVEL"`
-	GinMode        string `mapstructure:"GIN_MODE"`
-	SecretKey      string `mapstructure:"SECRET_KEY"`
-	AssetsPath     string `mapstructure:"ASSETS_PATH"`
-	AssetsHost     string `mapstructure:"ASSETS_HOST"`
+func configureLogger(cfg config.LoggerConfig) {
+	log.SetLevel(log.Level(cfg.LogLevel))
+	log.SetOutput(os.Stdout)
+	log.SetReportCaller(cfg.ReportCaller)
+	switch cfg.LogFormatter {
+	case 1:
+		log.SetFormatter(&log.TextFormatter{})
+	case 2:
+		log.SetFormatter(&log.JSONFormatter{})
+	}
 }
 
 func init() {
-	cfg, err := configuration.New[Config]()
+	if err := enrichConfig(); err != nil {
+		log.Fatal(err)
+	}
+
+	configureLogger(cfg.LoggerConfig)
+
+	var dbConfig = &db.PostgresConfig{
+		Host:         cfg.DBHost,
+		Port:         cfg.DBPort,
+		Username:     cfg.DBUserName,
+		Password:     cfg.DBUserPassword,
+		DatabaseName: cfg.DBName,
+	}
+
+	p, err := db.NewPostgresProvider(dbConfig)
 	if err != nil {
-		panic(err)
+		log.Fatal(err)
 	}
 
-	env = cfg.ENV
-	logger = configuration.GetLogger(env.LogLevel)
-
-	var dbConfig db.PostgresDatabaseConfiguration = db.PostgresDatabaseConfiguration{
-		Host:         env.DBHost,
-		UserName:     env.DBUserName,
-		UserPassword: env.DBUserPassword,
-		DatabaseName: env.DBName,
-		Port:         env.DBPort,
+	if err := p.Migrate(context.Background()); err != nil {
+		log.Fatal(err)
 	}
 
-	if err := db.InitializePostgresDatabase(dbConfig); err != nil {
-		logger.Sugar().Panic(err)
-	}
+	charRepo := p.GetCharacterRepository()
+	newsRepo := p.GetNewsRepository()
+	tableRepo := p.GetTableRepository()
+	assetService := assets_service.New(cfg.AssetsPath, cfg.AssetsHost)
+	r = router.New(cfg.GinMode, cfg.SecretKey).
+		WithCharactersController(characters_controller.New(character_service.New(assetService, charRepo))).
+		WithWeaselAppraiserController(appraiser_controller.New(appraiser_service.New(assetService, charRepo, p.GetArtifactProfitsRepository()))).
+		WithNewsController(news_controller.New(news_service.New(assetService, newsRepo))).
+		WithTablesController(tables_controller.New(table_service.New(assetService, tableRepo))).
+		WithAssetsController(assets_controller.New(assetService))
+}
 
-	//Initializing gacore ga_config and configure it for postgres db
-	var ga_config academy.AcademyCoreConfiguration = academy.AcademyCoreConfiguration{
-		GenshinCoreConfiguration: genshin.GenshinCoreConfiguration{
-			DefaultLanguage: languages.English,
-		},
-		AssetsPath: env.AssetsHost,
-	}
-	db.ConfigurePostgresDB(&ga_config)
-
-	// Create ga core
-	gacore := academy.CreateAcademyCore(ga_config)
-
-	// Create services
-	weaselAppraiserService = appraiser.CreateService(gacore)
-	genshinService = characters.CreateService(gacore)
-	newsService = news.CreateService(gacore)
-	tablesService = tables.CreateService(gacore)
-	assetsService = assets.CreateService(gacore, env.AssetsPath)
+func enrichConfig() (err error) {
+	cfg, err = config.New()
+	log.Infof("Config: %+v", cfg)
+	return
 }
 
 // @BasePath					/api
@@ -101,62 +86,7 @@ func init() {
 // @name						Authorization
 // @description				Token for endpoints
 func main() {
-	defer db.CleanupConnections()
-	defer logger.Sync()
-
-	r := gin.Default()
-
-	gin.SetMode(env.GinMode)
-
-	// TODO: Move all router related code to internal/router package
-	r.Use(cors.New(cors.Config{
-		AllowAllOrigins: true,
-		AllowMethods:    []string{"GET"},
-		AllowHeaders:    []string{"Origin", "Content-Length", "Content-Type", "Accept-Languages"},
-		MaxAge:          12 * time.Hour,
-	}))
-
-	docs.SwaggerInfo.BasePath = "/api"
-
-	mainRoute := r.Group("/api")
-	mainRoute.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerfiles.Handler))
-
-	characters := mainRoute.Group("/characters")
-	{
-		characters.GET("/", middlewares.GetLimitOffset(), genshinService.GetAll)
-		characters.POST("/", middlewares.Authenticate(env.SecretKey), genshinService.Create)
-		characters.GET("/stats", middlewares.GetLimitOffset(), weaselAppraiserService.GetAll)
-		characters.PATCH("/stats/:id", middlewares.Authenticate(env.SecretKey), weaselAppraiserService.UpdateStats)
-	}
-
-	news := mainRoute.Group("/news")
-	{
-		news.GET("/", middlewares.GetLimitOffset(), newsService.GetAll)
-		news.POST("/", middlewares.Authenticate(env.SecretKey), newsService.Create)
-		news.PATCH("/:id", middlewares.Authenticate(env.SecretKey), newsService.Update)
-	}
-
-	tables := mainRoute.Group("/tables")
-	{
-		tables.GET("/", middlewares.GetLimitOffset(), tablesService.GetAll)
-		tables.POST("/", middlewares.Authenticate(env.SecretKey), tablesService.Create)
-		tables.PATCH("/:id", middlewares.Authenticate(env.SecretKey), tablesService.Update)
-	}
-
-	assets := mainRoute.Group("/assets")
-	{
-		assets.POST("/*path", middlewares.Authenticate(env.SecretKey), assetsService.Upload)
-		assets.DELETE("/*path", middlewares.Authenticate(env.SecretKey), assetsService.Delete)
-	}
-
-	r.NoRoute(func(c *gin.Context) {
-		c.JSON(http.StatusNotFound, gin.H{
-			"message": "Not Found",
-		})
-	})
-
-	err := r.Run(":" + env.ServerPort)
-	if err != nil {
-		logger.Sugar().Panic(err)
+	if err := r.Run(cfg.ServerPort); err != nil {
+		log.Fatal(err)
 	}
 }

@@ -15,24 +15,23 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-        - name: Checkout code
-          uses: actions/checkout@v3
-  
-        - name: Set up Go
-          uses: actions/setup-go@v3.5.0
-          with:
-            go-version: "1.20"
-  
-        - name: Install dependencies
-          run: go mod download
-    
-        - name: Run tests
-          run: go test ./...
-            
-        - name: Test Build Server
-          run: |
-            go build -o server ./cmd/web/main.go
+      - uses: actions/checkout@v4
 
-        - name: Test Build Sync
-          run: |
-            go build -o sync ./cmd/sync/v2/main.go
+      - name: Setup Go
+        uses: actions/setup-go@v4
+        with:
+          go-version: '1.21.x'
+
+      - name: Install dependencies
+        run: go get ./...
+
+      - name: Test with the Go CLI
+        run: go test -coverprofile=coverage.txt -covermode=atomic -v ./...
+
+      - name: Test Build Server
+        run: |
+          go build -o server ./cmd/web/main.go
+
+      - name: Test Build Sync
+        run: |
+          go build -o sync ./cmd/sync/v2/main.go
