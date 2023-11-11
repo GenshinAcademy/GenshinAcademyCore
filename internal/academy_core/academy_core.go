@@ -1,5 +1,6 @@
 package academy_core
 
+
 import (
 	"ga/internal/academy_core/models"
 	"ga/internal/academy_core/repositories"
