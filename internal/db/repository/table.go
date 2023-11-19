@@ -6,6 +6,7 @@ import (
 	"ga/internal/db/entity"
 	"ga/internal/models"
 	"ga/internal/types"
+
 	"gorm.io/gorm"
 )
 
@@ -85,6 +86,22 @@ func (r *TableRepository) UpdateTable(ctx context.Context, id types.TableId, tab
 			RedirectUrl: dbTable.RedirectUrl,
 		}).Error; err != nil {
 		return fmt.Errorf("failed to update table: %w", err)
+	}
+
+	return nil
+}
+
+func (r *TableRepository) DeleteTable(ctx context.Context, id types.TableId, force bool) error {
+	dbTable := new(entity.Table)
+	dbTable.ID = uint(id)
+
+	tx := r.db
+	if force {
+		tx = tx.Unscoped()
+	}
+
+	if err := tx.Delete(&dbTable).Error; err != nil {
+		return fmt.Errorf("failed to delete table: %w", err)
 	}
 
 	return nil

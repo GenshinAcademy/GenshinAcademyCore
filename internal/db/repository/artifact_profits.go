@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"ga/internal/db/entity"
 	"ga/internal/types"
+
 	"gorm.io/gorm"
 )
 
@@ -36,6 +37,17 @@ func (r *ArtifactProfitsRepository) UpdateArtifactProfits(ctx context.Context, i
 		Model(&entity.ArtifactProfits{CharacterId: id}).
 		Update("profits", artifactProfits).Error; err != nil {
 		return fmt.Errorf("failed to update artifact profits: %w", err)
+	}
+
+	return nil
+}
+
+func (r *ArtifactProfitsRepository) DeleteArtifactProfits(ctx context.Context, id types.CharacterId) error {
+	dbProfits := new(entity.ArtifactProfits)
+	dbProfits.CharacterId = id
+
+	if err := r.db.Delete(&dbProfits).Error; err != nil {
+		return fmt.Errorf("failed to delete artifact_profits: %w", err)
 	}
 
 	return nil

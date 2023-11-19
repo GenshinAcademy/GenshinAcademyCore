@@ -6,6 +6,7 @@ import (
 	"ga/internal/db/entity"
 	"ga/internal/models"
 	"ga/internal/types"
+
 	"gorm.io/gorm"
 )
 
@@ -118,6 +119,17 @@ func (r *CharacterRepository) CreateCharacter(ctx context.Context, characterMult
 	if err := r.db.WithContext(ctx).
 		Create(dbCharacter).Error; err != nil {
 		return fmt.Errorf("failed to create character: %w", err)
+	}
+
+	return nil
+}
+
+func (r *CharacterRepository) DeleteCharacter(ctx context.Context, id types.CharacterId) error {
+	dbCharacter := new(entity.Character)
+	dbCharacter.Id = id
+
+	if err := r.db.Delete(&dbCharacter).Error; err != nil {
+		return fmt.Errorf("failed to delete character: %w", err)
 	}
 
 	return nil
