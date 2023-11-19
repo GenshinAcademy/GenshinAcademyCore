@@ -37,6 +37,7 @@ jobs:
           name: artifacts
           path: |
             docker-compose.dev.yaml
+            docs/swagger.yaml
 
   deploy:
     runs-on: ubuntu-latest
@@ -54,8 +55,16 @@ jobs:
           host: ${{ secrets.HOST }}
           username: ${{ secrets.USERNAME }}
           key: ${{ secrets.SSH_KEY }}
-          source: docker-compose.dev.yaml
+          source: "docker-compose.dev.yaml,docs/swagger.yaml"
           target: ${{ vars.OUTPUT_DIR_DEV }}
+      - name: Deploy swagger docs
+        uses: appleboy/scp-action@master
+        with:
+          host: ${{ secrets.HOST }}
+          username: ${{ secrets.USERNAME }}
+          key: ${{ secrets.SSH_KEY }}
+          source: "docs/swagger.yaml"
+          target: ${{ vars.OUTPUT_DIR_DEV }}/docs
 
       - name: Create .env file
         uses: appleboy/ssh-action@master
