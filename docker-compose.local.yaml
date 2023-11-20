@@ -3,7 +3,9 @@ version: '3.7'
 services:
   server:
     container_name: ga_server-dev
-    image: ${DOCKER_IMAGE}
+    build:
+      dockerfile: "Dockerfile"
+    restart: unless-stopped
     depends_on:
       - postgres_db
     ports:
@@ -35,7 +37,6 @@ services:
       interval: 5s
       timeout: 5s
       retries: 5
-
   swagger_ui:
     container_name: swagger_ui-dev
     image: swaggerapi/swagger-ui

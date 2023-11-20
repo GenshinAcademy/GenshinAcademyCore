@@ -1,0 +1,4 @@
+---
+- name: Execute docker login
+  ansible.builtin.command: "docker login -u {{username}} -p {{password}}"
+  become: yes

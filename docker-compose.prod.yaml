@@ -2,6 +2,7 @@ version: '3.7'
 
 services:
   server:
+    container_name: ga_server-prod
     image: ${DOCKER_IMAGE}
     depends_on:
       - postgres_db
@@ -9,13 +10,15 @@ services:
       - ${SERVER_PORT_OUT}:${SERVER_PORT}
     volumes:
       - ${ASSETS_PATH_OUT}:${ASSETS_PATH}
+      - docs-prod:/docs
     networks:
       - internal-prod
     env_file:
       - prod.env
 
   postgres_db:
-    image: postgres
+    container_name: ga_db-prod
+    image: postgres:16-alpine
     restart: always
     ports:
       - ${POSTGRES_PORT_OUT}:${POSTGRES_PORT}
@@ -33,9 +36,19 @@ services:
       timeout: 5s
       retries: 5
 
+  swagger_ui:
+    container_name: swagger_ui-prod
+    image: swaggerapi/swagger-ui
+    ports:
+      - ${SWAGGER_PORT_OUT}:8080
+    environment:
+      - SWAGGER_JSON=/docs/swagger.yaml
+    volumes:
+      - docs-prod:/docs
+
 volumes:
   postgres_db-prod:
-
+  docs-prod:
 
 networks:
   internal-prod:

@@ -1,0 +1,28 @@
+---
+- name: Install nginx
+  apt:
+    pkg:
+      - nginx
+    state: present
+    update_cache: true
+
+- name: Migrate ssl certificates
+  copy:
+    src: "{{item}}"
+    dest: /etc/ssl/
+  with_items: "{{certificates}}"
+
+- name: Apply Nginx template
+  template:
+    src: "{{ item.template }}"
+    dest: /etc/nginx/sites-available/{{item.server_name}}
+  notify: Restart Nginx
+  with_items: "{{sites}}"
+
+- name: Enable new site
+  file:
+    src: /etc/nginx/sites-available/{{item.server_name}}
+    dest: /etc/nginx/sites-enabled/{{item.server_name}}
+    state: link
+  notify: Restart Nginx
+  with_items: "{{sites}}"

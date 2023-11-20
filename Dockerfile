@@ -20,5 +20,6 @@ RUN CGO_ENABLED=0 \
 FROM scratch
 
 COPY --from=builder /server /bin/server
+COPY /docs/swagger.yaml /docs/swagger.yaml
 
 ENTRYPOINT ["/bin/server"]

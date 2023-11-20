@@ -1,0 +1,5 @@
+---
+- name: Add sudoers configuration to disable password prompt
+  lineinfile:
+    dest: /etc/sudoers
+    line: "{{ username }} ALL=(ALL:ALL) NOPASSWD:ALL"

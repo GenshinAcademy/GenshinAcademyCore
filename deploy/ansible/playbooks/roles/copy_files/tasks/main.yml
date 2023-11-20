@@ -1,0 +1,6 @@
+---
+- name: Copy files to specified destinations
+  ansible.builtin.copy:
+    src: "{{ item.src }}"
+    dest: "{{ item.dst }}"
+  with_items: "{{ files }}"
