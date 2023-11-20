@@ -1,0 +1,8 @@
+---
+- name: Create folders
+  ansible.builtin.file:
+    path: "{{ item.path }}"
+    owner: "{{ item.owner }}"
+    group: "{{ item.group }}"
+    state: directory
+  with_items: "{{ folders }}"

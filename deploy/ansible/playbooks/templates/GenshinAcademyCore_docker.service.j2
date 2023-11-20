@@ -1,0 +1,16 @@
+[Unit]
+Description=GenshinAcademyCore Docker {{item.env}} Service
+Requires=docker.service
+After=docker.service
+
+[Service]
+Type=oneshot
+User={{item.user}}
+RemainAfterExit=yes
+WorkingDirectory=/var/www/genshinacademy/{{item.env}}/server
+ExecStart=/usr/bin/docker compose --file /var/www/genshinacademy/{{item.env}}/server/docker-compose.{{item.env}}.yaml --env-file /var/www/genshinacademy/dev/server/{{item.env}}.env pull
+ExecStart=/usr/bin/docker compose --file /var/www/genshinacademy/{{item.env}}/server/docker-compose.{{item.env}}.yaml --project-name ga_server-{{item.env}} --env-file /var/www/genshinacademy/{{item.env}}/server/{{item.env}}.env up -d
+ExecStop=/usr/bin/docker compose --file /var/www/genshinacademy/{{item.env}}/server/docker-compose.{{item.env}}.yaml --project-name ga_server-{{item.env}} --env-file /var/www/genshinacademy/{{item.env}}/server/{{item.env}}.env down
+
+[Install]
+WantedBy=multi-user.target

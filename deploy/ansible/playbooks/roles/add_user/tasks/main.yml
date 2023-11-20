@@ -1,0 +1,13 @@
+---
+- name: Create user
+  user:
+    name: "{{ username }}"
+    groups: "{{ user_groups }}"
+    append: yes
+    shell: /bin/bash
+
+- name: Add SSH keys for user academy
+  authorized_key:
+    user: "{{ username }}"
+    key: "{{ lookup('file', '{{ item }}') }}"
+  with_items: "{{ pub_keys }}"

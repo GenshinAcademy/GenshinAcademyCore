@@ -1,0 +1,15 @@
+---
+- name: Remove existing PasswordAuthentication and PubkeyAuthentication lines
+  lineinfile:
+    path: /etc/ssh/sshd_config
+    state: absent
+    regexp: '^(PasswordAuthentication no|PubkeyAuthentication yes)'
+
+- name: Enable SSH access and disable password
+  lineinfile:
+    path: /etc/ssh/sshd_config
+    line: |
+      PasswordAuthentication no
+      PubkeyAuthentication yes
+  notify:
+    - Restart SSH

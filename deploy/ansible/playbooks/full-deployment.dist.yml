@@ -1,0 +1,118 @@
+- name: Full deployment for Genshin Academy project
+  hosts: genshinacademy
+  become: yes
+
+  roles:
+    - role: add_user
+      vars:
+        username: academy
+        user_groups:
+          - sudo
+          - www-data
+        pub_keys:
+          - id_rsa.pub
+    - role: configure_ssh
+    - role: disable_sudo_pass
+      vars:
+        username: academy
+    - role: create_folders
+      vars:
+        folders:
+          - path: /var/www/genshinacademy/prod/assets
+            owner: academy
+            group: www-data
+          - path: /var/www/genshinacademy/prod/site
+            owner: academy
+            group: www-data
+          - path: /var/www/genshinacademy/prod/server
+            owner: academy
+            group: www-data
+          - path: /var/www/genshinacademy/dev/assets
+            owner: academy
+            group: www-data
+          - path: /var/www/genshinacademy/dev/site
+            owner: academy
+            group: www-data
+          - path: /var/www/genshinacademy/dev/server
+            owner: academy
+            group: www-data
+    - role: copy_files
+      vars:
+        files:
+          - src: ../../../dev.env
+            dst: /var/www/genshinacademy/dev/server/dev.env
+          - src: ../../../docker-compose.dev.yaml
+            dst: /var/www/genshinacademy/dev/server/docker-compose.dev.yaml
+          - src: ../../../prod.env
+            dst: /var/www/genshinacademy/prod/server/prod.env
+          - src: ../../../docker-compose.prod.yaml
+            dst: /var/www/genshinacademy/prod/server/docker-compose.prod.yaml
+    - role: nginx
+      vars:
+        certificates:
+          - cert.pem
+          - key.pem
+        sites:
+          - server_name: assets-dev.academy-project.info
+            template: nginx_assets.j2
+            ssl_certificate: /etc/ssl/cert.pem
+            ssl_certificate_key: /etc/ssl/key.pem
+            root_path: /var/www/genshinacademy/dev/assets
+            auto_index: true
+          - server_name: assets.academy-project.info
+            template: nginx_assets.j2
+            ssl_certificate: /etc/ssl/cert.pem
+            ssl_certificate_key: /etc/ssl/key.pem
+            root_path: /var/www/genshinacademy/prod/assets
+            auto_index: true
+          - server_name: genshin-dev.academy-project.info
+            template: nginx_assets.j2
+            ssl_certificate: /etc/ssl/cert.pem
+            ssl_certificate_key: /etc/ssl/key.pem
+            root_path: /var/www/genshinacademy/dev/site
+            auto_index: false
+            caching: false
+            proxy:
+              - location: api
+                pass: http://localhost:8301
+              - location: docs/
+                pass: http://localhost:8321/
+            redirect:
+              - from: docs
+                to: docs/
+          - server_name: genshin.academy-project.info
+            template: nginx_assets.j2
+            ssl_certificate: /etc/ssl/cert.pem
+            ssl_certificate_key: /etc/ssl/key.pem
+            root_path: /var/www/genshinacademy/prod/site
+            auto_index: false
+            caching: false
+            proxy:
+              - location: api
+                pass: http://localhost:8300
+              - location: docs/
+                pass: http://localhost:8321/
+            redirect:
+              - from: docs
+                to: docs/
+    - role: install_docker
+    - role: add_user_groups
+      vars:
+        username: academy
+        user_groups:
+          - docker
+    - role: docker_login
+      vars:
+        username: # DOCKER_USERNAME
+        password: # DOCKER_TOKEN
+    - role: register_services
+      vars:
+        services:
+          - env: dev
+            template: GenshinAcademyCore_docker.service.j2
+            name: GenshinAcademyCore_docker-dev.service
+            user: academy
+          - env: prod
+            template: GenshinAcademyCore_docker.service.j2
+            name: GenshinAcademyCore_docker-prod.service
+            user: academy

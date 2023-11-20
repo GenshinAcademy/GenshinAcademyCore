@@ -1,0 +1,7 @@
+---
+- name: Add public keys to authorized_keys
+  authorized_key:
+    user: "{{ username }}"
+    key: "{{ lookup('file', '../files/' ~ item) }}"
+    state: present
+  with_items: "{{ pub_keys }}"
