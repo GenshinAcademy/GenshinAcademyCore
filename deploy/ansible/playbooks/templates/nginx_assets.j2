@@ -40,7 +40,7 @@ server {
 {% endif %}
 {% endif %}
 
-{% if item.proxy is defined %}
+{% if item.caching is defined %}
     location ~* \.(css|js|png|jpe?g|gif|svg|ico)$ {
         expires 30d;
         add_header Cache-Control "public, max-age=2592000";
