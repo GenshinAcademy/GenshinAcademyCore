@@ -151,7 +151,7 @@ func (c *Controller) Create(ctx *gin.Context) {
 //	@Security		ApiKeyAuth
 //	@Success		202
 //	@Failure		400,500
-//	@Router			/news/{id} [put]
+//	@Router			/news/{id} [patch]
 func (c *Controller) Update(ctx *gin.Context) {
 	id, err := strconv.Atoi(ctx.Param("id"))
 	if err != nil {

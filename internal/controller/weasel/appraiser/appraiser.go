@@ -5,19 +5,35 @@ import (
 	"ga/internal/controller/handlers"
 	"ga/internal/models"
 	"ga/internal/types"
-	"ga/pkg/url"
 	"github.com/gin-gonic/gin"
 	log "github.com/sirupsen/logrus"
 	"net/http"
 )
 
 type WeaselAppraiserCharacter struct {
-	CharacterId types.CharacterId       `json:"character_id"`
-	Name        string                  `json:"name"`
-	Element     types.Element           `json:"element"`
-	IconUrl     url.Url                 `json:"icon_url"`
-	StatsProfit []models.ArtifactProfit `json:"stats_profit"`
+	Name            string                         `json:"name" `
+	Element         types.Element                  `json:"element"`
+	IconUrl         string                         `json:"icon_url"`
+	ArtifactProfits types.CharacterArtifactProfits `json:"artifact_profits"`
 }
+
+type WeaselAppraiserUpdateStatsRequest types.CharacterArtifactProfits
+
+type WeaselAppraiserCharacterDoc struct {
+	Name            string                      `json:"name" example:"Hu Tao" extensions:"x-order=1"`
+	Element         types.Element               `json:"element" example:"Pyro" extensions:"x-order=2"`
+	IconUrl         string                      `json:"icon_url" example:"https://example.com/hu_tao.webp" extensions:"x-order=3"`
+	ArtifactProfits CharacterArtifactProfitsDoc `json:"artifact_profits" extensions:"x-order=4"`
+} // @name WeaselAppraiserCharacter
+
+type CharacterArtifactProfitsDoc struct {
+	SubStats models.ArtifactProfit `json:"substats" extensions:"x-order=1"`
+	Flower   models.ArtifactProfit `json:"flower" extensions:"x-order=2"`
+	Plume    models.ArtifactProfit `json:"plume" extensions:"x-order=3"`
+	Sands    models.ArtifactProfit `json:"sands" extensions:"x-order=4"`
+	Goblet   models.ArtifactProfit `json:"goblet" extensions:"x-order=5"`
+	Circlet  models.ArtifactProfit `json:"circlet" extensions:"x-order=6"`
+} // @name CharacterArtifactProfits
 
 type WeaselAppraiserService interface {
 	GetAll(language types.Language) ([]models.WeaselAppraiserCharacter, error)
@@ -37,13 +53,16 @@ func New(weaselAppraiserService WeaselAppraiserService) *Controller {
 	}
 }
 
-type GetAllWeaselAppraisersResponse struct {
-	Id              types.CharacterId              `json:"id"`
-	Name            string                         `json:"name"`
-	IconUrl         string                         `json:"icon_url"`
-	ArtifactProfits types.CharacterArtifactProfits `json:"artifact_profits"`
-}
-
+// GetAll godoc
+//
+//	@Summary		Get all characters with stats
+//	@Description	Get a list of characters with artifact profits.
+//	@Tags			characters, weasel, appraiser
+//	@Produce		json
+//	@Param			Accept-Languages	header	string	false	"Preferred languages for response content"	default(en,ru)
+//	@Success		200					{array}	WeaselAppraiserCharacterDoc
+//	@Failure		500
+//	@Router			/characters/stats [get]
 func (c *Controller) GetAll(ctx *gin.Context) {
 	var (
 		language = handlers.GetLanguage(ctx)
@@ -56,11 +75,11 @@ func (c *Controller) GetAll(ctx *gin.Context) {
 		return
 	}
 
-	response := make([]GetAllWeaselAppraisersResponse, len(result))
+	response := make([]WeaselAppraiserCharacter, len(result))
 	for i := range result {
-		response[i] = GetAllWeaselAppraisersResponse{
-			Id:              result[i].Id,
+		response[i] = WeaselAppraiserCharacter{
 			Name:            result[i].Name,
+			Element:         result[i].Element,
 			IconUrl:         result[i].IconsUrl[types.FrontFace],
 			ArtifactProfits: result[i].CharacterArtifactProfits,
 		}
@@ -69,12 +88,21 @@ func (c *Controller) GetAll(ctx *gin.Context) {
 	ctx.JSON(http.StatusOK, response)
 }
 
-type UpdateCharacterStatsRequest types.CharacterArtifactProfits
-
+// UpdateStats godoc
+//
+//	@Summary		Update character stats
+//	@Description	Update character stats with the provided data.
+//	@Tags			characters, weasel, appraiser
+//	@Accept			json
+//	@Param			stats	body	CharacterArtifactProfitsDoc	true	"Character stats. All fields are optional but at least 1 is required."
+//	@Security		ApiKeyAuth
+//	@Success		202
+//	@Failure		400,500
+//	@Router			/characters/stats/{id} [patch]
 func (c *Controller) UpdateStats(ctx *gin.Context) {
 	id := ctx.Param("id")
 
-	var requestData UpdateCharacterStatsRequest
+	var requestData WeaselAppraiserUpdateStatsRequest
 	if err := ctx.BindJSON(&requestData); err != nil {
 		ctx.AbortWithStatusJSON(http.StatusBadRequest, gin.H{"error": err})
 		return
