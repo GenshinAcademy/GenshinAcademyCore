@@ -145,8 +145,9 @@ func (c *Controller) Create(ctx *gin.Context) {
 //	@Accept			json
 //	@Param			table	body	UpdateTableRequest	true	"Table data. All fields are optional but at least 1 is required."
 //	@Security		ApiKeyAuth
+//	@Success		202
 //	@Failure		400,500
-//	@Router			/tables/{id} [put]
+//	@Router			/tables/{id} [patch]
 func (c *Controller) Update(ctx *gin.Context) {
 	id, err := strconv.Atoi(ctx.Param("id"))
 	if err != nil {
