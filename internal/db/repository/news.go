@@ -6,6 +6,7 @@ import (
 	"ga/internal/db/entity"
 	"ga/internal/models"
 	"ga/internal/types"
+
 	"gorm.io/gorm"
 )
 
@@ -85,6 +86,22 @@ func (r *NewsRepository) UpdateNews(ctx context.Context, id types.NewsId, news *
 			RedirectUrl: dbNews.RedirectUrl,
 		}).Error; err != nil {
 		return fmt.Errorf("failed to update news: %w", err)
+	}
+
+	return nil
+}
+
+func (r *NewsRepository) DeleteNews(ctx context.Context, id types.NewsId, force bool) error {
+	dbNews := new(entity.News)
+	dbNews.ID = uint(id)
+
+	tx := r.db
+	if force {
+		tx = tx.Unscoped()
+	}
+
+	if err := tx.Delete(&dbNews).Error; err != nil {
+		return fmt.Errorf("failed to delete news: %w", err)
 	}
 
 	return nil

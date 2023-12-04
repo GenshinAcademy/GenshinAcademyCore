@@ -12,6 +12,7 @@ type NewsRepository interface {
 	FindAllNews(ctx context.Context, language types.Language, offset int, limit int, sort string) ([]models.News, error)
 	CreateNews(ctx context.Context, news *models.NewsMultilingual) error
 	UpdateNews(ctx context.Context, id types.NewsId, news *models.NewsMultilingual) error
+	DeleteNews(ctx context.Context, id types.NewsId, force bool) error
 }
 
 type AssetsService interface {
@@ -77,6 +78,14 @@ func (s *Service) UpdateNews(id types.NewsId, news *models.NewsMultilingual) err
 
 	if err := s.newsRepository.UpdateNews(context.Background(), id, news); err != nil {
 		return fmt.Errorf("failed to update news: %w", err)
+	}
+
+	return nil
+}
+
+func (s *Service) DeleteNews(id types.NewsId, force bool) error {
+	if err := s.newsRepository.DeleteNews(context.Background(), id, force); err != nil {
+		return fmt.Errorf("failed to delete news: %w", err)
 	}
 
 	return nil

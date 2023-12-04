@@ -12,6 +12,7 @@ type TablesRepository interface {
 	FindAllTables(ctx context.Context, language types.Language, offset int, limit int, sort string) ([]models.Table, error)
 	CreateTable(ctx context.Context, table *models.TableMultilingual) error
 	UpdateTable(ctx context.Context, id types.TableId, Tables *models.TableMultilingual) error
+	DeleteTable(ctx context.Context, id types.TableId, force bool) error
 }
 
 type AssetsService interface {
@@ -72,6 +73,14 @@ func (s *Service) UpdateTable(id types.TableId, table *models.TableMultilingual)
 
 	if err := s.tablesRepository.UpdateTable(context.Background(), id, table); err != nil {
 		return fmt.Errorf("failed to update table: %w", err)
+	}
+
+	return nil
+}
+
+func (s *Service) DeleteTable(id types.TableId, force bool) error {
+	if err := s.tablesRepository.DeleteTable(context.Background(), id, force); err != nil {
+		return fmt.Errorf("failed to delete table: %w", err)
 	}
 
 	return nil

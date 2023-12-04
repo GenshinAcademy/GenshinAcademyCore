@@ -80,7 +80,7 @@ func enrichConfig() (err error) {
 
 // @BasePath					/api
 // @title						Genshin Academy Service API
-// @description				Genshin Academy API documentation
+// @description				Genshin Academy Service API
 // @securitydefinitions.apikey	ApiKeyAuth
 // @in							header
 // @name						Authorization
