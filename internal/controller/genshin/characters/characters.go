@@ -30,6 +30,7 @@ type CreateCharacterRequest struct {
 type CharactersService interface {
 	GetCharacters(language types.Language, offset int, limit int) ([]models.Character, error)
 	CreateCharacter(character *models.CharacterMultilingual) error
+	DeleteCharacter(id types.CharacterId) error
 }
 
 type Controller struct {
@@ -127,4 +128,25 @@ func (c *Controller) Create(ctx *gin.Context) {
 	}
 
 	ctx.Status(http.StatusCreated)
+}
+
+// Delete godoc
+//
+//	@Summary		Delete character
+//	@Description	Delete character by id.
+//	@Tags			characters
+//	@Security		ApiKeyAuth
+//	@Success		200
+//	@Failure		500
+//	@Router			/characters/{id} [delete]
+func (c *Controller) Delete(ctx *gin.Context) {
+	id := types.CharacterId(ctx.Param("id"))
+
+	if err := c.charactersService.DeleteCharacter(id); err != nil {
+		log.Errorf("failed to delete character: %v", err)
+		ctx.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{"error": "failed to delete character"})
+		return
+	}
+
+	ctx.Status(http.StatusOK)
 }

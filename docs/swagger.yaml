@@ -383,7 +383,7 @@ definitions:
     - Catalyst
 info:
   contact: {}
-  description: Genshin Academy API documentation
+  description: Genshin Academy Service API
   title: Genshin Academy Service API
 paths:
   /assets:
@@ -503,6 +503,19 @@ paths:
       summary: Create a new character
       tags:
       - characters
+  /characters/{id}:
+    delete:
+      description: Delete character by id.
+      responses:
+        "200":
+          description: OK
+        "500":
+          description: Internal Server Error
+      security:
+      - ApiKeyAuth: []
+      summary: Delete character
+      tags:
+      - characters
   /characters/stats:
     get:
       description: Get a list of characters with artifact profits.
@@ -618,6 +631,26 @@ paths:
       tags:
       - news
   /news/{id}:
+    delete:
+      description: Delete news by id.
+      parameters:
+      - default: false
+        description: Force deletion
+        in: query
+        name: force
+        type: boolean
+      responses:
+        "200":
+          description: OK
+        "400":
+          description: Bad Request
+        "500":
+          description: Internal Server Error
+      security:
+      - ApiKeyAuth: []
+      summary: Delete news
+      tags:
+      - news
     patch:
       consumes:
       - application/json
@@ -702,6 +735,26 @@ paths:
       tags:
       - tables
   /tables/{id}:
+    delete:
+      description: Delete table by id.
+      parameters:
+      - default: false
+        description: Force deletion
+        in: query
+        name: force
+        type: boolean
+      responses:
+        "200":
+          description: OK
+        "400":
+          description: Bad Request
+        "500":
+          description: Internal Server Error
+      security:
+      - ApiKeyAuth: []
+      summary: Delete table
+      tags:
+      - tables
     patch:
       consumes:
       - application/json

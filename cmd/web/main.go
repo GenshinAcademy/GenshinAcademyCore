@@ -78,6 +78,13 @@ func enrichConfig() (err error) {
 	return
 }
 
+// @BasePath					/api
+// @title						Genshin Academy Service API
+// @description				Genshin Academy Service API
+// @securitydefinitions.apikey	ApiKeyAuth
+// @in							header
+// @name						Authorization
+// @description				Token for endpoints
 func main() {
 	if err := r.Run(cfg.ServerPort); err != nil {
 		log.Fatal(err)

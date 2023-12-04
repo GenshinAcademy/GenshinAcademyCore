@@ -36,6 +36,7 @@ type TablesService interface {
 	GetTables(language types.Language, offset int, limit int, sort string) ([]models.Table, error)
 	CreateTable(table *models.TableMultilingual) error
 	UpdateTable(id types.TableId, table *models.TableMultilingual) error
+	DeleteTable(id types.TableId, force bool) error
 }
 
 type Controller struct {
@@ -187,4 +188,33 @@ func (c *Controller) Update(ctx *gin.Context) {
 	}
 
 	ctx.Status(http.StatusAccepted)
+}
+
+// Delete godoc
+//
+//	@Summary		Delete table
+//	@Description	Delete table by id.
+//	@Tags			tables
+//	@Param			force	query	bool	false	"Force deletion"	default(false)
+//	@Security		ApiKeyAuth
+//	@Success		200
+//	@Failure		400,500
+//	@Router			/tables/{id} [delete]
+func (c *Controller) Delete(ctx *gin.Context) {
+	id, err := strconv.Atoi(ctx.Param("id"))
+	if err != nil {
+		ctx.AbortWithStatusJSON(http.StatusBadRequest, gin.H{"error": "invalid id"})
+		return
+	}
+
+	v, ok := ctx.GetQuery("force")
+	force := ok && v == "true"
+
+	if err := c.tablesService.DeleteTable(types.TableId(id), force); err != nil {
+		log.Errorf("failed to delete table: %v", err)
+		ctx.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{"error": "failed to delete table"})
+		return
+	}
+
+	ctx.Status(http.StatusOK)
 }

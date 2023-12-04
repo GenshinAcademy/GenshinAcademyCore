@@ -13,6 +13,7 @@ type CharacterRepository interface {
 	FindAllByLanguageWithIcons(ctx context.Context, language types.Language, offset int, limit int) ([]models.Character, error)
 	FindAllMultilingual(ctx context.Context, offset int, limit int) ([]models.CharacterMultilingual, error)
 	CreateCharacter(ctx context.Context, characterMultilingual *models.CharacterMultilingual) error
+	DeleteCharacter(ctx context.Context, id types.CharacterId) error
 }
 
 type AssetsService interface {
@@ -78,6 +79,14 @@ func (s *Service) CreateCharacter(character *models.CharacterMultilingual) error
 
 	if err := s.characterRepository.CreateCharacter(context.Background(), character); err != nil {
 		return fmt.Errorf("failed to create multilingual character: %w", err)
+	}
+
+	return nil
+}
+
+func (s *Service) DeleteCharacter(id types.CharacterId) error {
+	if err := s.characterRepository.DeleteCharacter(context.Background(), id); err != nil {
+		return fmt.Errorf("failed to delete character: %w", err)
 	}
 
 	return nil
